@@ -2,7 +2,7 @@ import discord
 from discord import ui
 
 from Modules.Management.setting_permissions_for_the_channel import SetPermissions
-from db.setup import DB
+from db.data_base_setup import DB
 from db.messages import EDIT_CONFIG_MESSAGES, GENERAL_MESSAGES
 
 

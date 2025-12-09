@@ -4,18 +4,17 @@ import discord
 
 
 class DeleteMessageButton(discord.ui.Button):
-    def __init__(self, ctx):
+    def __init__(self):
         super().__init__(
             label='Delete message',
             style=discord.ButtonStyle.blurple
         )
-        self.ctx = ctx
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         def check(m):
             return (
-                m.author == self.ctx.author and
-                m.channel == self.ctx.channel
+                m.author == interaction.user and
+                m.channel == interaction.channel
             )
 
         await interaction.response.send_message(
@@ -23,7 +22,7 @@ class DeleteMessageButton(discord.ui.Button):
             ephemeral=True
         )
 
-        msg = await self.ctx.bot.wait_for("message", check=check)
+        msg = await interaction.client.wait_for("message", check=check)
 
         try:
             amount = int(msg.content)
@@ -36,7 +35,7 @@ class DeleteMessageButton(discord.ui.Button):
             )
 
         deleted = 0
-        async for message in self.ctx.channel.history(limit=amount):
+        async for message in interaction.channel.history(limit=amount):
             try:
                 await message.delete()
                 deleted += 1

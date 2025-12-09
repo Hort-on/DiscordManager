@@ -20,7 +20,6 @@
     <file url="file://$PROJECT_DIR$/Modules/Management/channel_type_selection.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Modules/Management/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Modules/Management/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/getting_channel.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Modules/Management/management.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Modules/Message_processing/bad_games_handling.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Modules/Message_processing/bad_words/bad_words.py" charset="UTF-8" />
@@ -29,8 +28,8 @@
     <file url="file://$PROJECT_DIR$/Modules/Message_processing/spam_handling.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/bot.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/db" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/db/data_base_setup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/db/db.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/db/setup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/requirements.txt" charset="windows-1251" />
   </component>
 </project>

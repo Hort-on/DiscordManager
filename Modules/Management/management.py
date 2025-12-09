@@ -19,7 +19,7 @@ class Management(View):
 
     def _add_buttons(self):
         """Додає кнопки залежно від налаштувань"""
-        self.add_item(EditSettingsButton(self.ctx))
+        self.add_item(EditSettingsButton())
         self.add_item(DeleteMessageButton(self.ctx))
 
         if self.settings.get("setting_permissions", False):

@@ -37,10 +37,10 @@ async def on_ready():
     await bot.load_extension('Modules.Management.management')
     await bot.load_extension('Modules.Configuration.starting_cog')
 
-    channel = bot.get_channel(CHANNEL_ID)
-    message = await channel.fetch_message(MESSAGE_ID)
-    await message.add_reaction('✅')
-    await message.add_reaction('❌')
+    # channel = bot.get_channel(CHANNEL_ID)
+    # message = await channel.fetch_message(MESSAGE_ID)
+    # await message.add_reaction('✅')
+    # await message.add_reaction('❌')
 
     # allows the bot to send messages
     await send_message()

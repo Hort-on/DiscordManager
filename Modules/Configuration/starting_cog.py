@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from Modules.Configuration.starting_configuration import ConfigurationView
-from db.setup import DB
+from db.data_base_setup import DB
 
 
 class StartCog(commands.Cog):

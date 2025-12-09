@@ -1,5 +1,5 @@
 import discord
-from db.setup import DB
+from db.data_base_setup import DB
 
 
 class FinishingConfiguration:
@@ -9,7 +9,7 @@ class FinishingConfiguration:
 
     async def finishing_configuration(self, interaction: discord.Interaction) -> None:
         try:
-            self.db.write_data(
+            await self.db.write_data(
                 interaction.guild.id,
                 'settings',
                 {key.replace('_enabled', ''): value for key, value in self.parent.config.items() if
@@ -26,7 +26,7 @@ class FinishingConfiguration:
     async def users_procedure(self, interaction) -> None:
         for member in self.parent.found_users:
             try:
-                self.db.write_data(
+               await self.db.write_data(
                     interaction.guild.id,
                     "super_users",
                     {"user_id": member.id

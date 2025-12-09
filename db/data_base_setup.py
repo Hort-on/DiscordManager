@@ -2,13 +2,15 @@ import aiosqlite
 from contextlib import asynccontextmanager
 
 class DB:
-    def __init__(self, path="database.sqlite"):
+    def __init__(self, path='database.sqlite'):
         self.path = path
+        self._create_all_tables()
 
         self.table_map = {
-            "settings": "GuildSettings",
-            "super_users": "SuperUsers",
-            "channels": "SelectedChannels"
+            'settings': "GuildSettings",
+            'super_users': "SuperUsers",
+            'channels': "SelectedChannels",
+            'birthdays': "Birthdays"
         }
 
     @asynccontextmanager
@@ -20,9 +22,9 @@ class DB:
         finally:
             await conn.close()
 
-    async def create_all_tables(self):
-        async with self.connect() as db:
-            await db.execute('''
+    async def _create_all_tables(self):
+        async with self.connect() as cursor:
+            await cursor.execute('''
                 CREATE TABLE IF NOT EXISTS GuildSettings (
                     guild_id INTEGER PRIMARY KEY,
                     birthday BOOLEAN DEFAULT TRUE NOT NULL,
@@ -46,16 +48,16 @@ class DB:
                 )
             ''')
 
-            await db.execute('''
+            await cursor.execute('''
                 CREATE TABLE IF NOT EXISTS SuperUsers (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
-                    UNIQUE(guild_id, user_id)
+                    UNIQUE (guild_id, user_id)
                 )
             ''')
 
-            await db.execute('''
+            await cursor.execute('''
                 CREATE TABLE IF NOT EXISTS SelectedChannels (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     guild_id INTEGER NOT NULL,
@@ -65,49 +67,53 @@ class DB:
                 )
             ''')
 
-    async def write_data(self, guild_id: int, name: str, data: dict) -> bool:
-        table = self.table_map.get(name)
+            await cursor.execute('''
+                CREATE TABLE IF NOT EXISTS Birthdays
+                      (guild_id INTEGER NOT NULL,
+                       user_id INTEGER,
+                       birthday TEXT,
+                       last_congrats TEXT,
+                       UNIQUE (guild_id, user_id)
+                )
+            ''')
+
+    async def write_data(self, guild_id: int, table_name: str, data: dict) -> bool:
+        table = self.table_map.get(table_name)
         if not table:
             raise ValueError('Unknown table name')
 
         async with self.connect() as db:
             try:
-                async with db.execute(f"SELECT 1 FROM {table} WHERE guild_id=?", (guild_id,)) as cursor:
-                    exists = await cursor.fetchone()
+                columns = ", ".join(["guild_id", *data.keys()])
+                placeholders = ", ".join(["?"] * (len(data) + 1))
+                update_clause = ", ".join(f"{k}=excluded.{k}" for k in data.keys())
 
-                if exists:
-                    set_clause = ", ".join(f"{k}=?" for k in data.keys())
-                    params = list(data.values()) + [guild_id]
-                    await db.execute(f"UPDATE {table} SET {set_clause} WHERE guild_id=?", params)
-                else:
-                    columns = ["guild_id", *data.keys()]
-                    placeholders = ["?"] * len(columns)
-                    params = [guild_id] + list(data.values())
-                    await db.execute(f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(placeholders)})",
-                                     params)
-
+                await db.execute(
+                    f"INSERT INTO {table} ({columns}) VALUES ({placeholders}) "
+                    f"ON CONFLICT(guild_id) DO UPDATE SET {update_clause}",
+                    (guild_id, *data.values())
+                )
                 await db.commit()
                 return True
             except Exception as e:
                 print(f"Error writing to DB: {e}")
                 return False
 
-    async def get_data(self, guild_id: int, name: str, *columns: str, fetch_all=False):
-        table = self.table_map.get(name)
+    async def get_data(self, guild_id: int, table_name: str, *columns: str, fetch_all=False):
+        table = self.table_map.get(table_name)
         if not table:
             raise ValueError("Unknown table name")
 
         columns_sql = ", ".join(columns) if columns else "*"
+        query = f"SELECT {columns_sql} FROM {table} WHERE guild_id = ?"
+
         async with self.connect() as db:
-            if fetch_all:
-                async with db.execute(f"SELECT {columns_sql} FROM {table} WHERE guild_id = ?", (guild_id,)) as cursor:
+            async with db.execute(query, (guild_id,)) as cursor:
+                col_names = [desc[0] for desc in cursor.description]
+
+                if fetch_all:
                     rows = await cursor.fetchall()
-                    col_names = [desc[0] for desc in cursor.description]
                     return [dict(zip(col_names, row)) for row in rows]
-            else:
-                async with db.execute(f"SELECT {columns_sql} FROM {table} WHERE guild_id = ?", (guild_id,)) as cursor:
+                else:
                     row = await cursor.fetchone()
-                    if row is None:
-                        return None
-                    col_names = [desc[0] for desc in cursor.description]
-                    return dict(zip(col_names, row))
+                    return dict(zip(col_names, row)) if row else None

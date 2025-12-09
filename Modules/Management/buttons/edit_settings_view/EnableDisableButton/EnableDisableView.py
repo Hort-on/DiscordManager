@@ -1,7 +1,7 @@
 import discord
 from discord.ui import View
 from Modules.Management.buttons.edit_settings_view.setting_selection import SettingSelectorView
-from db.setup import DB
+from db.data_base_setup import DB
 from db.messages import EDIT_CONFIG_MESSAGES as ECM
 
 
