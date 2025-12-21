@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/Logs" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/Modules" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/Modules/Administration/Messages_data/messages_data.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Administration/message_sender.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Administration/user_auto_ban.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Administration/verification.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Birthdays/adding_birthday.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Birthdays/birthday.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Birthdays/checking_birthday.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Birthdays/removing_birthday.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Birthdays/resetting_last_congrats.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Configuration/finishing_configuration.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Configuration/starting_configuration.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Fun/joke.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/buttons/edit_settings_view/settings_formatter.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/channel_selection.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/channel_type_selection.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/finishing_configuration.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Management/management.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Message_processing/bad_games_handling.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Message_processing/bad_words/bad_words.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Message_processing/bad_words_handling.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Message_processing/invitation_checking.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/Modules/Message_processing/spam_handling.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/YesNoView/view/YesNoView.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/YesNoView/view/YesNoView.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/bot.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/core/management_cog.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/core/starting_cog.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/database/birthday_db_repo.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/database/data_base_model.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/db" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/db/data_base_setup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/db/db.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/logs" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modules" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modules/Fun/joke.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Management/channel_selection.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Management/channel_type_selection.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Management/finishing_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Management/getting_channel.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Management/management.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Message_processing/BadWordsHandler.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Message_processing/bad_games_handling.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Message_processing/invitation_checking.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/Message_processing/spam_handling.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/administration/Messages_data/messages_data.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/administration/message_sender.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/administration/user_auto_ban.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/administration/verification.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/adding_birthday.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/birthday.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/checking_birthday.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/removing_birthday.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/birthday_button/service/birthday_add_button_func/BirthdayService.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/birthday_button/service/birthday_delete_button_func/BirthdayService.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageModal.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/edit_settings_button/service/settings_formatter.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/requirements.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/utils/bad_words.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/utils/channels_permissions.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/utils/messages.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/utils/start_config_steps.py" charset="windows-1251" />
   </component>
 </project>
