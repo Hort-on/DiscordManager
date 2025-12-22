@@ -10,9 +10,13 @@ load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
 
-GUILD_ID = int(os.getenv('GUILD_ID'))
+bot = commands.Bot(command_prefix='', intents=discord.Intents.all())
+@bot.event
+async def setup_hook():
+    await bot.load_extension('core.start_cog')
+    await bot.load_extension('core.management_cog')
+    await bot.tree.sync()
 
-bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
-controller = BotController()
+controller = BotController(bot)
 
 bot.run(TOKEN)

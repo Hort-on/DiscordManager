@@ -14,8 +14,8 @@ class ChannelScenarioFactory:
         return PermissionsScenario()
 
     @staticmethod
-    def for_db_save():
-        return SaveChannelToDBScenario()
+    def for_db_save(config_key):
+        return SaveChannelToDBScenario(config_key)
 
     @staticmethod
     def for_db_message_save():

@@ -1,4 +1,8 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from database.data_base_model import DB
+from modules.administration.user_manager import UserManager
 
 
 class MessageContentChecker:
@@ -10,7 +14,7 @@ class MessageContentChecker:
 
     async def handle_spam(self, message):
         user_id = message.author.id
-        current_time = time.time()
+        current_time = time.timedelta()
 
         if user_id not in user_spam_data:
             user_spam_data[user_id] = {'messages': [], 'warnings': 0}
@@ -26,7 +30,7 @@ class MessageContentChecker:
             user_data['warnings'] += 1
             await warn_spam(self, message)
         elif msg_count >= 5 and user_data['warnings'] >= 1:
-            await UserManager.block_user(message, 5, 'Спам')
+            await UserManager.block_user(message, 5, 'Spam')
             user_data['warnings'] = 0
         elif msg_count >= 5:
             user_data['warnings'] += 1

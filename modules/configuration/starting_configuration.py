@@ -2,7 +2,7 @@ import discord
 
 from YesNoView.YesNoViewFactory.yes_no_factory import YesNoViewFactory
 from modules.Management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
-from modules.Management.getting_channel import ChannelTypeView
+from modules.Management.channels_processing.getting_channel import ChannelTypeView
 from YesNoView.view.YesNoView import YesNoView
 from modules.configuration.superuser_procedure import SuperUserProcedure
 from modules.configuration.finishing_configuration import FinishingConfiguration

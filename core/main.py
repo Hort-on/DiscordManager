@@ -1,25 +1,20 @@
 from discord.ext import tasks
 
+from database.data_base_model import DB
 from modules.Logging.logging import Logger
+from modules.Management.message_processing import BadWordsHandler
 from modules.birthdays.birthday import Birthday
-from modules.Message_processing.bad_games_handling import handle_bad_games
-from utils import bad_words
-from utils.bad_words import invitation_pattern, blacklist_word_pattern, \
-    blacklist_games_pattern
-from modules.Message_processing.BadWordsHandler import BadWordsHandler
-from modules.Message_processing.caps_checking import is_caps
-from modules.Message_processing.invitation_checking import invitation_check
-from modules.Message_processing.spam_handling import handle_spam
-from bot import bot
+from utils.bad_words import invitation_pattern
 
 
 class BotController:
-    def __init__(self):
+    def __init__(self, bot):
         self.bot = bot
 
         self.logger = Logger()
         self.birthday = Birthday()
         self.bad_words = BadWordsHandler()
+        self.db = DB()
 
         self.bot.add_listener(self.on_ready)
         self.bot.add_listener(self.on_message)
@@ -106,7 +101,7 @@ class BotController:
             message = await channel.fetch_message(payload.message_id)
             handler = VerificationHandler()
 
-            # checks the ID of the message to which the reaction was added
+            #TODO: спростити
             if payload.message_id == eng_message_id:
                 user_eu = False
             elif payload.message_id == ukr_message_id:
@@ -117,7 +112,7 @@ class BotController:
             await handler.handle_verification_reaction(guild, user, user_eu, message, payload.emoji)
 
     async def on_member_remove(self, member):
-        # TODO: потрібно витягувати канал з бд для конкретної гільдії
+        # TODO: потрібно витягувати канал з бд для конкретної гільдії та зробити окремий метод для цього
         channel_id = 0
         channel = bot.get_channel(int(channel_id))
 

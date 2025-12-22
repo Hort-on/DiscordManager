@@ -6,7 +6,7 @@ from modules.Logging.logging import Logger
 from config import SUPERUSERS
 from modules.administration.user_manager import UserManager
 
-
+#TODO: треба оптимізувати роботу цього хендлера
 class BadWordsHandler:
     def __init__(self):
         self.bad_word_warnings = {}

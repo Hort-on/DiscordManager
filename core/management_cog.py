@@ -1,6 +1,8 @@
+import discord
+from discord import app_commands
 from discord.ext import commands
 
-from modules.Management.management import Management
+from modules.Management.channels_processing.management import Management
 from database.data_base_model import DB
 
 
@@ -9,33 +11,36 @@ class ManagementCog(commands.Cog):
         self.bot = bot
         self.db = DB()
 
-    @commands.command(name='mg')
-    async def management(self, ctx):
+    @app_commands.command(
+        name="management",
+        description="Open management panel"
+    )
+    async def management(self, interaction: discord.Interaction):
+
         super_users_data = await self.db.get_data(
-            ctx.guild.id,
+            interaction.guild.id,
             'super_users',
             'user_id'
         )
 
         if not super_users_data:
-            await ctx.send(
-                '```Only superusers are allowed to use this command!'
-                'Super users are not configured for this server!'
-                'To set superusers, please type "!mg"'
-                ' and press the button "management" -> "set superusers".```',
-                delete_after=120
+            await interaction.response.send_message(
+                "Super users are not configured for this server.",
+                ephemeral=True
             )
             return
 
         super_users = [user.get('user_id') for user in super_users_data]
 
-        if ctx.author.id not in super_users:
-            await ctx.send('```You do not have permission to use this feature!```',
-                           delete_after=120)
+        if interaction.user.id not in super_users:
+            await interaction.response.send_message(
+                "You do not have permission to use this feature!",
+                ephemeral=True
+            )
             return
 
         settings = await self.db.get_data(
-            ctx.guild.id,
+            interaction.guild.id,
             "settings",
             'birthday',
             'sending_messages',
@@ -46,14 +51,20 @@ class ManagementCog(commands.Cog):
             'configuration_done'
         )
 
-        if not settings.get('configuration_done'):
-            await ctx.send('```Settings are not configured for this server yet!```', delete_after=120)
+        if not settings.get("configuration_done"):
+            await interaction.response.send_message(
+                "Settings are not configured yet!",
+                ephemeral=True
+            )
             return
 
-        view = Management(ctx, self.bot, settings)
-        await ctx.send("Select an action:", view=view, delete_after=60)
+        view = Management(interaction, self.bot, settings)
+        await interaction.response.send_message(
+            "Select an action:",
+            view=view,
+            ephemeral=True
+        )
 
 
 async def setup(bot):
     await bot.add_cog(ManagementCog(bot))
-

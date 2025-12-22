@@ -7,5 +7,5 @@ class YesNoViewFactory:
         return StartConfigScenario(parent, config_key, on_decline_callback)
 
     @staticmethod
-    def for_confirmation():
-        return ConfirmationScenario()
+    def for_confirmation(config_key: str):
+        return ConfirmationScenario(config_key)

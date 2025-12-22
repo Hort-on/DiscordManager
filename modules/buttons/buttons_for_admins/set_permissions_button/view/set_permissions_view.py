@@ -1,7 +1,7 @@
 import discord
 
 from modules.Management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
-from modules.Management.getting_channel import ChannelTypeView
+from modules.Management.channels_processing.getting_channel import ChannelTypeView
 
 
 class SetPermissionButton(discord.ui.Button):
