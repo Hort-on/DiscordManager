@@ -2,7 +2,8 @@ from discord.ext import tasks
 
 from database.data_base_model import DB
 from modules.Logging.logging import Logger
-from modules.Management.message_processing import BadWordsHandler
+from modules.Management.events_processing.member_left_event import MemberLeftNotification
+from modules.Management.message_processing.BadWordsHandler import BadWordsHandler
 from modules.birthdays.birthday import Birthday
 from utils.bad_words import invitation_pattern
 
@@ -10,11 +11,12 @@ from utils.bad_words import invitation_pattern
 class BotController:
     def __init__(self, bot):
         self.bot = bot
+        self.db = DB()
 
         self.logger = Logger()
         self.birthday = Birthday()
         self.bad_words = BadWordsHandler()
-        self.db = DB()
+        self.member_left = MemberLeftNotification(self.bot, self.db)
 
         self.bot.add_listener(self.on_ready)
         self.bot.add_listener(self.on_message)
@@ -32,12 +34,6 @@ class BotController:
     async def on_message(self, message):
         # TODO: потрібно зробити перевірку суперюзерів з бд
         # TODO: потрібно переписати on_message, зробити більш простим та читабельним
-        if message.guild is None and message.author.id in SUPERUSERS:
-            if hasattr(self.bot, 'selected_channel') and self.bot.selected_channel:
-                await self.bot.selected_channel.send(message.content)
-            else:
-                await message.author.send('```First select the channel for sending messages.```')
-            return
 
         if message.author.bot:
             return
@@ -62,7 +58,7 @@ class BotController:
             elif blacklist_games_pattern.search(original_message):
                 await handle_bad_games(message, nick)
 
-            if len(message.content) > 4 and is_caps(message.content):
+            if len(message.content) > 5 and is_caps(message.content):
                 await message.delete()
                 await message.channel.send(f"```{nick}, please stop using the caps.```")
                 return
@@ -73,54 +69,28 @@ class BotController:
         await self.bot.process_commands(message)
 
     async def on_raw_reaction_add(self, payload):
-        if payload.user_id == bot.user.id:
+        result = await self.db.get_data(
+            payload.guild_id,
+            'settings',
+            'verification',
+            'verification_channel_id',
+            'verification_msg_id'
+        )
+
+        if not result or not all(result.values()):
             return
 
-        # TODO: потрібно витягувати id повідомлень та каналів з бд для конкретної гільдії
+        if payload.channel_id != result.get('verification_channel_id'):
+            return
 
-        ukr_message_id = 0
-        eng_message_id = 0
-        channel_id = 0
+        if payload.message_id != result.get('verification_msg_id'):
+            return
 
-        if payload.channel_id == channel_id:
-            channel = self.bot.get_channel(payload.channel_id)
-
-            # logs events if enabled
-            if channel is None:
-                await logger.error(f"Channel with ID {payload.channel_id} not found.")
-                return
-
-            guild = self.bot.get_guild(payload.guild_id)
-            user = guild.get_member(payload.user_id)
-
-            # logs events if enabled
-            if user is None:
-                await logger.error(f"User with ID {payload.user_id} not found.")
-                return
-
-            message = await channel.fetch_message(payload.message_id)
-            handler = VerificationHandler()
-
-            #TODO: спростити
-            if payload.message_id == eng_message_id:
-                user_eu = False
-            elif payload.message_id == ukr_message_id:
-                user_eu = True
-            else:
-                return
-
-            await handler.handle_verification_reaction(guild, user, user_eu, message, payload.emoji)
+        # тут твоя логіка
 
     async def on_member_remove(self, member):
-        # TODO: потрібно витягувати канал з бд для конкретної гільдії та зробити окремий метод для цього
-        channel_id = 0
-        channel = bot.get_channel(int(channel_id))
+        await self.member_left.check_if_notification(member)
 
-        if channel is not None:
-            await channel.send(f"User: {member} has left the server.")
-        else:
-            await logger.error(f"Channel with the ID {channel} not found.")
-            return
 
     # --------------------------- LOOPS ---------------------------
 

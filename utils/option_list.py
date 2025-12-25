@@ -1,13 +1,15 @@
 SETTINGS_OPTIONS = {
             'birthday': "boolean",
             'congrats': "boolean",
+            'congrats_channel': "channel",
             'verification': "boolean",
-            'invitation_checking': "boolean",
-            'spam_checking': "boolean",
+            'verification_channel': "channel",
+            'system_channel': "channel",
+            'block_user': "boolean",
+            'invitation_check': "boolean",
+            'spam_check': "boolean",
             'member_left': "boolean",
             'set_permissions': "boolean",
-            'sending_messages': "boolean",
-            'congrats_channel': "channel",
-            'system_channel': "channel",
-            'verification_channel': "channel"
+            'send_messages': "boolean",
+            'write_audit_log': "boolean"
         }

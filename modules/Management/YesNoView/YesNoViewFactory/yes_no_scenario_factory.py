@@ -1,4 +1,4 @@
-from YesNoView.YesNoViewFactory.yes_no_scenarios import StartConfigScenario, ConfirmationScenario
+from modules.Management.YesNoView.YesNoViewFactory.yes_no_scenarios import StartConfigScenario, ConfirmationScenario
 
 
 class YesNoViewFactory:

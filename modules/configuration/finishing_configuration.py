@@ -1,11 +1,14 @@
 import discord
 from database.data_base_model import DB
+from utils.format_the_result import FormatResult
+from utils.messages import GENERAL_MESSAGES as GM
 
 
 class FinishingConfiguration:
     def __init__(self, parent):
         self.parent = parent
         self.db = DB()
+
 
     async def finishing_configuration(self, interaction: discord.Interaction) -> None:
         try:
@@ -31,33 +34,17 @@ class FinishingConfiguration:
                     {"user_id": member.id
                      })
             except Exception as e:
-                print(f"[DB ERROR] Failed to write user to the db: {e}")
+                await interaction.edit_original_response(
+                    content="❌ Failed to save configuration. Please try again."
+                )
+                return
 
         await self.send_the_result(interaction)
 
     async def send_the_result(self, interaction: discord.Interaction) -> None:
-        system_channel_id = self.parent.config.get('system_channel_id')
-        congrats_channel_id = self.parent.config.get('congrats_channel_id')
 
-        system_channel = interaction.client.get_channel(system_channel_id) if system_channel_id else None
-        congrats_channel = interaction.client.get_channel(congrats_channel_id) if congrats_channel_id else None
-
-        summary = (
-            "configuration completed!\n\n"
-            f"🔹 Congrats: {'✅ Enabled' if self.parent.config.get('congrats_enabled') else '❌ Disabled'}\n"
-            f"🔹 Birthday feature: {'✅ Enabled' if self.parent.config.get('birthday_enabled') else '❌ Disabled'}\n"
-            f"🔹 Verification: {'✅ Enabled' if self.parent.config.get('verification_enabled') else '❌ Disabled'}\n"
-            f"🔹 Invitation checking: {'✅ Enabled' if self.parent.config.get('invitation_checking_enabled')
-            else '❌ Disabled'}\n"
-            f"🔹 Spam handling: {'✅ Enabled' if self.parent.config.get('spam_checking_enabled') else '❌ Disabled'}\n"
-            f"🔹 Member left notification: {'✅ Enabled' if self.parent.config.get('member_left_enabled')
-            else '❌ Disabled'}\n"
-            f"🔹 Blocking users: {'✅ Enabled' if self.parent.config.get('block_users_enabled') else '❌ Disabled'}\n"
-            f"🔹 System channel: {system_channel.name if system_channel else '❌ Not selected'}\n"
-            f"🔹 Congrats channel: {congrats_channel.name if congrats_channel else '❌ Not selected'}\n"
-            f"🔹 Superusers: {'✅ Assigned' if self.parent.found_users else '❌ Not assigned'}\n"
-        )
+        summary_result = FormatResult.format_the_result(parent=self.parent, interaction=interaction, start=True)
 
         await interaction.edit_original_response(
-            content=f'```Congratulations the bot is ready for usage.```\n\n{summary}',
+            content=GM.get('configuration_done') + f'\n\n{summary_result}\n\n' + GM.get('configuration_done_2')
         )

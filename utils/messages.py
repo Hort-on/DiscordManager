@@ -5,7 +5,7 @@ CONFIG_MESSAGES = {
     'canceled_msg':
         "```configuration cancelled.\n "
         "To start the configuration process again,"
-        " please use the command (!start).```",
+        " please use the command \"/start\".```",
 
     'sys_ch_msg':
         "```Please select the channel where bot will send system messages.```",
@@ -18,9 +18,7 @@ CONFIG_MESSAGES = {
 
     'congrats_ch_msg':
         "```Please select the channel where bot will send"
-        " birthday and new year congrats.\n"
-        "If you did not allow the bot to send the congrats messages, then just press skip"
-        " (No button)```",
+        " birthday and new year congrats.\n",
 
     'superusers_msg':
         "```Please type names of trusted users who will be a superuser in your server.\n"
@@ -39,9 +37,13 @@ CONFIG_MESSAGES = {
         "Also you need to create the channel if you don`t have one yet."
         " And typed some rules there.\n"
         "After you finished configuration,"
-        " you will need to type (!mg) command and press the button"
+        " you will need to type \"/mg\" command and press the button"
         "(Set emoji) It will automatically set emoji on the latest message"
         " in the verification channel.```",
+
+    'verification_channel_msg':
+        "```Please select the channel that will be used to verify new users.\n"
+        "PLEASE NOTE you can change this channel later by typing \"/mg\", then press the button \"edit settings\"```",
 
     'message_management_feature_msg':
         "```Would you like to enable message management?\n"
@@ -67,12 +69,12 @@ CONFIG_MESSAGES = {
     'send_messages_permission_feature_msg':
         "```Would you like to enable sending messages feature?```",
 
-    'set_permissions_feature_msg':
-        "```Would you like to enable setting permissions?```",
-
     'super_user_procedure_msg':
         "```Please enter the usernames NOT NICKNAMES!"
-        " of trusted superusers separated by commas e.g. user1, user2:```"
+        " of trusted superusers separated by commas e.g. user1, user2:```",
+
+    'audit_log_msg':
+        "```Would you like to allow the bot write into audit logs?```"
 }
 
 EDIT_CONFIG_MESSAGES = {
@@ -126,4 +128,10 @@ GENERAL_MESSAGES = {
 
     'ask_channel_type_msg':
         "Please select the type of channel:",
+
+    'configuration_done':
+        "Congratulations the bot is ready for usage.",
+
+    'configuration_done_2':
+        "You can change this settings any time, just type \"/mg\", and press \"edit settings\" button."
 }

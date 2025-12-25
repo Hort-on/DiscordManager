@@ -12,6 +12,8 @@ class VerificationHandler:
         #TODO: витягувати id ролей з бд
         #TODO: переробити цей файл
 
+    async def verification_process(self):
+
     async def send_user_message(self, user, msg_key):
         """Sends a message to the user if enabled"""
         try:
