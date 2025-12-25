@@ -6,18 +6,17 @@ from contextlib import asynccontextmanager
 class DB:
     def __init__(self, path='database.sqlite'):
         self.path = path
-        self._create_all_tables()
         self._write_lock = asyncio.Lock()
-
 
     @asynccontextmanager
     async def connect(self):
-        conn = await aiosqlite.connect(self.path)
-        try:
-            yield conn
-            await conn.commit()
-        finally:
-            await conn.close()
+        async with self._write_lock:
+            conn = await aiosqlite.connect(self.path)
+            try:
+                yield conn
+                await conn.commit()
+            finally:
+                await conn.close()
 
     async def _create_all_tables(self):
         async with self.connect() as cursor:
