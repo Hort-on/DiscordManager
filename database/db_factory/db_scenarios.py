@@ -19,7 +19,7 @@ class BaseScenario:
     async def proceed(self):
         raise NotImplementedError
 
-#TODO: треба ще довести до пуття
+
 class GetDataScenario(BaseScenario):
     def __init__(self, guild_id, table_name, columns):
         super().__init__()
@@ -52,15 +52,15 @@ class WriteDataScenario(BaseScenario):
     async def proceed(self) -> bool:
         table = self._get_table(self.table_name)
 
-        async with self.db.connect() as db:
+        async with self.db.connect() as cursor:
             columns = ", ".join(["guild_id", *self.data.keys()])
             placeholders = ", ".join(["?"] * (len(self.data) + 1))
             update_clause = ", ".join(f"{k}=excluded.{k}" for k in self.data.keys())
             query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
                     ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
 
-            await db.execute(query, (self.guild_id, *self.data.values()))
-            return True
+            await cursor.execute(query, (self.guild_id, *self.data.values()))
+            return cursor.rowcount > 0
 
 class FetchAllDataScenario(BaseScenario):
     def __init__(self, guild_id: int, table_name: str):
@@ -94,9 +94,9 @@ class AddBirthdayScenario(BaseScenario):
     async def proceed(self) -> bool:
         table = self._get_table("birthdays")
         query = f"INSERT INTO {table} (guild_id, user_id, birthday, last_congrats) VALUES (?, ?, ?, ?)"
-        async with self.db.connect() as db:
-            await db.execute(query, (self.guild_id, self.user_id, self.birthday, None))
-            return True
+        async with self.db.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.user_id, self.birthday, None))
+            return cursor.rowcount > 0
 
 
 class DeleteBirthdayScenario(BaseScenario):
@@ -107,10 +107,10 @@ class DeleteBirthdayScenario(BaseScenario):
 
     async def proceed(self) -> bool:
         table = self._get_table("birthdays")
-        query = f"DELETE FROM {table} WHERE user_id = ? AND guild_id = ?"
+        query = f"DELETE FROM {table} WHERE guild_id = ? AND user_id = ?"
         async with self.db.connect() as cursor:
-            await cursor.execute(query, (self.user_id, self.guild_id))
-            return True
+            await cursor.execute(query, (self.guild_id, self.user_id))
+            return cursor.rowcount > 0
 
 
 class ExistBirthdayCheckScenario(BaseScenario):
@@ -150,11 +150,12 @@ class UpdateLstCongratsScenario(BaseScenario):
         self.user_id = user_id
         self.date = today_str
 
-    async def proceed(self) -> None:
+    async def proceed(self) -> bool:
         table = self._get_table("birthdays")
         query = f"UPDATE {table} SET last_congrats = ? WHERE user_id = ? AND guild_id = ?"
         async with self.db.connect() as cursor:
             await cursor.execute(query, (self.date, self.user_id, self.guild_id))
+            return cursor.rowcount > 0
 
 
 class ResetAllCongratsScenario(BaseScenario):

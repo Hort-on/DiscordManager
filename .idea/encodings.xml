@@ -16,8 +16,6 @@
     <file url="file://$PROJECT_DIR$/modules/Management/channel_selection.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/Management/channel_type_selection.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/management.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/management.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/Management/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/Management/message_processing/BadWordsHandler.py" charset="UTF-8" />
@@ -29,7 +27,7 @@
     <file url="file://$PROJECT_DIR$/modules/administration/user_auto_ban.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/administration/verification.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/adding_birthday.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/birthdays/birthday.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/birthdays/birthday_repo.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/checking_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/removing_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />

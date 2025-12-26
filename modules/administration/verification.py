@@ -1,5 +1,5 @@
 import discord
-from modules.Logging.logging import Logger
+from modules.logger.logger import Logger
 from bot import bot
 from utils.messages import CONFIG_MESSAGES
 

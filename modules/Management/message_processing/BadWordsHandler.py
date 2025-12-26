@@ -2,7 +2,7 @@ import re
 import time
 import asyncio
 
-from modules.Logging.logging import Logger
+from modules.logger.logger import Logger
 from config import SUPERUSERS
 from modules.administration.user_manager import UserManager
 

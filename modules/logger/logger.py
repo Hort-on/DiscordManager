@@ -13,9 +13,6 @@ class Logger:
     async def error(self, message: str):
         await self.log("ERROR", message, "system_logs.log")
 
-    async def verification(self, message: str):
-        await self.log("VERIFICATION", message, "verification_logs.log")
-
     async def info(self, message: str):
         await self.log("INFO", message, "member_left_logs.log")
 

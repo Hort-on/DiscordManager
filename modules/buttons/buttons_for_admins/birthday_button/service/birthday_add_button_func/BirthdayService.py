@@ -1,5 +1,5 @@
 import discord
-from modules.birthdays.birthday import Birthday
+from modules.birthdays.birthday_repo import Birthday
 
 
 class AddBirthdayService:
@@ -18,7 +18,7 @@ class AddBirthdayService:
 
         if member is None:
             await interaction.response.send_message(
-                "❌ User not found. Check username.",
+                "❌ User not found. Please check username.",
                 ephemeral=True
             )
             return
@@ -31,15 +31,11 @@ class AddBirthdayService:
             return
 
         b_day = Birthday()
-        response = await b_day.add_new_birthday(
+        await b_day.add_new_birthday(
+            interaction,
             member.id,
             interaction.guild.id,
             birthday
-        )
-
-        await interaction.response.send_message(
-            response,
-            ephemeral=True
         )
 
     @staticmethod

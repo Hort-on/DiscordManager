@@ -5,14 +5,12 @@ from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message
 
 
 class ChannelScenario:
-    async def on_channel_selected(self, interaction, **kwargs):
+    async def on_channel_selected(self, interaction, channel):
         raise NotImplementedError
 
 
 class SaveChannelToDBForMessageScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, **kwargs) -> bool:
-        channel = kwargs.get("channel")
-
+    async def on_channel_selected(self, interaction, channel) -> bool:
         db = DB()
         return await db.write_data(
             interaction.guild.id,
@@ -29,9 +27,7 @@ class SaveChannelToDBScenario(ChannelScenario):
     def __init__(self, config_key):
         self.config_key = config_key
 
-    async def on_channel_selected(self, interaction, **kwargs) -> bool:
-        channel = kwargs.get("channel")
-
+    async def on_channel_selected(self, interaction, channel) -> bool:
         db = DB()
         return await db.write_data(
             interaction.guild.id,
@@ -43,9 +39,7 @@ class SaveChannelToDBScenario(ChannelScenario):
 
 
 class PermissionsScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, **kwargs) -> None:
-        channel = kwargs.get("channel")
-
+    async def on_channel_selected(self, interaction, channel) -> None:
         handler = SetPermissions(channel)
         await handler.set_permissions_for_channel(interaction)
 
@@ -55,8 +49,7 @@ class WizardScenario(ChannelScenario):
         self.parent = parent
         self.config_key = config_key
 
-    async def on_channel_selected(self, interaction, **kwargs) -> None:
-        channel = kwargs.get("channel")
+    async def on_channel_selected(self, interaction, channel) -> None:
         self.parent.config[self.config_key] = channel.id
         await self.parent.next_step(interaction)
 
@@ -65,15 +58,13 @@ class CompositeScenario(ChannelScenario):
     def __init__(self, *scenarios):
         self.scenarios = scenarios
 
-    async def on_channel_selected(self, interaction, **kwargs) -> None:
-        channel = kwargs.get("channel")
+    async def on_channel_selected(self, interaction, channel) -> None:
         for scenario in self.scenarios:
             await scenario.on_channel_selected(interaction, channel)
 
 
 class DeleteMessagesScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, **kwargs) -> None:
-        channel = kwargs.get("channel")
+    async def on_channel_selected(self, interaction, channel) -> None:
         await interaction.response.send_modal(
             DeleteMessagesModal(channel)
         )

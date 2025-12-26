@@ -1,10 +1,10 @@
 from discord.ext import tasks
 
 from database.data_base_model import DB
-from modules.Logging.logging import Logger
+from modules.logger.logger import Logger
 from modules.Management.events_processing.member_left_event import MemberLeftNotification
 from modules.Management.message_processing.BadWordsHandler import BadWordsHandler
-from modules.birthdays.birthday import Birthday
+from modules.birthdays.birthday_repo import Birthday
 from utils.bad_words import invitation_pattern
 
 
@@ -97,7 +97,7 @@ class BotController:
     @tasks.loop(hours=24)
     async def daily_birthday_check(self):
         for guild in self.bot.guilds:
-            await self.birthday.check_birthday(guild.id)
+            await self.birthday.check_daily_birthday(guild.id)
 
     # --------------------------- MESSAGE HANDLING ---------------------------
 
