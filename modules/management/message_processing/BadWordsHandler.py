@@ -3,7 +3,6 @@ import time
 import asyncio
 
 from modules.logger.logger import Logger
-from config import SUPERUSERS
 from modules.administration.user_manager import UserManager
 
 #TODO: треба оптимізувати роботу цього хендлера
@@ -45,14 +44,14 @@ class BadWordsHandler:
         return sentence
 
     @staticmethod
-    def get_warning_message(nick: str, warning_level: int) -> str:
+    def get_warning_message(nick: str,) -> str:
         messages = [
             f"```{nick}, please avoid using profanity, be polite!```",
             f"```{nick}, the use of profanity is prohibited on this server.```",
             f"```{nick}, for the next violation, you will be banned!```"
         ]
 
-        return messages[min(warning_level - 1, 2)]
+        return messages asf
 
 
     async def check_for_bad_words(self, message, nick):

@@ -2,39 +2,53 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from database.db_factory.db_scenario_factory import DBScenarioFactory
 from modules.configuration.starting_configuration import ConfigurationView
-from database.data_base_model import DB
+from modules.logger.logger import Logger
+from utils.messages import CONFIG_MSGS
 
 
 class StartCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, db: DBScenarioFactory, logger: Logger):
         self.bot = bot
-        self.db = DB()
+        self.db = db
+        self.logger = logger
 
     @app_commands.command(
         name="start",
         description="Start server configuration"
     )
     async def start_config(self, interaction: discord.Interaction):
-        config_done = await self.db.get_data(
+        scenario_get_data = self.db.for_get_data(
+            self.logger,
             interaction.guild.id,
             'settings',
             'configuration_done'
         )
 
-        if config_done:
-            await interaction.response.send_message(
-                "You have already configured the bot for this server.",
-                ephemeral=True
-            )
+        config_done = await scenario_get_data.db_proceed()
+
+        if not config_done:
             return
 
-        view = ConfigurationView()
         await interaction.response.send_message(
-            "Welcome to the configuration!",
+            CONFIG_MSGS.get('configuration_exists_msg'),
+            ephemeral=True
+        )
+
+        view = ConfigurationView(self.db, self.logger)
+        await interaction.response.send_message(
+            CONFIG_MSGS.get('config_welcome_msg'),
             view=view,
             ephemeral=True
         )
 
 async def setup(bot):
-    await bot.add_cog(StartCog(bot))
+    services = bot.services
+    await bot.add_cog(
+        StartCog(
+            bot,
+            services.db,
+            services.logger
+        )
+    )

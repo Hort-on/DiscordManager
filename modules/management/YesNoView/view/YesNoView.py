@@ -13,7 +13,7 @@ class YesNoView(View):
             item.disabled = True
 
         await interaction.edit_original_response(view=self)
-        await self.scenario.proceed(interaction, value=True)
+        await self.scenario.yes_no_proceed(interaction, value=True)
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.red)
     async def no_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -21,4 +21,4 @@ class YesNoView(View):
             item.disabled = True
 
         await interaction.edit_original_response(view=self)
-        await self.scenario.proceed(interaction, value=False)
+        await self.scenario.yes_no_proceed(interaction, value=False)

@@ -1,16 +1,18 @@
 import discord
 
+from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.buttons.buttons_for_admins.birthday_button.service.birthday_delete_button_func.BirthdayModal import \
     DeleteBirthdayModal
 
 
 class DeleteBirthdayButton(discord.ui.Button):
-    def __init__(self):
+    def __init__(self, birthday: BirthdayRepo):
         super().__init__(
             label='Delete birthday',
             style=discord.ButtonStyle.red
         )
+        self.birthday = birthday
 
     async def callback(self, interaction: discord.Interaction):
         self.view.disable_all_items()
-        await interaction.response.send_modal(DeleteBirthdayModal())
+        await interaction.response.send_modal(DeleteBirthdayModal(self.birthday))

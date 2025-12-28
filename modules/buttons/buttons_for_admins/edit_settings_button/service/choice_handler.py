@@ -1,32 +1,51 @@
 import discord
 
-from YesNoView.YesNoViewFactory.yes_no_factory import YesNoViewFactory
-from YesNoView.view.YesNoView import YesNoView
-from modules.Management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
-from modules.Management.channels_processing.getting_channel import ChannelTypeView
-from utils.messages import GENERAL_MESSAGES as GM
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
+from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
+from modules.management.YesNoView.view.YesNoView import YesNoView
+from modules.management.channels_processing.getting_channel import ChannelTypeView
+from utils.messages import GENERAL_MSGS, EDIT_CONFIG_MSGS, SYSTEM_MSGS
 
 
 class ChoiceHandler:
-    @staticmethod
-    async def choice_procedure(interaction: discord.Interaction, option_type: str, config_key: str) -> None:
+    def __init__(self, db: DBScenarioFactory):
+        self.db = db
+
+    async def choice_procedure(self, interaction: discord.Interaction, option_type: str, config_key: str) -> None:
         match option_type:
             case 'boolean':
-                scenario = YesNoViewFactory.for_confirmation(config_key)
+                scenario = YesNoViewFactory.for_confirmation(
+                    self.db,
+                    config_key
+                )
+
                 view = YesNoView(scenario)
+
                 await interaction.edit_original_response(
-                    content=f'Would you like to enable or disable {config_key.replace("_", " ").title()}?',
+                    content=EDIT_CONFIG_MSGS.get('editing_feature_msg').format(
+                        feature={config_key.replace("_", " ").title()}),
                     view=view
                 )
 
             case 'channel':
-                scenario = ChannelScenarioFactory.for_db_save(config_key)
-                view = ChannelTypeView(scenario, text_only=True)
+                scenario = ChannelScenarioFactory.for_db_save(
+                    self.db,
+                    config_key
+                )
+
+                view = ChannelTypeView(
+                    scenario,
+                    text_only=True
+                )
+
                 await interaction.edit_original_response(
-                    content=GM.get('ask_channel_msg'),
+                    content=GENERAL_MSGS.get('ask_channel_msg'),
                     view=view
                 )
 
             case _:
-                await interaction.edit_original_response(content='Unexpected error')
+                await interaction.edit_original_response(
+                    content=SYSTEM_MSGS.get('failure_msg')
+                )
                 return

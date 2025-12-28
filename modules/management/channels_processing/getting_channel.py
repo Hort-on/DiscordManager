@@ -1,6 +1,6 @@
 import discord
 from discord import ui
-from utils.messages import GENERAL_MESSAGES
+from utils.messages import GENERAL_MSGS
 
 
 class ChannelTypeView(ui.View):
@@ -8,10 +8,10 @@ class ChannelTypeView(ui.View):
         super().__init__(timeout=60)
         self.scenario = scenario
 
-        options = []
+        self.options = []
 
         if not channels_with_users_only:
-            options.append(
+            self.options.append(
                 discord.SelectOption(
                     label="Text channel",
                     value="text"
@@ -19,7 +19,7 @@ class ChannelTypeView(ui.View):
             )
 
         if not text_only:
-            options.append(
+            self.options.append(
                 discord.SelectOption(
                     label="Voice channel",
                     value="voice"
@@ -27,8 +27,8 @@ class ChannelTypeView(ui.View):
             )
 
         select = ui.Select(
-            placeholder=GENERAL_MESSAGES.get("ask_channel_type_msg"),
-            options=options
+            placeholder=GENERAL_MSGS.get("ask_channel_type_msg"),
+            options=self.options
         )
 
         select.callback = self.select_channel_type
@@ -88,7 +88,7 @@ class ChannelSelectView(ui.View):
             )
             return
 
-        await self.scenario.on_channel_selected(interaction, channel=channel)
+        await self.scenario.channel_proceed(interaction, channel=channel)
 
         await interaction.edit_original_response(
             content=f"```Selected channel: {channel.name}```",

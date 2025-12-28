@@ -1,0 +1,32 @@
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.settings_storage.settings_storage import SettingsStorage
+from utils.messages import GENERAL_MSGS as GM
+
+
+class MemberLeftNotification:
+    def __init__(self, bot, db: DBScenarioFactory, settings: SettingsStorage):
+        self.db = db
+        self.bot = bot
+        self.settings = settings
+
+    async def check_if_notification(self, member):
+        if not self.settings.get_guild_settings(member.guild.id).get('member_left'):
+            return
+
+        await self.process_guild_channel(member)
+
+    async def process_guild_channel(self, member):
+        channel_id = self.settings.get_guild_settings(member.guild.id).get('system_channel_id')
+
+        if not channel_id:
+            return
+
+        await self.send_notification_message(channel_id, member)
+
+    async def send_notification_message(self, channel_id, member):
+        channel = await self.bot.get_channel(channel_id)
+
+        if not channel:
+            return
+
+        await channel.send(GM.get('user_left_msg').format(member=member.name))

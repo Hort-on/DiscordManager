@@ -1,8 +1,8 @@
 import discord
 
-from modules.Management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
-from modules.Management.channels_processing.getting_channel import ChannelTypeView
-from utils.messages import GENERAL_MESSAGES as GM
+from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
+from modules.management.channels_processing.getting_channel import ChannelTypeView
+from utils.messages import GENERAL_MSGS as GM
 
 
 class DeleteMessageButton(discord.ui.Button):
@@ -20,4 +20,3 @@ class DeleteMessageButton(discord.ui.Button):
             content=GM.get('ask_channel_msg'),
             view=view
         )
-

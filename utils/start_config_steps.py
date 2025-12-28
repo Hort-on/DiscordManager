@@ -10,8 +10,9 @@ STEPS = [
     ('invitation_check_feature_msg', 'invitation_checking_enabled', 'YesNoView'),
     ('spam_check_feature_msg', 'spam_checking_enabled', 'YesNoView'),
     ('member_left_feature_msg', 'member_left_enabled', 'YesNoView'),
-    ('send_messages_permission_feature_msg', 'send_messages_enabled', 'YesNoView'),
+    ('send_messages_feature_msg', 'send_messages_enabled', 'YesNoView'),
     ('audit_log_msg', 'write_audit_log_enabled', 'YesNoView'),
+    ('role_management_msg', 'role_management_enabled', 'YesNoView'),
     ('superusers_msg', None, 'SuperUsers')
 ]
 

@@ -11,17 +11,6 @@
     <file url="file://$PROJECT_DIR$/logs" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/Fun/joke.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/YesNoView" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/YesNoView/view/YesNoView.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channel_selection.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channel_type_selection.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/channels_processing/management.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/finishing_configuration.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/message_processing/BadWordsHandler.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/message_processing/bad_games_handling.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/message_processing/invitation_checking.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/Management/message_processing/spam_handling.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/administration/Messages_data/messages_data.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/administration/message_sender.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/administration/user_auto_ban.py" charset="UTF-8" />
@@ -38,10 +27,21 @@
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/edit_settings_button/service/settings_formatter.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/YesNoView" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/YesNoView/view/YesNoView.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modules/management/channel_selection.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/channel_type_selection.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/channels_processing/getting_channel.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/channels_processing/management.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/finishing_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/message_processing/BadWordsHandler.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/message_processing/bad_games_handling.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/message_processing/invitation_checking.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/message_processing/spam_handling.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/requirements.txt" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/utils/bad_words.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/utils/channels_permissions.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/utils/messages.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/utils/messages.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/utils/option_list.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/utils/start_config_steps.py" charset="windows-1251" />
   </component>

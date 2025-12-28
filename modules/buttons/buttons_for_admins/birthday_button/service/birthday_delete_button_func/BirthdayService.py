@@ -1,12 +1,14 @@
 import discord
 
-from modules.birthdays.birthday_repo import Birthday
+from modules.birthdays.birthday_repo import BirthdayRepo
 
 
 class DeleteBirthdayService:
+    def __init__(self, birthday: BirthdayRepo):
+        self.birthday = birthday
 
-    @staticmethod
     async def process(
+            self,
             interaction: discord.Interaction,
             username: str,
     ) -> None:
@@ -23,8 +25,9 @@ class DeleteBirthdayService:
             )
             return
 
-        b_day = Birthday()
+        b_day =  self.birthday
         response = await b_day.delete_birthday(
+            interaction,
             member.id,
             interaction.guild.id
         )

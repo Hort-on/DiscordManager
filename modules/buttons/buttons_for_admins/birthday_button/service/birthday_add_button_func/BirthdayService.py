@@ -1,11 +1,13 @@
 import discord
-from modules.birthdays.birthday_repo import Birthday
+from modules.birthdays.birthday_repo import BirthdayRepo
 
 
 class AddBirthdayService:
+    def __init__(self, birthday: BirthdayRepo):
+        self.birthday = birthday
 
-    @staticmethod
     async def process(
+            self,
         interaction: discord.Interaction,
         username: str,
         birthday: str
@@ -30,7 +32,7 @@ class AddBirthdayService:
             )
             return
 
-        b_day = Birthday()
+        b_day = self.birthday
         await b_day.add_new_birthday(
             interaction,
             member.id,

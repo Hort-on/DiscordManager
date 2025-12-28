@@ -1,22 +1,26 @@
 from discord.ext import tasks
 
-from database.data_base_model import DB
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.settings_storage.settings_storage import SettingsStorage
+
 from modules.logger.logger import Logger
-from modules.Management.events_processing.member_left_event import MemberLeftNotification
-from modules.Management.message_processing.BadWordsHandler import BadWordsHandler
-from modules.birthdays.birthday_repo import Birthday
+from modules.management.events_processing.member_left_event import MemberLeftNotification
+from modules.management.message_processing.BadWordsHandler import BadWordsHandler
+from modules.birthdays.birthday_repo import BirthdayRepo
+
 from utils.bad_words import invitation_pattern
 
 
 class BotController:
     def __init__(self, bot):
         self.bot = bot
-        self.db = DB()
+        self.db = DBScenarioFactory()
+        self.logger = Logger() #готово
 
-        self.logger = Logger()
-        self.birthday = Birthday()
+        self.guilds_settings = SettingsStorage(self.bot, self.db, self.logger) #готово
+        self.birthday = BirthdayRepo(self.bot, self.guilds_settings, self.db, self.logger) #готово
         self.bad_words = BadWordsHandler()
-        self.member_left = MemberLeftNotification(self.bot, self.db)
+        self.member_left = MemberLeftNotification(self.bot, self.db, self.guilds_settings) #готово
 
         self.bot.add_listener(self.on_ready)
         self.bot.add_listener(self.on_message)
@@ -30,6 +34,8 @@ class BotController:
 
         if not self.daily_birthday_check.is_running():
             self.daily_birthday_check.start()
+
+        await self.guilds_settings.load_all_settings()
 
     async def on_message(self, message):
         # TODO: потрібно зробити перевірку суперюзерів з бд
@@ -96,8 +102,7 @@ class BotController:
 
     @tasks.loop(hours=24)
     async def daily_birthday_check(self):
-        for guild in self.bot.guilds:
-            await self.birthday.check_daily_birthday(guild.id)
+        await self.birthday.check_daily_birthday()
 
     # --------------------------- MESSAGE HANDLING ---------------------------
 

@@ -2,69 +2,76 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from modules.Management.channels_processing.management import Management
-from database.data_base_model import DB
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.settings_storage.settings_storage import SettingsStorage
+from modules.birthdays.birthday_repo import BirthdayRepo
+
+from modules.logger.logger import Logger
+from modules.management.channels_processing.management import Management
+
+from utils.messages import GENERAL_MSGS, CONFIG_MSGS
 
 
 class ManagementCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(
+            self,
+            bot,
+            settings: SettingsStorage,
+            db: DBScenarioFactory,
+            logger: Logger,
+            birthday: BirthdayRepo
+    ):
+
         self.bot = bot
-        self.db = DB()
+        self.settings = settings
+        self.db = db
+        self.logger = logger
+        self.birthday = birthday
 
     @app_commands.command(
         name="management",
         description="Open management panel"
     )
     async def management(self, interaction: discord.Interaction):
-
-        super_users_data = await self.db.get_data(
-            interaction.guild.id,
-            'super_users',
-            'user_id'
-        )
-
+        super_users_data = self.settings.get_guild_superusers(interaction.guild_id)
         if not super_users_data:
             await interaction.response.send_message(
-                "Super users are not configured for this server.",
+                GENERAL_MSGS.get('superusers_not_found_msg'),
                 ephemeral=True
             )
             return
 
         super_users = [user.get('user_id') for user in super_users_data]
-
         if interaction.user.id not in super_users:
             await interaction.response.send_message(
-                "You do not have permission to use this feature!",
+                GENERAL_MSGS.get('not_superuser_msg'),
                 ephemeral=True
             )
             return
 
-        settings = await self.db.get_data(
-            interaction.guild.id,
-            "settings",
-            'birthday',
-            'sending_messages',
-            'deleting_message',
-            'congrats_channel_id',
-            'system_channel_id',
-            'verification_channel_id',
-            'configuration_done'
-        )
-
-        if not settings.get("configuration_done"):
+        if not self.settings.get_guild_settings(interaction.guild_id).get('configuration_done'):
             await interaction.response.send_message(
-                "Settings are not configured yet!",
+                CONFIG_MSGS.get('no_configuration_msg'),
                 ephemeral=True
             )
             return
 
-        view = Management(interaction, self.bot, settings)
+        view = Management(interaction.guild_id, self.settings, self.db, self.birthday, self.logger)
         await interaction.response.send_message(
-            "Select an action:",
+            GENERAL_MSGS.get('ask_action_msg'),
             view=view,
             ephemeral=True
         )
 
 
 async def setup(bot):
-    await bot.add_cog(ManagementCog(bot))
+    services = bot.services
+    await bot.add_cog(
+        ManagementCog(
+            bot,
+            services.guilds_settings,
+            services.db,
+            services.logger,
+            services.birthday
+        )
+    )

@@ -2,22 +2,33 @@ from typing import Any
 
 import discord
 
-from modules.Management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
-from modules.Management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
-from modules.Management.YesNoView.view.YesNoView import YesNoView
-from modules.Management.channels_processing.getting_channel import ChannelTypeView
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from modules.logger.logger import Logger
+from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
+from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
+from modules.management.YesNoView.view.YesNoView import YesNoView
+from modules.management.channels_processing.getting_channel import ChannelTypeView
 from modules.configuration.superuser_procedure import SuperUserProcedure
 from modules.configuration.finishing_configuration import FinishingConfiguration
 
 from utils.start_config_steps import STEPS, STEP_DEPENDENCIES
-from utils.messages import CONFIG_MESSAGES as CM
+from utils.messages import CONFIG_MSGS as CM
 
 class ConfigurationView(discord.ui.View):
-    def __init__(self):
+    def __init__(
+            self,
+            db: DBScenarioFactory,
+            logger: Logger
+    ):
+
         super().__init__()
+        self.db = db
+        self.logger = logger
+
         self.config = {}
         self.found_users = []
         self.not_found_users = []
+
         self.step_index = 0
 
     @discord.ui.button(label='Lets start', style=discord.ButtonStyle.green)
@@ -64,7 +75,7 @@ class ConfigurationView(discord.ui.View):
 
             self.step_index += 1
 
-        finishing_handler = FinishingConfiguration(self)
+        finishing_handler = FinishingConfiguration(self, self.db, self.logger)
         await finishing_handler.finishing_configuration(interaction)
         return
 

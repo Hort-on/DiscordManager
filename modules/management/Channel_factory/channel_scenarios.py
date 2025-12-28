@@ -1,18 +1,28 @@
-from database.data_base_model import DB
-from modules.Management.channels_processing.setting_permissions_for_the_channel import SetPermissions
+from database.db_factory.db_scenario_factory import DBScenarioFactory
 from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message.service.DeleteMessageModal import \
     DeleteMessagesModal
 
 
 class ChannelScenario:
-    async def on_channel_selected(self, interaction, channel):
+    async def channel_proceed(self, interaction, channel):
         raise NotImplementedError
 
 
 class SaveChannelToDBForMessageScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, channel) -> bool:
-        db = DB()
-        return await db.write_data(
+    def __init__(
+            self,
+            db: DBScenarioFactory
+    ):
+
+        self.db = db
+
+    async def on_channel_selected(
+            self,
+            interaction,
+            channel
+    ) -> bool:
+
+        return await self.db.write_data(
             interaction.guild.id,
             'channels',
             {
@@ -24,12 +34,22 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
 
 
 class SaveChannelToDBScenario(ChannelScenario):
-    def __init__(self, config_key):
+    def __init__(
+            self,
+            db: DBScenarioFactory,
+            config_key
+    ):
+
+        self.db = db
         self.config_key = config_key
 
-    async def on_channel_selected(self, interaction, channel) -> bool:
-        db = DB()
-        return await db.write_data(
+    async def channel_proceed(
+            self,
+            interaction,
+            channel
+    ) -> bool:
+
+        return await self.db.write_data(
             interaction.guild.id,
             'settings',
             {
@@ -38,33 +58,48 @@ class SaveChannelToDBScenario(ChannelScenario):
         )
 
 
-class PermissionsScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, channel) -> None:
-        handler = SetPermissions(channel)
-        await handler.set_permissions_for_channel(interaction)
-
-
 class WizardScenario(ChannelScenario):
-    def __init__(self, parent, config_key):
+    def __init__(
+            self,
+            parent,
+            db: DBScenarioFactory,
+            config_key
+    ):
+
         self.parent = parent
+        self.db = db
         self.config_key = config_key
 
-    async def on_channel_selected(self, interaction, channel) -> None:
+    async def channel_proceed(
+            self,
+            interaction,
+            channel
+    ) -> None:
+
         self.parent.config[self.config_key] = channel.id
         await self.parent.next_step(interaction)
 
 
 class CompositeScenario(ChannelScenario):
-    def __init__(self, *scenarios):
+    def __init__(
+            self,
+            *scenarios
+    ):
+
         self.scenarios = scenarios
 
-    async def on_channel_selected(self, interaction, channel) -> None:
+    async def channel_proceed(
+            self,
+            interaction,
+            channel
+    ) -> None:
+
         for scenario in self.scenarios:
             await scenario.on_channel_selected(interaction, channel)
 
 
 class DeleteMessagesScenario(ChannelScenario):
-    async def on_channel_selected(self, interaction, channel) -> None:
+    async def channel_proceed(self, interaction, channel) -> None:
         await interaction.response.send_modal(
             DeleteMessagesModal(channel)
         )

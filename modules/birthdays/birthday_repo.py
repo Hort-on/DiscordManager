@@ -2,14 +2,26 @@ import discord
 
 from datetime import datetime
 
+from modules.logger.logger import Logger
+from utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
+
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-from bot import bot
+from database.settings_storage.settings_storage import SettingsStorage
 
 
-class Birthday:
-    def __init__(self):
+class BirthdayRepo:
+    def __init__(
+            self,
+            bot,
+            settings: SettingsStorage,
+            db: DBScenarioFactory,
+            logger: Logger
+    ):
+
         self.bot = bot
-        self.factory = DBScenarioFactory()
+        self.settings = settings
+        self.db = db
+        self.logger = logger
 
     async def add_new_birthday(
             self,
@@ -23,33 +35,47 @@ class Birthday:
             datetime.strptime(user_birthday, '%d.%m')
         except ValueError:
             await interaction.edit_original_response(
-                content="```Invalid date format. Use DD.MM```"
+                content=GENERAL_MSGS.get('invalid_date_msg')
             )
             return
 
         member = interaction.guild.get_member(user_id)
         if not member:
             await interaction.edit_original_response(
-                content="```User not found in this server.```"
+                content=GENERAL_MSGS.get('user_not_found_msg')
             )
             return
 
-        exists_scenario = self.factory.for_exists_birthday_check(guild_id, user_id)
-        if await exists_scenario.proceed():
+        exists_scenario = self.db.for_exists_birthday_check(
+            self.logger,
+            guild_id,
+            user_id
+
+        )
+        if await exists_scenario.db_proceed():
             await interaction.edit_original_response(
-                content=f"```{member.display_name} already has a birthday set.```"
+                content=BIRTHDAY_MSGS.get('user_exists_msg').format(member=member.display_name)
             )
             return
 
-        add_scenario = self.factory.for_add_birthday(guild_id, user_id, user_birthday)
-        if await add_scenario.proceed():
+        add_scenario = self.db.for_add_birthday(
+            self.logger,
+            guild_id,
+            user_id,
+            user_birthday
+        )
+
+        if await add_scenario.db_proceed():
             await interaction.edit_original_response(
-                content=f"```The birthday for {member.display_name} has been successfully added as {user_birthday}.```"
+                content=BIRTHDAY_MSGS.get('success_msg').format(
+                    member=member.display_name,
+                    user_birthday=user_birthday
+                )
             )
             return
 
         await interaction.edit_original_response(
-            content="```Something went wrong, please try again.```"
+            content=SYSTEM_MSGS.get('failure_msg')
         )
 
     async def delete_birthday(
@@ -59,50 +85,82 @@ class Birthday:
             guild_id: int
     ) -> None:
 
-        exists_scenario = self.factory.for_exists_birthday_check(guild_id, user_id)
-        if not await exists_scenario.proceed():
+        exists_scenario = self.db.for_exists_birthday_check(
+            self.logger,
+            guild_id,
+            user_id
+        )
+
+        if not await exists_scenario.db_proceed():
             await interaction.edit_original_response(
-                content=f"```The user with the ID {user_id} not found in the DB.```"
+                content=DB_MSGS.get('user_not_found_msg').format(user_id=user_id)
             )
             return
 
-        delete_scenario = self.factory.for_delete_birthday(guild_id, user_id)
-        if await delete_scenario.proceed():
+        delete_scenario = self.db.for_delete_birthday(
+            self.logger,
+            guild_id,
+            user_id
+        )
+
+        if await delete_scenario.db_proceed():
             await interaction.edit_original_response(
-                content=f"```The user with the ID {user_id} successfully deleted from the DB.```"
+                content=DB_MSGS.get('delete_user_msg').format(user_id=user_id)
             )
             return
 
         await interaction.edit_original_response(
-            content="```Something went wrong, please try again.```"
+            content=SYSTEM_MSGS.get('failure_msg')
         )
 
-    async def check_daily_birthday(self, guild_id: int) -> None:
-        today = datetime.now()
-        today_str = today.strftime('%d.%m')
+    async def check_daily_birthday(self) -> None:
+        for guild in self.bot.guilds:
+            is_enabled = self.settings.get_guild_settings(guild.id)
 
-        if today.month == 1 and today.day == 1:
-            reset_scenario = self.factory.for_reset_congrats()
-            await reset_scenario.proceed()
+            if not is_enabled.get('birthday', False):
+                continue
 
-        today_birthdays_scenario = self.factory.for_get_today_birthday(
-            guild_id,
-            today_str
-        )
-        birthdays = await today_birthdays_scenario.proceed()
+            #TODO: зробити точну часову зону для кожної гільдії
+            today = datetime.now()
+            today_str = today.strftime('%d.%m')
 
-        if not birthdays:
-            return
+            if today.month == 1 and today.day == 1:
+                reset_scenario = self.db.for_reset_congrats(self.logger)
+                await reset_scenario.db_proceed()
 
-        await self.prepare_data(guild_id, today_str, birthdays)
+            today_birthdays_scenario = self.db.for_get_today_birthday(
+                self.logger,
+                guild.id,
+                today_str
+            )
 
-    async def prepare_data(self, guild_id: int, today_str, birthdays) -> None:
-        settings_scenario = self.factory.for_get_data(
+            birthdays = await today_birthdays_scenario.db_proceed()
+
+            if not birthdays:
+                continue
+
+            await self.prepare_data(
+                self.logger,
+                guild.id,
+                today_str,
+                birthdays
+            )
+
+    async def prepare_data(
+            self,
+            logger: Logger,
+            guild_id: int,
+            today_str: str,
+            birthdays: list
+    ) -> None:
+
+        settings_scenario = self.db.for_get_data(
+            logger,
             guild_id,
             "settings",
             "congrats_channel_id"
         )
-        settings = await settings_scenario.proceed()
+        settings = await settings_scenario.db_proceed()
 
         if not settings:
             return
@@ -115,24 +173,51 @@ class Birthday:
         if not guild:
             return
 
-        await self.send_congrats(guild, channel, birthdays, today_str)
+        await self.send_congrats(
+            guild,
+            channel,
+            birthdays,
+            today_str
+        )
 
-    async def send_congrats(self, guild, channel, birthdays, today_str) -> None:
+    async def send_congrats(
+            self,
+            guild,
+            channel,
+            birthdays,
+            today_str
+    ) -> None:
+
         for user_id_tuple in birthdays:
             user_id = user_id_tuple[0]
             member = guild.get_member(user_id)
 
             if not member:
-                delete_scenario = self.factory.for_delete_birthday(guild.id, user_id)
-                await delete_scenario.proceed()
+                delete_scenario = self.db.for_delete_birthday(
+                    self.logger,
+                    guild.id,
+                    user_id
+                )
+                await delete_scenario.db_proceed()
                 continue
 
-            await channel.send(
-                f"Today we celebrate a birthday! 🎉🎂 {member.mention}"
-            )
+            message = await channel.send(BIRTHDAY_MSGS.get('congrats_msg') + member.mention)
 
+            await message.add_reaction('🎂')
             await self.update_congrats(guild.id, user_id, today_str)
 
-    async def update_congrats(self, guild_id: int, user_id, today_str) -> None:
-        update_scenario = self.factory.for_update_last_congrats(guild_id, user_id, today_str)
-        await update_scenario.proceed()
+    async def update_congrats(
+            self,
+            guild_id: int,
+            user_id,
+            today_str
+    ) -> None:
+
+        update_scenario = self.db.for_update_last_congrats(
+            self.logger,
+            guild_id,
+            user_id,
+            today_str
+        )
+
+        await update_scenario.db_proceed()

@@ -5,6 +5,11 @@ from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message
 
 
 class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
+    def __init__(self, channel: discord.TextChannel):
+        super().__init__()
+        self.channel = channel
+        self.b_day_service = DeleteMessageService()
+
     amount = discord.ui.TextInput(
         label="How many messages do you want to delete?",
         placeholder="Enter a number",
@@ -12,12 +17,8 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
         max_length=3
     )
 
-    def __init__(self, channel: discord.TextChannel):
-        super().__init__()
-        self.channel = channel
-
     async def on_submit(self, interaction: discord.Interaction):
-        await DeleteMessageService.process(
+        await self.b_day_service.process(
             interaction=interaction,
             amount=int(self.amount.value),
             channel=self.channel

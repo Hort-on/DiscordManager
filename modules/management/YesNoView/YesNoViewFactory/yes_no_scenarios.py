@@ -1,12 +1,13 @@
 import discord
 
 from database.data_base_model import DB
+from database.db_factory.db_scenario_factory import DBScenarioFactory
 from utils.messages import EDIT_CONFIG_MESSAGES as ECM
 from modules.buttons.buttons_for_admins.edit_settings_button.service.setting_selection import SettingSelectorView
 
 
 class BaseScenario:
-    async def proceed(self, interaction: discord.Interaction, **kwargs):
+    async def yes_no_proceed(self, interaction: discord.Interaction, **kwargs):
         raise NotImplementedError
 
 
@@ -16,7 +17,7 @@ class StartConfigScenario(BaseScenario):
         self.config_key = config_key
         self.on_decline_callback = on_decline_callback
 
-    async def proceed(self, interaction: discord.Interaction, **kwargs):
+    async def yes_no_proceed(self, interaction: discord.Interaction, **kwargs):
         value: bool = kwargs.get('value')
 
         if self.config_key is not None:
@@ -30,11 +31,11 @@ class StartConfigScenario(BaseScenario):
 
 
 class ConfirmationScenario(BaseScenario):
-    def __init__(self, config_key):
-        self.db = DB()
+    def __init__(self, db: DBScenarioFactory, config_key):
+        self.db = db
         self.config_key =  config_key
 
-    async def proceed(self, interaction, **kwargs):
+    async def yes_no_proceed(self, interaction, **kwargs):
         value: bool = kwargs.get('value')
         try:
             await self.db.write_data(
@@ -44,13 +45,13 @@ class ConfirmationScenario(BaseScenario):
             )
 
             await interaction.message.edit(
-                content=ECM.get('success_editing_msg'),
-                view=SettingSelectorView()
+                content=ECM.get('success_edit_msg'),
+                view=SettingSelectorView(self.db)
             )
 
         except Exception as e:
             print('[DB ERROR]', e)
             await interaction.message.edit(
-                content=ECM.get('failed_editing_msg'),
-                view=SettingSelectorView()
+                content=ECM.get('failure_edit_msg'),
+                view=SettingSelectorView(self.db)
             )
