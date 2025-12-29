@@ -20,13 +20,13 @@ class Management(View):
             self,
             guild_id: int,
             settings: SettingsStorage,
-            db: DBScenarioFactory,
+            db_factory: DBScenarioFactory,
             birthday: BirthdayRepo,
             logger: Logger
     ):
 
         super().__init__()
-        self.db = db
+        self.db_factory = db_factory
         self.guild_id = guild_id
         self.settings = settings
         self.birthday = birthday
@@ -36,7 +36,7 @@ class Management(View):
 
     def _add_buttons(self):
         """Додає кнопки залежно від налаштувань"""
-        self.add_item(EditSettingsButton(self.db, self.logger))
+        self.add_item(EditSettingsButton(self.db_factory))
         self.add_item(DeleteMessageButton())
         self.add_item(RandomizeButton()) #TODO: зробити загально доступною
 
@@ -45,4 +45,4 @@ class Management(View):
             self.add_item(DeleteBirthdayButton(self.birthday))
 
         if self.settings.get_guild_settings(self.guild_id).get('send_messages'):
-            self.add_item(SendMessageButton(self.db))
+            self.add_item(SendMessageButton(self.db_factory))

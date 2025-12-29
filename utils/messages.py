@@ -185,7 +185,16 @@ SYSTEM_MSGS = {
         "```❌ You don't have permission to do this action```",
 
     'success_message_delete_msg':
-        "✅ Deleted {deleted} messages in {channel}"
+        "```✅ Deleted {deleted} messages in {channel}```",
+
+    'ask_private_channel_msg':
+        "```❗ Please select the channel where the messages will be sent.:```",
+
+    'ask_private_msg':
+        "```❗ Please check your private messages to select a channel.```",
+
+    'send_message_failure_msg':
+        "```❗ Failed to send a message to your private messages. Please check your privacy settings.```"
 }
 
 ROLES_MSGS = {
@@ -207,5 +216,8 @@ DB_MSGS = {
         "❌ Failed to write data into DB",
 
     'failure_create_table_msg':
-        "❌ Failed to create table in the DB"
+        "❌ Failed to create table in the DB",
+
+    'channel_successful_msg':
+        "```✅ The channel successfully saved to the DB.```"
 }

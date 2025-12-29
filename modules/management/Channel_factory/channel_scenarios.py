@@ -1,28 +1,32 @@
+import discord
+
 from database.db_factory.db_scenario_factory import DBScenarioFactory
 from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message.service.DeleteMessageModal import \
     DeleteMessagesModal
 
+from utils.messages import DB_MSGS, SYSTEM_MSGS
+
 
 class ChannelScenario:
-    async def channel_proceed(self, interaction, channel):
+    async def channel_proceed(self, interaction: discord.Interaction, channel):
         raise NotImplementedError
 
 
 class SaveChannelToDBForMessageScenario(ChannelScenario):
     def __init__(
             self,
-            db: DBScenarioFactory
+            db_factory: DBScenarioFactory
     ):
 
-        self.db = db
+        self.db_factory = db_factory
 
     async def on_channel_selected(
             self,
-            interaction,
+            interaction: discord.Interaction,
             channel
-    ) -> bool:
+    ) -> None:
 
-        return await self.db.write_data(
+        write_data_scenario = self.db_factory.for_write_data(
             interaction.guild.id,
             'channels',
             {
@@ -32,24 +36,35 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
             }
         )
 
+        result = await write_data_scenario.db_proceed()
+        if result:
+            await interaction.edit_original_response(
+                content=DB_MSGS.get('channel_successful_msg')
+            )
+            return
+
+        await interaction.edit_original_response(
+            content=SYSTEM_MSGS.get('failure_msg')
+        )
+
 
 class SaveChannelToDBScenario(ChannelScenario):
     def __init__(
             self,
-            db: DBScenarioFactory,
-            config_key
+            db_factory: DBScenarioFactory,
+            config_key: str
     ):
 
-        self.db = db
+        self.db_factory = db_factory
         self.config_key = config_key
 
     async def channel_proceed(
             self,
-            interaction,
+            interaction: discord.Interaction,
             channel
-    ) -> bool:
+    ) -> None:
 
-        return await self.db.write_data(
+        write_data_scenario =  self.db_factory.for_write_data(
             interaction.guild.id,
             'settings',
             {
@@ -57,17 +72,28 @@ class SaveChannelToDBScenario(ChannelScenario):
             }
         )
 
+        result = await write_data_scenario.db_proceed()
+        if result:
+            await interaction.edit_original_response(
+                content=DB_MSGS.get('channel_successful_msg')
+            )
+            return
+
+        await interaction.edit_original_response(
+            content=SYSTEM_MSGS.get('failure_msg')
+        )
+
 
 class WizardScenario(ChannelScenario):
     def __init__(
             self,
             parent,
-            db: DBScenarioFactory,
+            db_factory: DBScenarioFactory,
             config_key
     ):
 
         self.parent = parent
-        self.db = db
+        self.db_factory = db_factory
         self.config_key = config_key
 
     async def channel_proceed(

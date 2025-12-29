@@ -7,7 +7,7 @@ from utils.messages import SYSTEM_MSGS as SM
 
 
 class SettingSelector(discord.ui.Select):
-    def __init__(self, db: DBScenarioFactory):
+    def __init__(self, db_factory: DBScenarioFactory):
         super().__init__(
             placeholder="Please select a setting to edit...",
             options=[
@@ -21,24 +21,36 @@ class SettingSelector(discord.ui.Select):
             max_values=1
         )
 
-        self.db = db
+        self.db_factory = db_factory
 
-        self.choice_handler = ChoiceHandler(self.db)
+        self.choice_handler = ChoiceHandler(self.db_factory)
 
-    async def callback(self, interaction: discord.Interaction) -> None:
+    async def callback(
+            self,
+            interaction: discord.Interaction
+    ) -> None:
+
         config_key = self.values[0]
-
         option_type = SETTINGS_OPTIONS.get(config_key)
 
         if not option_type:
-            await interaction.edit_original_response(content=SM.get('failure_msg'))
+            await interaction.edit_original_response(
+                content=SM.get('failure_msg')
+            )
             return
 
-        await self.choice_handler.choice_procedure(interaction, option_type, config_key)
+        await self.choice_handler.choice_procedure(
+            interaction,
+            option_type,
+            config_key
+        )
 
 
 class SettingSelectorView(discord.ui.View):
-    def __init__(self, db: DBScenarioFactory,):
+    def __init__(
+            self,
+            db_factory: DBScenarioFactory
+    ):
         super().__init__(timeout=None)
-        self.db = db
-        self.add_item(SettingSelector(self.db))
+        self.db_factory = db_factory
+        self.add_item(SettingSelector(self.db_factory))

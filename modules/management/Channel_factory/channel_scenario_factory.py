@@ -11,32 +11,32 @@ class ChannelScenarioFactory:
 
     @staticmethod
     def for_db_save(
-            db: DBScenarioFactory,
+            db_factory: DBScenarioFactory,
             config_key: str
     ) -> SaveChannelToDBScenario:
 
         return SaveChannelToDBScenario(
-            db,
+            db_factory,
             config_key
         )
 
     @staticmethod
     def for_db_message_save(
-            db: DBScenarioFactory
+            db_factory: DBScenarioFactory
     ) -> SaveChannelToDBForMessageScenario:
 
-        return SaveChannelToDBForMessageScenario(db)
+        return SaveChannelToDBForMessageScenario(db_factory)
 
     @staticmethod
     def for_wizard(
             parent,
-            db: DBScenarioFactory,
+            db_factory: DBScenarioFactory,
             config_key: str
     ) -> WizardScenario:
 
         return WizardScenario(
             parent,
-            db,
+            db_factory,
             config_key
         )
 
@@ -47,17 +47,17 @@ class ChannelScenarioFactory:
     @staticmethod
     def for_full_setup(
             parent,
-            db: DBScenarioFactory,
+            db_factory: DBScenarioFactory,
             config_key: str
     ):
         return CompositeScenario(
             WizardScenario(
                 parent,
-                db,
+                db_factory,
                 config_key
             ),
             SaveChannelToDBScenario(
-                db,
+                db_factory,
                 config_key
             ),
         )

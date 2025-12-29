@@ -12,15 +12,29 @@ from utils.bad_words import invitation_pattern
 
 
 class BotController:
-    def __init__(self, bot):
-        self.bot = bot
-        self.db = DBScenarioFactory()
-        self.logger = Logger() #готово
+    def __init__(
+            self,
+            bot,
+            db_connect,
+            db_factory,
+            logger,
+            guild_settings,
+            birthday_repo,
+            bad_words_handler,
+            member_left_notify
 
-        self.guilds_settings = SettingsStorage(self.bot, self.db, self.logger) #готово
-        self.birthday = BirthdayRepo(self.bot, self.guilds_settings, self.db, self.logger) #готово
-        self.bad_words = BadWordsHandler()
-        self.member_left = MemberLeftNotification(self.bot, self.db, self.guilds_settings) #готово
+    ):
+        self.bot = bot
+
+        self.db_connect = db_connect
+        self.db_factory = db_factory
+
+        self.logger = logger
+
+        self.guilds_settings = guild_settings
+        self.birthday_repo = birthday_repo
+        self.bad_words = bad_words_handler
+        self.member_left_notify = member_left_notify
 
         self.bot.add_listener(self.on_ready)
         self.bot.add_listener(self.on_message)

@@ -22,18 +22,24 @@ class SuperUserProcedure:
             usernames = [name.strip() for name in msg.content.split(',')]
 
             for username in usernames:
-                member = discord.utils.get(interaction.guild.members, name=username)
+                member_name = discord.utils.get(
+                    interaction.guild.members,
+                    name=username
+                )
 
-                if member:
-                    self.parent.found_users.append(member)
+                if not member_name:
+                    member_display_name = discord.utils.get(
+                        interaction.guild.members,
+                        display_name=username
+                    )
 
-                if member is None:
-                    member = discord.utils.get(interaction.guild.members, display_name=username)
+                    if not member_display_name:
+                        continue
 
-                    if member:
-                        self.parent.found_users.append(member)
-                    else:
-                        self.parent.not_found_users.append(username)
+                    self.parent.found_users.append(member_display_name)
+
+                self.parent.found_users.append(member_name)
+
 
                 found_result = f"Added {len(self.parent.found_users)} superuser(s):\n"
                 found_result += "\n".join([f"- {member.name}" for member in self.parent.found_users])
@@ -41,7 +47,9 @@ class SuperUserProcedure:
                 not_found_result = ""
                 if self.parent.not_found_users:
                     not_found_result = "\n\nNot found on this server, please check their names:\n"
-                    not_found_result += "\n".join([f"- {name}" for name in self.parent.not_found_users])
+                    not_found_result += "\n".join(
+                        [f"- {name}" for name in self.parent.not_found_users]
+                    )
 
                 result_msg = f"```{found_result}{not_found_result}```"
 

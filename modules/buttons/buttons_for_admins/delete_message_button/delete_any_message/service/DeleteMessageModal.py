@@ -8,7 +8,7 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
     def __init__(self, channel: discord.TextChannel):
         super().__init__()
         self.channel = channel
-        self.b_day_service = DeleteMessageService()
+        self.delete_msg_service = DeleteMessageService()
 
     amount = discord.ui.TextInput(
         label="How many messages do you want to delete?",
@@ -18,7 +18,7 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        await self.b_day_service.process(
+        await self.delete_msg_service.process(
             interaction=interaction,
             amount=int(self.amount.value),
             channel=self.channel

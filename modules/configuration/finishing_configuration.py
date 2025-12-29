@@ -1,50 +1,55 @@
 import discord
+
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.logger.logger import Logger
+
 from utils.format_the_result import FormatResult
-from utils.messages import GENERAL_MSGS, DB_MSGS
+from utils.messages import GENERAL_MSGS, SYSTEM_MSGS
 
 
 class FinishingConfiguration:
     def __init__(
             self,
             parent,
-            db: DBScenarioFactory,
-            logger: Logger
+            db_factory: DBScenarioFactory,
     ):
 
         self.parent = parent
-        self.db = db
-        self.logger = logger
+        self.db_factory = db_factory
 
     async def finishing_configuration(self, interaction: discord.Interaction) -> None:
-        try:
-            await self.db.write_data(
-                interaction.guild.id,
-                'settings',
-                {key.replace('_enabled', ''): value for key, value in self.parent.config.items()}
+        write_data_scenario = self.db_factory.for_write_data(
+            interaction.guild.id,
+            'settings',
+            {key.replace('_enabled', ''): value for key, value in self.parent.config.items()}
+        )
+
+        result = await write_data_scenario.db_proceed()
+        if not result:
+            await interaction.edit_original_response(
+                content=SYSTEM_MSGS.get('failure_msg')
             )
-        except Exception as e:
-            await self.logger.error(DB_MSGS.get('failure_write_msg'), exc=e)
             return
 
         if not self.parent.found_users:
             await self.send_the_result(interaction)
 
-        await self.users_procedure(interaction)
+        await self.superusers_procedure(interaction)
 
-    async def users_procedure(self, interaction) -> None:
-        for member in self.parent.found_users:
-            try:
-               await self.db.write_data(
-                    interaction.guild.id,
-                    "super_users",
-                    {"user_id": member.id
-                     })
+    async def superusers_procedure(self, interaction: discord.Interaction) -> None:
+        user_ids = [member.id for member in self.parent.found_users]
 
-            except Exception as e:
-                await self.logger.error(DB_MSGS.get('failure_write_msg'), exc=e)
-                return
+        write_data_scenario = self.db_factory.for_write_user(
+            interaction.guild.id,
+            "super_users",
+            user_ids
+        )
+
+        result = await write_data_scenario.db_proceed()
+        if not result:
+            await interaction.edit_original_response(
+                content=SYSTEM_MSGS.get('failure_msg')
+            )
+            return
 
         await self.send_the_result(interaction)
 

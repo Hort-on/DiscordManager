@@ -9,9 +9,9 @@ from utils.messages import CONFIG_MSGS
 
 
 class StartCog(commands.Cog):
-    def __init__(self, bot, db: DBScenarioFactory, logger: Logger):
+    def __init__(self, bot, db_factory: DBScenarioFactory, logger: Logger):
         self.bot = bot
-        self.db = db
+        self.db_factory = db_factory
         self.logger = logger
 
     @app_commands.command(
@@ -19,8 +19,7 @@ class StartCog(commands.Cog):
         description="Start server configuration"
     )
     async def start_config(self, interaction: discord.Interaction):
-        scenario_get_data = self.db.for_get_data(
-            self.logger,
+        scenario_get_data = self.db_factory.for_get_data(
             interaction.guild.id,
             'settings',
             'configuration_done'
@@ -36,7 +35,7 @@ class StartCog(commands.Cog):
             ephemeral=True
         )
 
-        view = ConfigurationView(self.db, self.logger)
+        view = ConfigurationView(self.db_factory, self.logger)
         await interaction.response.send_message(
             CONFIG_MSGS.get('config_welcome_msg'),
             view=view,

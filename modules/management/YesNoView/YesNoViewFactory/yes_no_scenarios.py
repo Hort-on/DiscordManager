@@ -1,8 +1,7 @@
 import discord
 
-from database.data_base_model import DB
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-from utils.messages import EDIT_CONFIG_MESSAGES as ECM
+from utils.messages import EDIT_CONFIG_MSGS as ECM
 from modules.buttons.buttons_for_admins.edit_settings_button.service.setting_selection import SettingSelectorView
 
 
@@ -31,27 +30,28 @@ class StartConfigScenario(BaseScenario):
 
 
 class ConfirmationScenario(BaseScenario):
-    def __init__(self, db: DBScenarioFactory, config_key):
-        self.db = db
+    def __init__(self, db_factory: DBScenarioFactory, config_key):
+        self.db_factory = db_factory
         self.config_key =  config_key
 
     async def yes_no_proceed(self, interaction, **kwargs):
         value: bool = kwargs.get('value')
-        try:
-            await self.db.write_data(
-                interaction.guild.id,
-                'settings',
-                {self.config_key: value}
-            )
 
+        write_data_scenario =  self.db_factory.for_write_data(
+            interaction.guild.id,
+            'settings',
+            {self.config_key: value}
+        )
+
+        result = await write_data_scenario.db_proceed()
+        if result:
             await interaction.message.edit(
                 content=ECM.get('success_edit_msg'),
-                view=SettingSelectorView(self.db)
+                view=SettingSelectorView(self.db_factory)
             )
+            return
 
-        except Exception as e:
-            print('[DB ERROR]', e)
-            await interaction.message.edit(
-                content=ECM.get('failure_edit_msg'),
-                view=SettingSelectorView(self.db)
-            )
+        await interaction.message.edit(
+            content=ECM.get('failure_edit_msg'),
+            view=SettingSelectorView(self.db_factory)
+        )

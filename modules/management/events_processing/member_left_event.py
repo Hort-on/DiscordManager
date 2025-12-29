@@ -1,11 +1,9 @@
-from database.db_factory.db_scenario_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 from utils.messages import GENERAL_MSGS as GM
 
 
 class MemberLeftNotification:
-    def __init__(self, bot, db: DBScenarioFactory, settings: SettingsStorage):
-        self.db = db
+    def __init__(self, bot, settings: SettingsStorage):
         self.bot = bot
         self.settings = settings
 

@@ -12,4 +12,3 @@ class RandomizeButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()
-

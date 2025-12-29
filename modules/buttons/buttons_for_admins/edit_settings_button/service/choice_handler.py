@@ -9,14 +9,14 @@ from utils.messages import GENERAL_MSGS, EDIT_CONFIG_MSGS, SYSTEM_MSGS
 
 
 class ChoiceHandler:
-    def __init__(self, db: DBScenarioFactory):
-        self.db = db
+    def __init__(self, db_factory: DBScenarioFactory):
+        self.db_factory = db_factory
 
     async def choice_procedure(self, interaction: discord.Interaction, option_type: str, config_key: str) -> None:
         match option_type:
             case 'boolean':
                 scenario = YesNoViewFactory.for_confirmation(
-                    self.db,
+                    self.db_factory,
                     config_key
                 )
 
@@ -30,7 +30,7 @@ class ChoiceHandler:
 
             case 'channel':
                 scenario = ChannelScenarioFactory.for_db_save(
-                    self.db,
+                    self.db_factory,
                     config_key
                 )
 

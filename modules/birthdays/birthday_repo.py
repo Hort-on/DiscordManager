@@ -2,7 +2,6 @@ import discord
 
 from datetime import datetime
 
-from modules.logger.logger import Logger
 from utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
@@ -14,14 +13,12 @@ class BirthdayRepo:
             self,
             bot,
             settings: SettingsStorage,
-            db: DBScenarioFactory,
-            logger: Logger
+            db_factory: DBScenarioFactory
     ):
 
         self.bot = bot
         self.settings = settings
-        self.db = db
-        self.logger = logger
+        self.db_factory = db_factory
 
     async def add_new_birthday(
             self,
@@ -46,8 +43,7 @@ class BirthdayRepo:
             )
             return
 
-        exists_scenario = self.db.for_exists_birthday_check(
-            self.logger,
+        exists_scenario = self.db_factory.for_exists_birthday_check(
             guild_id,
             user_id
 
@@ -58,8 +54,7 @@ class BirthdayRepo:
             )
             return
 
-        add_scenario = self.db.for_add_birthday(
-            self.logger,
+        add_scenario = self.db_factory.for_add_birthday(
             guild_id,
             user_id,
             user_birthday
@@ -85,8 +80,7 @@ class BirthdayRepo:
             guild_id: int
     ) -> None:
 
-        exists_scenario = self.db.for_exists_birthday_check(
-            self.logger,
+        exists_scenario = self.db_factory.for_exists_birthday_check(
             guild_id,
             user_id
         )
@@ -97,8 +91,7 @@ class BirthdayRepo:
             )
             return
 
-        delete_scenario = self.db.for_delete_birthday(
-            self.logger,
+        delete_scenario = self.db_factory.for_delete_birthday(
             guild_id,
             user_id
         )
@@ -125,11 +118,10 @@ class BirthdayRepo:
             today_str = today.strftime('%d.%m')
 
             if today.month == 1 and today.day == 1:
-                reset_scenario = self.db.for_reset_congrats(self.logger)
+                reset_scenario = self.db_factory.for_reset_congrats()
                 await reset_scenario.db_proceed()
 
-            today_birthdays_scenario = self.db.for_get_today_birthday(
-                self.logger,
+            today_birthdays_scenario = self.db_factory.for_get_today_birthday(
                 guild.id,
                 today_str
             )
@@ -140,7 +132,6 @@ class BirthdayRepo:
                 continue
 
             await self.prepare_data(
-                self.logger,
                 guild.id,
                 today_str,
                 birthdays
@@ -148,14 +139,12 @@ class BirthdayRepo:
 
     async def prepare_data(
             self,
-            logger: Logger,
             guild_id: int,
             today_str: str,
             birthdays: list
     ) -> None:
 
-        settings_scenario = self.db.for_get_data(
-            logger,
+        settings_scenario = self.db_factory.for_get_data(
             guild_id,
             "settings",
             "congrats_channel_id"
@@ -193,8 +182,7 @@ class BirthdayRepo:
             member = guild.get_member(user_id)
 
             if not member:
-                delete_scenario = self.db.for_delete_birthday(
-                    self.logger,
+                delete_scenario = self.db_factory.for_delete_birthday(
                     guild.id,
                     user_id
                 )
@@ -213,8 +201,7 @@ class BirthdayRepo:
             today_str
     ) -> None:
 
-        update_scenario = self.db.for_update_last_congrats(
-            self.logger,
+        update_scenario = self.db_factory.for_update_last_congrats(
             guild_id,
             user_id,
             today_str

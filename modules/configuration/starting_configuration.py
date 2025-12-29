@@ -17,13 +17,11 @@ from utils.messages import CONFIG_MSGS as CM
 class ConfigurationView(discord.ui.View):
     def __init__(
             self,
-            db: DBScenarioFactory,
-            logger: Logger
+            db_factory: DBScenarioFactory,
     ):
 
         super().__init__()
-        self.db = db
-        self.logger = logger
+        self.db_factory = db_factory
 
         self.config = {}
         self.found_users = []
@@ -52,7 +50,11 @@ class ConfigurationView(discord.ui.View):
 
             match view_type:
                 case 'YesNoView':
-                    scenario = YesNoViewFactory.for_start_config(parent=self, config_key=config_key)
+                    scenario = YesNoViewFactory.for_start_config(
+                        parent=self,
+                        config_key=config_key
+                    )
+
                     view = YesNoView(scenario)
 
                     await interaction.edit_original_response(
@@ -61,7 +63,12 @@ class ConfigurationView(discord.ui.View):
                     )
 
                 case 'ChannelTypeView':
-                    scenario = ChannelScenarioFactory.for_wizard(parent=self, config_key=config_key)
+                    scenario = ChannelScenarioFactory.for_wizard(
+                        parent=self,
+                        db_factory=self.db_factory,
+                        config_key=config_key
+                    )
+
                     view = ChannelTypeView(scenario)
 
                     await interaction.edit_original_response(
@@ -75,7 +82,7 @@ class ConfigurationView(discord.ui.View):
 
             self.step_index += 1
 
-        finishing_handler = FinishingConfiguration(self, self.db, self.logger)
+        finishing_handler = FinishingConfiguration(self, self.db_factory)
         await finishing_handler.finishing_configuration(interaction)
         return
 

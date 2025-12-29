@@ -1,18 +1,17 @@
-from modules.logger.logger import Logger
+from database.db_factory.db_scenario_factory import DBScenarioFactory
 
 
 class SettingsStorage:
-    def __init__(self, bot, db, logger: Logger):
-        self.db = db
+    def __init__(self, bot, db_factory: DBScenarioFactory):
+        self.db_factory = db_factory
         self.bot = bot
-        self.logger = logger
         self.guilds_settings = {}
         self.guilds_superusers = {}
         self.guilds_roles = {}
 
     async def load_all_settings(self) -> None:
         for guild in self.bot.guilds:
-            guild_data_scenario = self.db.for_fetch_all(
+            guild_data_scenario = self.db_factory.for_fetch_all(
                 guild.id,
                 'settings'
             )
@@ -24,10 +23,9 @@ class SettingsStorage:
             self.guilds_settings[guild.id] = result
 
         for guild in self.bot.guilds:
-            superusers_scenario = self.db.for_get_data(
+            superusers_scenario = self.db_factory.for_get_data(
                 guild.id,
                 'super_users',
-                self.logger,
                 'userId'
             )
 

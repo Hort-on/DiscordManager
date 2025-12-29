@@ -3,7 +3,7 @@ from modules.logger.logger import Logger
 from utils.messages import DB_MSGS as DM
 
 
-class BaseScenario:
+class DataBaseScenario:
     table_map = {
         'settings': "GuildSettings",
         'super_users': "SuperUsers",
@@ -11,262 +11,283 @@ class BaseScenario:
         'birthdays': "Birthdays"
     }
 
+    def __init__(self, db_connect: DB, logger: Logger):
+        self.logger = logger
+        self.db_connect = db_connect
+
+    async def db_proceed(self):
+        try:
+            return await self._execute()
+        except Exception as e:
+            await self.logger.error(
+                await self.logger.error(DM.get('failure_read_msg'), exc=e)
+            )
+            return None
+
+    async def _execute(self):
+        raise NotImplementedError
+
     def _get_table(self, table_name: str) -> str:
         table = self.table_map.get(table_name)
         if not table:
             raise ValueError(f"Unknown table name: {table_name}")
         return table
 
-    async def db_proceed(self):
-        raise NotImplementedError
 
 
-class GetDataScenario(BaseScenario):
+class GetDataScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             table_name: str,
             *columns
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.table_name = table_name
         self.columns = columns
 
-    async def db_proceed(self) -> dict | None:
+    async def _execute(self) -> dict:
         table = self._get_table(self.table_name)
         columns_sql = ", ".join(self.columns)
         query = f"SELECT {columns_sql} FROM {table} WHERE guild_id = ?"
 
-        try:
-            async with self.db.connect() as db:
-                async with db.execute(query, (self.guild_id,)) as cursor:
-                    col_names = [desc[0] for desc in cursor.description]
 
-                    row = await cursor.fetchone()
-                    return dict(zip(col_names, row)) if row else None
+        async with self.db_connect.connect() as db:
+            async with db.execute(query, (self.guild_id,)) as cursor:
+                col_names = [desc[0] for desc in cursor.description]
 
-        except Exception as e:
-            await self.logger.error(DM.get('failure_read_msg'), exc=e)
+                row = await cursor.fetchone()
+                return dict(zip(col_names, row)) if row else None
 
 
-class WriteDataScenario(BaseScenario):
+
+class WriteDataScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             table_name: str,
             data: dict
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.table_name = table_name
         self.data = data
 
-    async def db_proceed(self) -> bool | None:
+    async def _execute(self) -> bool:
         table = self._get_table(self.table_name)
 
-        try:
-            async with self.db.connect() as cursor:
-                columns = ", ".join(["guild_id", *self.data.keys()])
-                placeholders = ", ".join(["?"] * (len(self.data) + 1))
-                update_clause = ", ".join(f"{k}=excluded.{k}" for k in self.data.keys())
-                query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
-                        ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
+        columns = ", ".join(["guild_id", *self.data.keys()])
+        placeholders = ", ".join(["?"] * (len(self.data) + 1))
+        update_clause = ", ".join(f"{k}=excluded.{k}" for k in self.data.keys())
 
-                await cursor.execute(query, (self.guild_id, *self.data.values()))
-                return cursor.rowcount > 0
+        query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
+                            ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
 
-        except Exception as e:
-            await self.logger.error(DM.get('failure_write_msg'), exc=e)
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, *self.data.values()))
+            return cursor.rowcount > 0
 
-class FetchAllDataScenario(BaseScenario):
+
+class WriteUserScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
+            logger: Logger,
+            guild_id: int,
+            table_name: str,
+            user_ids: list[int]
+    ):
+        super().__init__(db_connect, logger)
+        self.guild_id = guild_id
+        self.table_name = table_name
+        self.user_ids = user_ids
+
+    async def _execute(self) -> bool:
+        table = self._get_table("super_users")
+
+        query = f"""
+            INSERT INTO {table} (guild_id, user_id)
+            VALUES (?, ?)
+            ON CONFLICT(guild_id, user_id) DO NOTHING
+        """
+
+        values = [(self.guild_id, user_id) for user_id in self.user_ids]
+
+        async with self.db_connect.connect() as cursor:
+            await cursor.executemany(query, values)
+            return cursor.rowcount > 0
+
+
+class FetchAllDataScenario(DataBaseScenario):
+    def __init__(
+            self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             table_name: str
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.table_name = table_name
 
-    async def db_proceed(self) -> list[dict | None] | None:
+    async def _execute(self) -> list[dict | None]:
         table = self._get_table(self.table_name)
         query = f"SELECT * FROM {table} WHERE guild_id = ?"
 
-        try:
-            async with self.db.connect() as db:
-                async with db.execute(query, (self.guild_id,)) as cursor:
-                    columns = [desc[0] for desc in cursor.description]
-                    rows = await cursor.fetchall()
+        async with self.db_connect.connect() as db:
+            async with db.execute(query, (self.guild_id,)) as cursor:
+                columns = [desc[0] for desc in cursor.description]
+                rows = await cursor.fetchall()
 
-                    if not rows:
-                        return []
+                if not rows:
+                    return []
 
-                    return [dict(zip(columns, row)) for row in rows]
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_read_msg', exc=e))
+                return [dict(zip(columns, row)) for row in rows]
 
 
-class AddBirthdayScenario(BaseScenario):
+class AddBirthdayScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             user_id: int,
             user_birthday: str
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.user_id = user_id
         self.birthday = user_birthday
 
-    async def db_proceed(self) -> bool | None:
+    async def _execute(self) -> bool:
         table = self._get_table("birthdays")
         query = f"INSERT INTO {table} (guild_id, user_id, birthday, last_congrats) VALUES (?, ?, ?, ?)"
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query, (self.guild_id, self.user_id, self.birthday, None))
-                return cursor.rowcount > 0
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_write_msg', exc=e))
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.user_id, self.birthday, None))
+            return cursor.rowcount > 0
 
 
-class DeleteBirthdayScenario(BaseScenario):
+class DeleteBirthdayScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             user_id: int
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.user_id = user_id
 
-    async def db_proceed(self) -> bool | None:
+    async def _execute(self) -> bool:
         table = self._get_table("birthdays")
         query = f"DELETE FROM {table} WHERE guild_id = ? AND user_id = ?"
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query, (self.guild_id, self.user_id))
-                return cursor.rowcount > 0
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_write_msg'), exc=e)
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.user_id))
+            return cursor.rowcount > 0
 
 
-class ExistBirthdayCheckScenario(BaseScenario):
+class ExistBirthdayCheckScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             user_id: int
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.user_id = user_id
 
-    async def db_proceed(self) -> bool | None:
+    async def _execute(self) -> bool:
         table = self._get_table("birthdays")
         query = f"SELECT 1 FROM {table} WHERE user_id = ? AND guild_id = ? LIMIT 1"
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query, (self.user_id, self.guild_id))
-                return await cursor.fetchone() is not None
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.user_id, self.guild_id))
+            return await cursor.fetchone() is not None
 
-        except Exception as e:
-            await self.logger.error(DM.get('failure_read_msg'), exc=e)
-
-class GetTodayBirthdayScenario(BaseScenario):
+class GetTodayBirthdayScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             today: str
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.today = today
 
-    async def db_proceed(self) -> list[int] | None:
+    async def _execute(self) -> list[int]:
         table = self._get_table("birthdays")
         query = f"""SELECT user_id FROM {table} WHERE guild_id = ?
                 AND birthday = ? AND (last_congrats IS NULL OR last_congrats != ?)"""
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query, (self.guild_id, self.today, self.today))
-                return await cursor.fetchall()
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_read_msg'), exc=e)
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.today, self.today))
+            return await cursor.fetchall()
 
 
-class UpdateLastCongratsScenario(BaseScenario):
+class UpdateLastCongratsScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger,
             guild_id: int,
             user_id: int,
             today_str: str
     ):
+        super().__init__(db_connect, logger)
 
-        self.logger = logger
-        self.db = DB(self.logger)
+        self.db_connect = db_connect
         self.guild_id = guild_id
         self.user_id = user_id
         self.date = today_str
 
-    async def db_proceed(self) -> bool | None:
+    async def _execute(self) -> bool:
         table = self._get_table("birthdays")
         query = f"UPDATE {table} SET last_congrats = ? WHERE user_id = ? AND guild_id = ?"
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query, (self.date, self.user_id, self.guild_id))
-                return cursor.rowcount > 0
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_write_msg'), exc=e)
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.date, self.user_id, self.guild_id))
+            return cursor.rowcount > 0
 
 
-class ResetAllCongratsScenario(BaseScenario):
+class ResetAllCongratsScenario(DataBaseScenario):
     def __init__(
             self,
+            db_connect: DB,
             logger: Logger
     ):
-
+        super().__init__(db_connect, logger)
+        self.db_connect = db_connect
         self.logger = logger
-        self.db = DB(self.logger)
 
-    async def db_proceed(self) -> None:
+    async def _execute(self) -> None:
         table = self._get_table("birthdays")
         query = f"UPDATE {table} SET last_congrats = NULL"
 
-        try:
-            async with self.db.connect() as cursor:
-                await cursor.execute(query)
-
-        except Exception as e:
-            await self.logger.error(DM.get('failure_write_msg'), exc=e)
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query)
