@@ -11,13 +11,13 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
         self.delete_msg_service = DeleteMessageService()
 
     amount = discord.ui.TextInput(
-        label="How many messages do you want to delete?",
-        placeholder="Enter a number",
+        label='How many messages do you want to delete?',
+        placeholder='Enter a number',
         required=True,
         max_length=3
     )
 
-    async def on_submit(self, interaction: discord.Interaction):
+    async def on_submit(self, interaction: discord.Interaction) -> None:
         await self.delete_msg_service.process(
             interaction=interaction,
             amount=int(self.amount.value),

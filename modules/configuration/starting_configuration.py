@@ -1,14 +1,12 @@
-from typing import Any
-
 import discord
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.logger.logger import Logger
+from modules.configuration.superusers.modal.superuser_modal import SuperUserModal
 from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
 from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
 from modules.management.YesNoView.view.YesNoView import YesNoView
 from modules.management.channels_processing.getting_channel import ChannelTypeView
-from modules.configuration.superuser_procedure import SuperUserProcedure
+from modules.configuration.superusers.superuser_procedure import SuperUserProcedure
 from modules.configuration.finishing_configuration import FinishingConfiguration
 
 from utils.start_config_steps import STEPS, STEP_DEPENDENCIES
@@ -24,8 +22,9 @@ class ConfigurationView(discord.ui.View):
         self.db_factory = db_factory
 
         self.config = {}
-        self.found_users = []
-        self.not_found_users = []
+
+        self.found_user_ids: dict[int, str] = {}
+        self.not_found_users: list[str] = []
 
         self.step_index = 0
 
@@ -77,8 +76,8 @@ class ConfigurationView(discord.ui.View):
                     )
 
                 case 'SuperUsers':
-                    super_user_handler = SuperUserProcedure(self)
-                    await super_user_handler.super_user_procedure(interaction)
+                    superuser_modal = SuperUserModal(parent=self)
+                    await interaction.response.send_modal(superuser_modal)
 
             self.step_index += 1
 

@@ -7,7 +7,7 @@ class SuperUserProcedure:
 
 
     # ПОТРІБНО ОПТИМІЗУВАТИ ТА ПЕРЕПИСАТИ
-    async def super_user_procedure(self,  interaction: discord.Interaction):
+    async def superuser_prepare(self,  interaction: discord.Interaction):
         await interaction.edit_original_response(content=CM.get('super_user_procedure_msg'))
 
         def _check(m):
@@ -54,7 +54,6 @@ class SuperUserProcedure:
                 result_msg = f"```{found_result}{not_found_result}```"
 
                 await interaction.edit_original_response(content=result_msg)
-            else:
                 #TODO: добавити це повідомлення у загальний список messages
                 await interaction.edit_original_response(
                     content="```None of the specified users were found on this server.```"
