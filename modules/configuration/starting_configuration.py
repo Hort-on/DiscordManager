@@ -1,12 +1,14 @@
 import discord
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.configuration.superusers.modal.superuser_modal import SuperUserModal
+
+from modules.configuration.superusers.superuser_modal import SuperUserModal
+
 from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
 from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
 from modules.management.YesNoView.view.YesNoView import YesNoView
 from modules.management.channels_processing.getting_channel import ChannelTypeView
-from modules.configuration.superusers.superuser_procedure import SuperUserProcedure
+
 from modules.configuration.finishing_configuration import FinishingConfiguration
 
 from utils.start_config_steps import STEPS, STEP_DEPENDENCIES
@@ -21,7 +23,7 @@ class ConfigurationView(discord.ui.View):
         super().__init__()
         self.db_factory = db_factory
 
-        self.config = {}
+        self.config: dict[str, bool] = {}
 
         self.found_user_ids: dict[int, str] = {}
         self.not_found_users: list[str] = []
@@ -83,16 +85,18 @@ class ConfigurationView(discord.ui.View):
 
         finishing_handler = FinishingConfiguration(self, self.db_factory)
         await finishing_handler.finishing_configuration(interaction)
+
         return
 
     @staticmethod
-    async def cancel_configuration(interaction: discord.Interaction):
+    async def cancel_configuration(interaction: discord.Interaction) -> None:
+
         await interaction.edit_original_response(
             content=CM.get('canceled_msg'),
             view=None
         )
 
-    def check_step(self, config_key):
+    def check_step(self, config_key) -> bool:
         if not config_key:
             return True
 
