@@ -1,6 +1,6 @@
 import discord
 
-from modules.configuration.superusers.superuser_service import SuperUserService
+from modules.configuration.superuser_service.superuser_service import SuperUserService
 
 
 class SuperUserModal(discord.ui.Modal, title='Superuser names.'):

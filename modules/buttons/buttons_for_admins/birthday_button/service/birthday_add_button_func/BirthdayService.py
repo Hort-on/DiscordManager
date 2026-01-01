@@ -8,14 +8,14 @@ class AddBirthdayService:
 
     async def process(
             self,
-        interaction: discord.Interaction,
-        username: str,
-        birthday: str
+            interaction: discord.Interaction,
+            username: str,
+            birthday: str
     ) -> None:
 
         member = (
-            discord.utils.get(interaction.guild.members, name=username)
-            or discord.utils.get(interaction.guild.members, display_name=username)
+                discord.utils.get(interaction.guild.members, name=username)
+                or discord.utils.get(interaction.guild.members, display_name=username)
         )
 
         if member is None:

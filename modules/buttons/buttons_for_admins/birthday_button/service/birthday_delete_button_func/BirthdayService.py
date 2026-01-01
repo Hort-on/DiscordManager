@@ -25,7 +25,7 @@ class DeleteBirthdayService:
             )
             return
 
-        b_day =  self.birthday
+        b_day = self.birthday
         response = await b_day.delete_birthday(
             interaction,
             member.id,

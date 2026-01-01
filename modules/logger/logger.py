@@ -22,10 +22,3 @@ class Logger:
             message += "\n" + "".join(traceback.format_exception(exc))
 
         await self.log("ERROR", message, "system_logs.log", func_name)
-
-
-    async def info(self, message: str, func_info: str):
-        await self.log("INFO", message, func_info, "member_left_logs.log")
-
-    async def bad_words(self, message: str, func_info: str):
-        await self.log("INFO", message, func_info, "bad_words_logs.log")

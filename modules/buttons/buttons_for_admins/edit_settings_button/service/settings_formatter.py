@@ -1,15 +1,25 @@
 import discord
 
-from utils.format_the_result import FormatResult
+from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.settings_storage.settings_storage import SettingsStorage
+
+from utils.format_result.esult_scenarios_factory import ResultFactory
 from utils.messages import GENERAL_MSGS as GM
 
 
 class SettingsFormatter:
-    def __init__(self):
-        self.config = {}
+    def __init__(
+            self,
+            db_factory: DBScenarioFactory,
+            settings: SettingsStorage
+    ):
+
+        self.settings = settings
+        self.db_factory = db_factory
 
     async def format_settings(self, interaction: discord.Interaction) -> None:
-        summary_result = FormatResult.format_the_result(
+        scenario = ResultFactory.for_settings_edit(self.db_factory, self.settings)
+        summary_result = scenario.format_the_result(
             parent=self,
             interaction=interaction,
             start=False

@@ -2,21 +2,27 @@ import discord
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
 
-from utils.format_the_result import FormatResult
+from modules.configuration.starting_configuration import ConfigurationView
+
+from utils.format_result.esult_scenarios_factory import ResultFactory
 from utils.messages import GENERAL_MSGS, SYSTEM_MSGS
 
 
 class FinishingConfiguration:
     def __init__(
             self,
-            parent,
+            parent: ConfigurationView,
             db_factory: DBScenarioFactory,
     ):
 
         self.parent = parent
         self.db_factory = db_factory
 
-    async def finishing_configuration(self, interaction: discord.Interaction) -> None:
+    async def finishing_configuration(
+            self,
+            interaction: discord.Interaction
+    ) -> None:
+
         write_data_scenario = self.db_factory.for_write_data(
             interaction.guild.id,
             'settings',
@@ -30,13 +36,17 @@ class FinishingConfiguration:
             )
             return
 
-        if not self.parent.found_users:
+        if not self.parent.found_user_ids:
             await self.send_the_result(interaction)
 
         await self.superusers_procedure(interaction)
 
-    async def superusers_procedure(self, interaction: discord.Interaction) -> None:
-        user_ids = [member.id for member in self.parent.found_users]
+    async def superusers_procedure(
+            self,
+            interaction: discord.Interaction
+    ) -> None:
+
+        user_ids = [member for member in self.parent.found_user_ids.keys()]
 
         write_data_scenario = self.db_factory.for_write_user(
             interaction.guild.id,
@@ -53,9 +63,13 @@ class FinishingConfiguration:
 
         await self.send_the_result(interaction)
 
-    async def send_the_result(self, interaction: discord.Interaction) -> None:
+    async def send_the_result(
+            self,
+            interaction: discord.Interaction
+    ) -> None:
 
-        summary_result = FormatResult.format_the_result(parent=self.parent, interaction=interaction, start=True)
+        scenario = ResultFactory.for_first_config(parent=self.parent)
+        summary_result = await scenario.result_proceed(interaction)
 
         await interaction.edit_original_response(
             content=GENERAL_MSGS.get('configuration_done_msg') + f'\n\n{summary_result}\n\n'

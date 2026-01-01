@@ -6,7 +6,7 @@ from database.settings_storage.settings_storage import SettingsStorage
 from utils.messages import SYSTEM_MSGS as SM
 
 
-#TODO: ПИТАННЯ ЩОДО БЕЗПЕКИ
+# TODO: ПИТАННЯ ЩОДО БЕЗПЕКИ
 class UserManager:
     def __init__(self, settings: SettingsStorage):
         self.settings = settings
@@ -16,7 +16,7 @@ class UserManager:
             message,
             duration_in_minutes,
             reason,
-            is_games_violation #TODO: можливо переробити
+            is_games_violation  # TODO: можливо переробити
     ):
 
         user = message.author

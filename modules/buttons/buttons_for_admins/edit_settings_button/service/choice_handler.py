@@ -12,7 +12,13 @@ class ChoiceHandler:
     def __init__(self, db_factory: DBScenarioFactory):
         self.db_factory = db_factory
 
-    async def choice_procedure(self, interaction: discord.Interaction, option_type: str, config_key: str) -> None:
+    async def choice_procedure(
+            self,
+            interaction: discord.Interaction,
+            option_type: str,
+            config_key: str
+    ) -> None:
+
         match option_type:
             case 'boolean':
                 scenario = YesNoViewFactory.for_confirmation(

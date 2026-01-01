@@ -23,4 +23,3 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
             amount=int(self.amount.value),
             channel=self.channel
         )
-

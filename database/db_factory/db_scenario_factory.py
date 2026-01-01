@@ -1,16 +1,26 @@
 from database.data_base_model import DB
 
-from database.db_factory.db_scenarios import(
+from database.db_factory.scenarios.common_scenarios.common_scenarios import (
     GetDataScenario,
     WriteDataScenario,
     WriteUserScenario,
-    FetchAllDataScenario,
+    FetchAllDataScenario
+)
+
+from database.db_factory.scenarios.birthday_scenarios.birthday_scenarios import (
     AddBirthdayScenario,
     DeleteBirthdayScenario,
     ExistBirthdayCheckScenario,
     GetTodayBirthdayScenario,
     UpdateLastCongratsScenario,
     ResetAllCongratsScenario
+)
+
+from database.db_factory.scenarios.cleanup_scenarios.cleanup_scenarios import (
+    CleanupRemovedGuildScenario,
+    CleanupRemovedUserScenario,
+    CleanupRemovedChannelScenario,
+    CleanupRemovedRoleScenario
 )
 
 from modules.logger.logger import Logger
@@ -25,7 +35,6 @@ class DBScenarioFactory:
 
         self.db_connect = db_connect
         self.logger = logger
-
 
     def for_get_data(
             self,
@@ -161,4 +170,60 @@ class DBScenarioFactory:
         return ResetAllCongratsScenario(
             self.db_connect,
             self.logger,
+        )
+
+    def for_remove_guild(
+            self,
+            table_name: str,
+            guild_id: int,
+
+    ) -> CleanupRemovedGuildScenario:
+
+        return CleanupRemovedGuildScenario(
+            self.db_connect,
+            self.logger,
+            table_name,
+            guild_id,
+        )
+
+    def for_remove_user(
+            self,
+            guild_id: int,
+            user_id: int
+
+    ) -> CleanupRemovedUserScenario:
+
+        return CleanupRemovedUserScenario(
+            self.db_connect,
+            self.logger,
+            guild_id,
+            user_id
+        )
+
+    def for_remove_channel(
+            self,
+            guild_id: int,
+            channel_id: int
+
+    ) -> CleanupRemovedChannelScenario:
+
+        return CleanupRemovedChannelScenario(
+            self.db_connect,
+            self.logger,
+            guild_id,
+            channel_id
+        )
+
+    def for_remove_role(
+            self,
+            guild_id: int,
+            role_id: int
+
+    ) -> CleanupRemovedRoleScenario:
+
+        return CleanupRemovedRoleScenario(
+            self.db_connect,
+            self.logger,
+            guild_id,
+            role_id
         )

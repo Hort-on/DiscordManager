@@ -75,7 +75,7 @@ class BirthdayRepo:
 
     async def delete_birthday(
             self,
-            interaction : discord.Interaction,
+            interaction: discord.Interaction,
             user_id: int,
             guild_id: int
     ) -> None:
@@ -113,7 +113,7 @@ class BirthdayRepo:
             if not is_enabled.get('birthday', False):
                 continue
 
-            #TODO: зробити точну часову зону для кожної гільдії
+            # TODO: зробити точну часову зону для кожної гільдії
             today = datetime.now()
             today_str = today.strftime('%d.%m')
 

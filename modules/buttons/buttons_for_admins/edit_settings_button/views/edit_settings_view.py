@@ -1,6 +1,7 @@
 import discord
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.settings_storage.settings_storage import SettingsStorage
 from modules.buttons.buttons_for_admins.edit_settings_button.service.setting_selection import SettingSelectorView
 from modules.buttons.buttons_for_admins.edit_settings_button.service.settings_formatter import SettingsFormatter
 from modules.logger.logger import Logger
@@ -9,7 +10,8 @@ from modules.logger.logger import Logger
 class EditSettingsButton(discord.ui.Button):
     def __init__(
             self,
-            db_factory: DBScenarioFactory
+            db_factory: DBScenarioFactory,
+            settings: SettingsStorage
     ):
         super().__init__(
             label="Edit settings",
@@ -17,8 +19,9 @@ class EditSettingsButton(discord.ui.Button):
         )
 
         self.db_factory = db_factory
+        self.settings = settings
 
-        self.settings_formatter = SettingsFormatter()
+        self.settings_formatter = SettingsFormatter(self.settings)
 
     async def callback(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()

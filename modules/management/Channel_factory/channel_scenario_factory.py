@@ -1,4 +1,5 @@
 from database.db_factory.db_scenario_factory import DBScenarioFactory
+from modules.configuration.starting_configuration import ConfigurationView
 from modules.management.Channel_factory.channel_scenarios import (
     SaveChannelToDBScenario,
     WizardScenario,
@@ -6,6 +7,7 @@ from modules.management.Channel_factory.channel_scenarios import (
     DeleteMessagesScenario,
     SaveChannelToDBForMessageScenario
 )
+
 
 class ChannelScenarioFactory:
 
@@ -29,7 +31,7 @@ class ChannelScenarioFactory:
 
     @staticmethod
     def for_wizard(
-            parent,
+            parent: ConfigurationView,
             db_factory: DBScenarioFactory,
             config_key: str
     ) -> WizardScenario:
@@ -46,7 +48,7 @@ class ChannelScenarioFactory:
 
     @staticmethod
     def for_full_setup(
-            parent,
+            parent: ConfigurationView,
             db_factory: DBScenarioFactory,
             config_key: str
     ):

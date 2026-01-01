@@ -64,7 +64,7 @@ class SaveChannelToDBScenario(ChannelScenario):
             channel
     ) -> None:
 
-        write_data_scenario =  self.db_factory.for_write_data(
+        write_data_scenario = self.db_factory.for_write_data(
             interaction.guild.id,
             'settings',
             {

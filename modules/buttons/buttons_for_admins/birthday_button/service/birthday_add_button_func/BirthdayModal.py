@@ -20,7 +20,7 @@ class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
     birthday_input = discord.ui.TextInput(
         label='Birthday (DD.MM)',
         placeholder='31.12',
-        required=True
+        required=True,
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:

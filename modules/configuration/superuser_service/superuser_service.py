@@ -20,9 +20,9 @@ class SuperUserService:
                     )
 
                     or discord.utils.get(
-                interaction.guild.members,
-                display_name=username
-                )
+                        interaction.guild.members,
+                        display_name=username
+                    )
             )
 
             if member is None:
@@ -59,7 +59,6 @@ class SuperUserService:
             parent,
             result_msg
         )
-
 
     @staticmethod
     async def _send_the_result(

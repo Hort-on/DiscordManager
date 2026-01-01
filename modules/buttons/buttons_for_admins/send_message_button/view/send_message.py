@@ -21,9 +21,7 @@ class SendMessageButton(discord.ui.Button):
         try:
             scenario = ChannelScenarioFactory.for_db_message_save(self.db_factory)
             view = ChannelTypeView(scenario, text_only=True)
-            await interaction.user.send(SM.get('ask_private_channel_msg'),
-                                        view=view
-            )
+            await interaction.user.send(SM.get('ask_private_channel_msg'), view=view)
 
             await interaction.edit_original_response(
                 content=SM.get('ask_private_msg')

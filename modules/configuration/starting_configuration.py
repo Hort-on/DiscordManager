@@ -1,8 +1,7 @@
 import discord
 
 from database.db_factory.db_scenario_factory import DBScenarioFactory
-
-from modules.configuration.superusers.superuser_modal import SuperUserModal
+from modules.configuration.superuser_service.superuser_modal import SuperUserModal
 
 from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
 from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
@@ -13,6 +12,7 @@ from modules.configuration.finishing_configuration import FinishingConfiguration
 
 from utils.start_config_steps import STEPS, STEP_DEPENDENCIES
 from utils.messages import CONFIG_MSGS as CM
+
 
 class ConfigurationView(discord.ui.View):
     def __init__(
@@ -32,7 +32,11 @@ class ConfigurationView(discord.ui.View):
 
     @discord.ui.button(label='Lets start', style=discord.ButtonStyle.green)
     async def start_configuration(self, interaction: discord.Interaction) -> None:
-        scenario = YesNoViewFactory.for_start_config(self, on_decline_callback=self.cancel_configuration)
+        scenario = YesNoViewFactory.for_start_config(
+            parent=self,
+            on_decline_callback=self.cancel_configuration
+        )
+
         view = YesNoView(scenario)
 
         await interaction.response.send_message(

@@ -36,9 +36,9 @@ class Management(View):
 
     def _add_buttons(self):
         """Додає кнопки залежно від налаштувань"""
-        self.add_item(EditSettingsButton(self.db_factory))
+        self.add_item(EditSettingsButton(self.db_factory, self.settings))
         self.add_item(DeleteMessageButton())
-        self.add_item(RandomizeButton()) #TODO: зробити загально доступною
+        self.add_item(RandomizeButton())  # TODO: зробити загально доступною
 
         if self.settings.get_guild_settings(self.guild_id).get('birthday'):
             self.add_item(AddBirthdayButton(self.birthday))

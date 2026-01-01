@@ -2,12 +2,13 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from database.data_base_model import DB
+from database.db_factory.db_scenario_factory import DBScenarioFactory
 from modules.administration.user_manager import UserManager
 
 
 class MessageContentChecker:
-    def __init__(self):
-        self.db = DB()
+    def __init__(self, db_factory: DBScenarioFactory):
+        self.db_factory = db_factory
 
     def db_info(self, interaction, user_id):
         ...
