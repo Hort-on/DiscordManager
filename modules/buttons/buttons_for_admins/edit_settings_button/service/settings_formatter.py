@@ -1,6 +1,6 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 from utils.format_result.esult_scenarios_factory import ResultFactory
@@ -21,8 +21,7 @@ class SettingsFormatter:
         scenario = ResultFactory.for_settings_edit(self.db_factory, self.settings)
         summary_result = scenario.format_the_result(
             parent=self,
-            interaction=interaction,
-            start=False
+            interaction=interaction
         )
 
         await interaction.edit_original_response(

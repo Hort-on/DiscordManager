@@ -1,7 +1,9 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
+
 from modules.buttons.buttons_for_admins.edit_settings_button.service.choice_handler import ChoiceHandler
+
 from utils.option_list import SETTINGS_OPTIONS
 from utils.messages import SYSTEM_MSGS as SM
 

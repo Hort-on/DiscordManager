@@ -1,4 +1,5 @@
 import discord
+
 from modules.birthdays.birthday_repo import BirthdayRepo
 
 

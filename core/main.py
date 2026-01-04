@@ -1,7 +1,10 @@
+import discord
 from discord.ext import tasks
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from database.data_base_model import DB
 from database.settings_storage.settings_storage import SettingsStorage
+
+from factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from modules.logger.logger import Logger
 from modules.management.events_processing.member_left_event import MemberLeftNotification
@@ -15,13 +18,13 @@ class BotController:
     def __init__(
             self,
             bot,
-            db_connect,
-            db_factory,
-            logger,
-            guild_settings,
-            birthday_repo,
-            bad_words_handler,
-            member_left_notify
+            db_connect: DB,
+            db_factory: DBScenarioFactory,
+            logger: Logger,
+            guild_settings: SettingsStorage,
+            birthday_repo: BirthdayRepo,
+            bad_words_handler: BadWordsHandler,
+            member_left_notify: MemberLeftNotification
 
     ):
         self.bot = bot
@@ -40,6 +43,8 @@ class BotController:
         self.bot.add_listener(self.on_message)
         self.bot.add_listener(self.on_raw_reaction_add)
         self.bot.add_listener(self.on_member_remove)
+        self.bot.add_listener(self.on_guild_remove)
+        self.bot.add_listener(self.on_guild_join)
 
     # --------------------------- EVENTS --------------------------- #
 
@@ -109,17 +114,23 @@ class BotController:
         # тут твоя логіка
 
     async def on_member_remove(self, member):
-        await self.member_left.check_if_notification(member)
+        await self.member_left_notify.check_if_notification(member)
 
+    async def on_guild_remove(self, guild: discord.Guild):
+        delete_guild_scenario = self.db_factory.for_remove_guild(guild.id)
+        await delete_guild_scenario.db_proceed()
+
+    async def on_guild_join(self, guild: discord.Guild):
+        scenario = self.db_factory.for_init_guild(guild.id)
+        await scenario.db_proceed()
 
     # --------------------------- LOOPS ---------------------------
 
     @tasks.loop(hours=24)
     async def daily_birthday_check(self):
-        await self.birthday.check_daily_birthday()
+        await self.birthday_repo.check_daily_birthday()
 
     # --------------------------- MESSAGE HANDLING ---------------------------
 
     async def handle_message(self, message):
-        cleaned = self.bad_words.prepare(message.content)
-        await self.bad_words.check(message, cleaned)
+        ...

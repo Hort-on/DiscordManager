@@ -13,5 +13,5 @@ SUMMARY_FIELDS = {
 CHANNEL_FIELDS = {
     'congrats_channel_id': "Congrats channel",
     'verification_channel_id': "Verification channel",
-    'system_channel_id': "System channel"
+    'notification_channel_id': "Notification channel"
 }

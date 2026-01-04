@@ -1,14 +1,14 @@
 import discord
-from modules.logger.logger import Logger
+
 from bot import bot
-from utils.messages import CONFIG_MESSAGES
+
+from utils.messages import CONFIG_MSGS as CM
 
 
 class VerificationHandler:
     def __init__(self):
         self.bot = bot
-        self.vrf_mg = CONFIG_MESSAGES  #TODO: розібратись з vrf_msg що це має бути
-        self.logger = Logger()
+        self.vrf_mg = CM  #TODO: розібратись з vrf_msg що це має бути
         #TODO: витягувати id ролей з бд
         #TODO: переробити цей файл
 
@@ -55,7 +55,7 @@ class VerificationHandler:
         msg_key = 'eng_decline' if user_eu else 'ukr_decline'
         await self.send_user_message(user, msg_key)
 
-        await self.logger.verification(f'The user: {user} has declined the server`s rules')
+        await self.logger.verification(f'The user: {user} has declined the server`s rules') # TODO: це має записувати бот в логи або відправляти повідомлення у системний канал
 
         channel = self.bot.get_channel(self.mc)
         await channel.send(f'```The user: {user} has declined the server`s rules```')

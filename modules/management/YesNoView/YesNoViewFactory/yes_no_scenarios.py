@@ -1,41 +1,15 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.configuration.starting_configuration import ConfigurationView
+from factories.db_factory import DBScenarioFactory
+
 from utils.messages import EDIT_CONFIG_MSGS as ECM
+
 from modules.buttons.buttons_for_admins.edit_settings_button.service.setting_selection import SettingSelectorView
 
 
 class BaseScenario:
     async def yes_no_proceed(self, interaction: discord.Interaction, value: bool):
         raise NotImplementedError
-
-
-class StartConfigScenario(BaseScenario):
-    def __init__(
-            self,
-            parent: ConfigurationView,
-            config_key: str,
-            on_decline_callback
-    ):
-        self.parent = parent
-        self.config_key = config_key
-        self.on_decline_callback = on_decline_callback
-
-    async def yes_no_proceed(
-            self,
-            interaction: discord.Interaction,
-            value: bool
-    ) -> None:
-
-        if self.config_key is not None:
-            self.parent.config[self.config_key] = value
-
-        if not value and self.on_decline_callback:
-            await self.on_decline_callback(interaction)
-            return
-
-        await self.parent.next_step(interaction)
 
 
 class ConfirmationScenario(BaseScenario):

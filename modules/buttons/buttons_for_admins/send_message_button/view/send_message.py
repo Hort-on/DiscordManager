@@ -1,8 +1,8 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
 
-from modules.management.Channel_factory.channel_scenario_factory import ChannelScenarioFactory
+from factories.channel_factory.channel_scenario_factory import ChannelScenarioFactory
 from modules.management.channels_processing.getting_channel import ChannelTypeView
 
 from utils.messages import SYSTEM_MSGS as SM
@@ -18,9 +18,14 @@ class SendMessageButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         self.view.disable_all_items()
+        scenario = ChannelScenarioFactory.for_db_message_save(self.db_factory)
+
+        view = ChannelTypeView(
+            scenario,
+            text_only=True
+        )
+
         try:
-            scenario = ChannelScenarioFactory.for_db_message_save(self.db_factory)
-            view = ChannelTypeView(scenario, text_only=True)
             await interaction.user.send(SM.get('ask_private_channel_msg'), view=view)
 
             await interaction.edit_original_response(

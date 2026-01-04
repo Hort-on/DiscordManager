@@ -1,13 +1,14 @@
 from database.data_base_model import DB
 
-from database.db_factory.scenarios.common_scenarios.common_scenarios import (
+from factories.db_factory.scenarios.common_scenarios.common_scenarios import (
     GetDataScenario,
     WriteDataScenario,
     WriteUserScenario,
-    FetchAllDataScenario
+    FetchAllDataScenario,
+    InitGuildScenario
 )
 
-from database.db_factory.scenarios.birthday_scenarios.birthday_scenarios import (
+from factories.db_factory.scenarios.birthday_scenarios.birthday_scenarios import (
     AddBirthdayScenario,
     DeleteBirthdayScenario,
     ExistBirthdayCheckScenario,
@@ -16,7 +17,7 @@ from database.db_factory.scenarios.birthday_scenarios.birthday_scenarios import 
     ResetAllCongratsScenario
 )
 
-from database.db_factory.scenarios.cleanup_scenarios.cleanup_scenarios import (
+from factories.db_factory.scenarios.cleanup_scenarios.cleanup_scenarios import (
     CleanupRemovedGuildScenario,
     CleanupRemovedUserScenario,
     CleanupRemovedChannelScenario,
@@ -174,7 +175,6 @@ class DBScenarioFactory:
 
     def for_remove_guild(
             self,
-            table_name: str,
             guild_id: int,
 
     ) -> CleanupRemovedGuildScenario:
@@ -182,7 +182,6 @@ class DBScenarioFactory:
         return CleanupRemovedGuildScenario(
             self.db_connect,
             self.logger,
-            table_name,
             guild_id,
         )
 
@@ -226,4 +225,15 @@ class DBScenarioFactory:
             self.logger,
             guild_id,
             role_id
+        )
+
+    def for_init_guild(
+            self,
+            guild_id: int
+    ) -> InitGuildScenario:
+
+        return InitGuildScenario(
+            self.db_connect,
+            self.logger,
+            guild_id
         )

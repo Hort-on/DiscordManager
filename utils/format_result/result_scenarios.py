@@ -1,12 +1,8 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
-from modules.configuration.starting_configuration import ConfigurationView
-
-from utils.get_channel_name import get_channel_name
-from utils.summary_fields import SUMMARY_FIELDS, CHANNEL_FIELDS
 from utils.messages import CONFIG_MSGS as CM
 
 
@@ -14,30 +10,6 @@ class FormatResultBaseScenario:
 
     def result_proceed(self, interaction: discord.Interaction):
         raise NotImplementedError
-
-
-class FirstConfirmationScenario(FormatResultBaseScenario):
-    def __init__(
-            self,
-            parent: ConfigurationView
-    ):
-        self.parent = parent
-
-    async def result_proceed(self, interaction: discord.Interaction) -> str:
-        summary = ['Configuration completed!\n']
-
-        for key, label in SUMMARY_FIELDS.items():
-            value = self.parent.config.get(key, False)
-            status = '✅ Enabled' if value else '❌ Disabled'
-            summary.append(f"-> {label}: {status}")
-
-        for key, label in CHANNEL_FIELDS.items():
-            name = get_channel_name(interaction, self.parent.config.get(key))
-            summary.append(f"-> {label}: {name}")
-
-        summary_result = "\n".join(summary)
-
-        return summary_result
 
 
 class EditSettingsResultScenario(FormatResultBaseScenario):
@@ -60,6 +32,8 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
         for key, value in current_settings.items():
             status = '✅ Enabled' if value else '❌ Disabled'
             summary.append(f"-> {key}: {status}")
+
+        for get_channel_name()
 
         if current_superusers:
             summary.append("\nSuperusers:")

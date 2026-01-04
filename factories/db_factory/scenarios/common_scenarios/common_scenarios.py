@@ -1,5 +1,5 @@
 from database.data_base_model import DB
-from database.db_factory.scenarios.base_scenario import DataBaseScenario
+from factories.db_factory.scenarios.base_scenario import DataBaseScenario
 
 from modules.logger.logger import Logger
 
@@ -24,15 +24,16 @@ class GetDataScenario(DataBaseScenario):
 
     async def _execute(self) -> dict:
         table = self._get_table(self.table_name)
-        columns_sql = ', '.join(self.columns)
+        columns_sql = ', '.join(self.columns) if self.columns else '*'
         query = f'SELECT {columns_sql} FROM {table} WHERE guild_id = ?'
 
-        async with self.db_connect.connect() as db:
-            async with db.execute(query, (self.guild_id,)) as cursor:
-                col_names = [desc[0] for desc in cursor.description]
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id,))
 
-                row = await cursor.fetchone()
-                return dict(zip(col_names, row)) if row else None
+            col_names = [desc[0] for desc in cursor.description]
+            row = await cursor.fetchone()
+
+            return dict(zip(col_names, row)) if row else None
 
 
 class WriteDataScenario(DataBaseScenario):
@@ -122,12 +123,30 @@ class FetchAllDataScenario(DataBaseScenario):
         table = self._get_table(self.table_name)
         query = f'SELECT * FROM {table} WHERE guild_id = ?'
 
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id,))
+            columns = [desc[0] for desc in cursor.description]
+            rows = await cursor.fetchall()
+
+            if not rows:
+                return []
+
+            return [dict(zip(columns, row)) for row in rows]
+
+
+class InitGuildScenario(DataBaseScenario):
+    def __init__(
+            self,
+            db_connect: DB,
+            logger: Logger,
+            guild_id: int
+    ):
+        super().__init__(db_connect, logger, guild_id)
+
+    async def _execute(self):
+        query = '''
+        INSERT OR IGNORE INTO GuildSettings (guild_id)
+        VALUES (?)
+        '''
         async with self.db_connect.connect() as db:
-            async with db.execute(query, (self.guild_id,)) as cursor:
-                columns = [desc[0] for desc in cursor.description]
-                rows = await cursor.fetchall()
-
-                if not rows:
-                    return []
-
-                return [dict(zip(columns, row)) for row in rows]
+            await db.execute(query, (self.guild_id,))

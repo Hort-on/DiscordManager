@@ -4,7 +4,7 @@ from datetime import datetime
 
 from utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 

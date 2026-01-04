@@ -1,11 +1,18 @@
 import discord
 from discord import ui
+
 from utils.messages import GENERAL_MSGS
 
 
 class ChannelTypeView(ui.View):
-    def __init__(self, scenario, text_only=False, channels_with_users_only=False):
+    def __init__(
+            self,
+            scenario,
+            text_only=False,
+            channels_with_users_only=False
+    ):
         super().__init__(timeout=60)
+
         self.scenario = scenario
 
         self.options = []
@@ -88,7 +95,7 @@ class ChannelSelectView(ui.View):
             )
             return
 
-        await self.scenario.channel_proceed(interaction, channel=channel)
+        await self.scenario.on_channel_selected(interaction, channel=channel)
 
         await interaction.edit_original_response(
             content=f"```Selected channel: {channel.name}```",

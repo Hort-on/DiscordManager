@@ -1,5 +1,6 @@
 import discord
 from discord import ui
+
 from database.settings_storage.settings_storage import SettingsStorage
 
 
@@ -42,7 +43,7 @@ class AddRoleManagerScenario(BaseRoleScenario):
                     "name": role.name
                 })
 
-    ...
+    ..
 
 
 class DeleteRoleManagerScenario(BaseRoleScenario):

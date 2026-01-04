@@ -1,5 +1,5 @@
 from database.data_base_model import DB
-from database.db_factory.db_scenarios import DataBaseScenario
+from factories.db_factory.scenarios.base_scenario import DataBaseScenario
 
 from modules.logger.logger import Logger
 

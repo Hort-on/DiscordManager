@@ -1,4 +1,5 @@
 from database.settings_storage.settings_storage import SettingsStorage
+
 from utils.messages import GENERAL_MSGS as GM
 
 
@@ -14,7 +15,7 @@ class MemberLeftNotification:
         await self.process_guild_channel(member)
 
     async def process_guild_channel(self, member):
-        channel_id = self.settings.get_guild_settings(member.guild.id).get('system_channel_id')
+        channel_id = self.settings.get_guild_settings(member.guild.id).get('notification_channel_id')
 
         if not channel_id:
             return

@@ -7,7 +7,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from database.data_base_model import DB
-from database.db_factory.db_scenario_factory import DBScenarioFactory
+from factories.db_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 from modules.birthdays.birthday_repo import BirthdayRepo
@@ -47,11 +47,13 @@ controller = BotController(
 )
 
 bot.services = controller
+
+
 # --------------------------- COGS --------------------------- #
 @bot.event
 async def setup_hook():
-    await bot.load_extension('core.start_cog')
     await bot.load_extension('core.management_cog')
     await bot.tree.sync()
+
 
 bot.run(TOKEN)

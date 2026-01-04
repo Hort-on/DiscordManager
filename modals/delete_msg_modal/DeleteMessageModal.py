@@ -1,25 +1,24 @@
 import discord
 
-from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message.service.DeleteMessageService import \
-    DeleteMessageService
+from factories.delete_msg_factory.delete_msg_scenario_factory import DeleteMessageScenario
 
 
 class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
     def __init__(self, channel: discord.TextChannel):
         super().__init__()
         self.channel = channel
-        self.delete_msg_service = DeleteMessageService()
+        self.delete_factory = DeleteMessageScenario()
 
     amount = discord.ui.TextInput(
         label='How many messages do you want to delete?',
-        placeholder='Enter a number',
+        placeholder='Please enter a number between 1 and 100',
         required=True,
         max_length=3
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.delete_msg_service.process(
-            interaction=interaction,
-            amount=int(self.amount.value),
-            channel=self.channel
+        service_delete_msg = self.delete_factory.for_delete_msg(
+            self.channel,
+            int(self.amount.value)
         )
+        await service_delete_msg.delete_msg_process(interaction)

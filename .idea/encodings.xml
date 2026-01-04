@@ -8,7 +8,14 @@
     <file url="file://$PROJECT_DIR$/database/data_base_model.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/db" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/db/db.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/factories/channel_factory/channel_scenario_factory.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/factories/channel_factory/channel_scenarios.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/logs" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modals/birthday_modal/BirthdayAddModal.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modals/birthday_modal/BirthdayDeleteModal.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modals/delete_msg_modal/DeleteMessageModal.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modals/delete_msg_modal/DeleteMessageUserModal.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/modals/delete_msg_modal/DeleteMessageUserModal.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/Fun/joke.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/administration/Messages_data/messages_data.py" charset="UTF-8" />
@@ -22,11 +29,11 @@
     <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/birthday_button/service/birthday_add_button_func/BirthdayService.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/birthday_button/service/birthday_delete_button_func/BirthdayService.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageModal.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/edit_settings_button/service/settings_formatter.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/configuration/utils/start_config_steps.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/management/YesNoView" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/YesNoView/view/YesNoView.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/management/channel_selection.py" charset="UTF-8" />
@@ -43,6 +50,5 @@
     <file url="file://$PROJECT_DIR$/utils/channels_permissions.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/utils/messages.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/utils/option_list.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/utils/start_config_steps.py" charset="windows-1251" />
   </component>
 </project>

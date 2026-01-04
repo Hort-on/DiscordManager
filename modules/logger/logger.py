@@ -1,7 +1,10 @@
 import inspect
-from datetime import datetime
+
 import aiofiles
+
 import traceback
+
+from datetime import datetime
 
 
 class Logger:

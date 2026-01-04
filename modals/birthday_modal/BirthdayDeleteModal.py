@@ -1,6 +1,7 @@
 import discord
 
 from modules.birthdays.birthday_repo import BirthdayRepo
+
 from .BirthdayService import DeleteBirthdayService
 
 

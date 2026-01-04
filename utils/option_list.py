@@ -4,7 +4,7 @@ SETTINGS_OPTIONS = {
             'congrats_channel': "channel",
             'verification': "boolean",
             'verification_channel': "channel",
-            'system_channel': "channel",
+            'notification_channel': "channel",
             'block_user': "boolean",
             'invitation_check': "boolean",
             'spam_check': "boolean",

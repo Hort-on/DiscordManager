@@ -8,6 +8,6 @@ class AddRoleButton(discord.ui.Button):
             style=discord.ButtonStyle.blurple
         )
 
-    def callback(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()
-        await interaction.response
+        await interaction.response dag

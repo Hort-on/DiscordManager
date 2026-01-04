@@ -1,4 +1,5 @@
 import discord
+
 from discord.ui import View
 
 
@@ -8,7 +9,7 @@ class YesNoView(View):
         self.scenario = scenario
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
-    async def yes_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         for item in self.children:
             item.disabled = True
 
@@ -16,7 +17,7 @@ class YesNoView(View):
         await self.scenario.yes_no_proceed(interaction, value=True)
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.red)
-    async def no_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         for item in self.children:
             item.disabled = True
 

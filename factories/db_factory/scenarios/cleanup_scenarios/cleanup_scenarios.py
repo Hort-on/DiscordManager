@@ -1,5 +1,5 @@
 from database.data_base_model import DB
-from database.db_factory.scenarios.base_scenario import DataBaseScenario
+from factories.db_factory.scenarios.base_scenario import DataBaseScenario
 
 from modules.logger.logger import Logger
 
@@ -9,7 +9,6 @@ class CleanupRemovedGuildScenario(DataBaseScenario):
             self,
             db_connect: DB,
             logger: Logger,
-            table_name: str,
             guild_id: int,
     ):
         super().__init__(
@@ -18,14 +17,10 @@ class CleanupRemovedGuildScenario(DataBaseScenario):
             guild_id
         )
 
-        self.table_name = table_name
-
     async def _execute(self) -> None:
-        async with self.db_connect.connect() as db:
-            for table in self.table_map.values():
-                query = f'DELETE FROM {table} WHERE guild_id = ?'
-
-                await db.execute(query, (self.guild_id,))
+        async with self.db_connect.connect() as cursor:
+            query = f'DELETE FROM GuildSettings WHERE guild_id = ?'
+            await cursor.execute(query, (self.guild_id,))
 
 
 class CleanupRemovedUserScenario(DataBaseScenario):
@@ -45,11 +40,11 @@ class CleanupRemovedUserScenario(DataBaseScenario):
         self.user_id = user_id
 
     async def _execute(self) -> None:
-        async with self.db_connect.connect() as db:
+        async with self.db_connect.connect() as cursor:
             for table in self.USER_TABLES:
                 query = f'DELETE FROM {table} WHERE guild_id = ? AND user_id = ?'
 
-                await db.execute(query, (self.guild_id, self.user_id))
+                await cursor.execute(query, (self.guild_id, self.user_id))
 
 
 class CleanupRemovedChannelScenario(DataBaseScenario):
@@ -72,8 +67,8 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
         table = self._get_table('channels')
         query = f'DELETE FROM {table} WHERE guild_id = ? AND channel_id = ?'
 
-        async with self.db_connect.connect() as db:
-            await db.execute(query, (self.guild_id, self.channel_id))
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.channel_id))
 
 
 class CleanupRemovedRoleScenario(DataBaseScenario):
@@ -96,5 +91,5 @@ class CleanupRemovedRoleScenario(DataBaseScenario):
         table = self._get_table('roles')
         query = f'DELETE FROM {table} WHERE guild_id = ? AND role_id = ?'
 
-        async with self.db_connect.connect() as db:
-            await db.execute(query, (self.guild_id, self.role_id))
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, (self.guild_id, self.role_id))

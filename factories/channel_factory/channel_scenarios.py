@@ -1,14 +1,12 @@
 import discord
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message.service.DeleteMessageModal import \
-    DeleteMessagesModal
+from factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from utils.messages import DB_MSGS, SYSTEM_MSGS
 
 
 class ChannelScenario:
-    async def channel_proceed(self, interaction: discord.Interaction, channel):
+    async def on_channel_selected(self, interaction: discord.Interaction, channel):
         raise NotImplementedError
 
 
@@ -58,7 +56,7 @@ class SaveChannelToDBScenario(ChannelScenario):
         self.db_factory = db_factory
         self.config_key = config_key
 
-    async def channel_proceed(
+    async def on_channel_selected(
             self,
             interaction: discord.Interaction,
             channel
@@ -84,48 +82,11 @@ class SaveChannelToDBScenario(ChannelScenario):
         )
 
 
-class WizardScenario(ChannelScenario):
-    def __init__(
-            self,
-            parent,
-            db_factory: DBScenarioFactory,
-            config_key
-    ):
-
-        self.parent = parent
-        self.db_factory = db_factory
-        self.config_key = config_key
-
-    async def channel_proceed(
-            self,
-            interaction,
-            channel
-    ) -> None:
-
-        self.parent.config[self.config_key] = channel.id
-        await self.parent.next_step(interaction)
-
-
-class CompositeScenario(ChannelScenario):
-    def __init__(
-            self,
-            *scenarios
-    ):
-
-        self.scenarios = scenarios
-
-    async def channel_proceed(
-            self,
-            interaction,
-            channel
-    ) -> None:
-
-        for scenario in self.scenarios:
-            await scenario.on_channel_selected(interaction, channel)
-
-
 class DeleteMessagesScenario(ChannelScenario):
-    async def channel_proceed(self, interaction, channel) -> None:
+    def __init__(self, modal):
+        self.modal = modal
+
+    async def on_channel_selected(self, interaction, channel) -> None:
         await interaction.response.send_modal(
-            DeleteMessagesModal(channel)
+            self.modal(channel)
         )

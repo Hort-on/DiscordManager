@@ -2,10 +2,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.db_factory.db_scenario_factory import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
-from modules.birthdays.birthday_repo import BirthdayRepo
 
+from factories.db_factory.db_scenario_factory import DBScenarioFactory
+
+from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.logger.logger import Logger
 from modules.management.channels_processing.management import Management
 

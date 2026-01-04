@@ -1,100 +1,3 @@
-CONFIG_MSGS = {
-    'config_welcome_msg':
-        "```👋 Welcome to the configuration!```",
-
-    'initial_msg':
-        "```❓ Would you like to start configuring the bot\'s capabilities?```",
-
-    'canceled_msg':
-        "``` ❌ configuration cancelled.\n "
-        "To start the configuration process again,"
-        " please use the command \"/start\".```",
-
-    'sys_ch_msg':
-        "```❗ Please select the channel where bot will send system messages.```",
-
-    'congrats_permission_msg':
-        "```❓ Would you like the bot to send birthday,"
-        " new year congrats, etc.?\n"
-        "You will need to choose or create a channel"
-        " if you do not have one.```",
-
-    'congrats_ch_msg':
-        "```❗ Please select the channel where bot will send"
-        " birthday and new year congrats.\n",
-
-    'superusers_msg':
-        "```❗ Please type names of trusted users who will be a superuser in your server.\n"
-        "It is required for a proper bot service. PLEASE PROVIDE THEIR DISCORD NAMES,"
-        "NOT NICKNAMES!```",
-
-    'birthday_feature_msg':
-        "```❓ Would you like to enable the birthday feature?\n"
-        "The bot will congratulate users on their birthdays."
-        " If you provide their names and birthday date.```",
-
-    'verification_feature_msg':
-        "```❓ Would you like to enable user verification?\n"
-        "New members will need to agree with rules (which you need to write),"
-        " before accessing the server.\n"
-        "Also you need to create the channel if you don`t have one yet."
-        " And typed some rules there.\n"
-        "After you finished configuration,"
-        " you will need to type \"/mg\" command and press the button"
-        "(Set emoji) It will automatically set emoji on the latest message"
-        " in the verification channel.```",
-
-    'verification_channel_msg':
-        "```❗ Please select the channel that will be used to verify new users.\n"
-        "PLEASE NOTE you can change this channel later by typing \"/mg\", then press the button \"edit settings\"```",
-
-    'message_management_feature_msg':
-        "```❓ Would you like to enable message management?\n"
-        "This allows sending and deleting messages through the bot.```",
-
-    'invitation_check_feature_msg':
-        "```❓ Would you like to enable invitation checking?\n"
-        "If enabled, invitation messages will be deleted,"
-        "if they were sent from users who is not a superuser.```",
-
-    'spam_check_feature_msg':
-        "```❓ Would you like to enable spam checking?\n"
-        "If enabled, spam messages will be deleted,"
-        " and the user who made spam, might be banned```",
-
-    'member_left_feature_msg':
-        "```❓ Would you like to enable sending a message into a system"
-        " channel when user left the server?```",
-
-    'block_users_feature_msg':
-        "```❓ Would you like to allow the bot to block users if they violated the rules?```",
-
-    'send_messages_permission_feature_msg':
-        "```❓ Would you like to enable sending messages feature?```",
-
-    'super_user_procedure_msg':
-        "```❗ Please enter the usernames NOT NICKNAMES!"
-        " of trusted superusers separated by commas e.g. user1, user2:```",
-
-    'audit_log_msg':
-        "```❓ Would you like to allow the bot write into audit logs?```",
-
-    'role_management_msg':
-        "```❓ Would you like to enable role management?"
-        "This will allow users to independently delete or add roles for themselves."
-        " You can also hide certain roles so that only administrators can manage them.```",
-
-    'configuration_done_msg':
-        "```✅ Congratulations the bot is ready for usage."
-        "You can change this settings any time, just type \"/mg\", and press \"edit settings\" button.```",
-
-    'no_configuration_msg':
-        "```❌ Settings are not configured for this server yet!```",
-
-    'configuration_exists_msg':
-        "```⚠️ You have already configured the bot for this server.```"
-}
-
 EDIT_CONFIG_MSGS = {
     'editing_feature_msg':
         "```❓ Would you like to enable or disable {feature} feature?```",
@@ -105,8 +8,8 @@ EDIT_CONFIG_MSGS = {
     'congrats_channel_msg':
         "```❓ Would you like to change congrats channel?```",
 
-    'system_channel_msg':
-        "```❓ Would you like to change system channel?```",
+    'notification_channel_msg':
+        "```❓ Would you like to change notification channel?```",
 
     'verification_feature_msg':
         "```❓ Would you like to enable or disable verification feature?```",
@@ -160,7 +63,10 @@ GENERAL_MSGS = {
         "```⚠️ You do not have permission to use this feature!```",
 
     'ask_action_msg':
-        "```❗ Please select an action:```"
+        "```❗ Please select an action:```",
+
+    'no_msg_found':
+        "⚠️ No message was found in this channel {channel}"
 }
 
 BIRTHDAY_MSGS = {
