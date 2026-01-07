@@ -2,9 +2,9 @@ import discord
 
 from datetime import datetime
 
-from utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
+from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
-from factories.db_factory import DBScenarioFactory
+from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 

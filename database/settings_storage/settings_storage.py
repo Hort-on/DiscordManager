@@ -1,4 +1,4 @@
-from factories.db_factory import DBScenarioFactory
+from services.factories import DBScenarioFactory
 
 
 class SettingsStorage:

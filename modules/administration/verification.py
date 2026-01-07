@@ -2,7 +2,7 @@ import discord
 
 from bot import bot
 
-from utils.messages import CONFIG_MSGS as CM
+from services.utils.messages import CONFIG_MSGS as CM
 
 
 class VerificationHandler:

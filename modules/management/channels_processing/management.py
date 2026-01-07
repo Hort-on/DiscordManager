@@ -1,17 +1,17 @@
 from discord.ui import View
 
-from factories.db_factory import DBScenarioFactory
+from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.logger.logger import Logger
 
-from modules.buttons.buttons_for_admins.birthday_button.views.add_birthday_view import AddBirthdayButton
-from modules.buttons.buttons_for_admins.birthday_button.views.delete_birthday_view import DeleteBirthdayButton
-from modules.buttons.buttons_for_admins.edit_settings_button.views.edit_settings_view import EditSettingsButton
-from modules.buttons.buttons_for_users.randomizer_button.view.randomizer_view import RandomizeButton
-from modules.buttons.buttons_for_admins.send_message_button.view.send_message import SendMessageButton
-from modules.buttons.buttons_for_admins.delete_message_button.delete_any_message.view.delete_message_view import \
+from modules.buttons.buttons_for_admins.birthday_button.add_birthday_view import AddBirthdayButton
+from modules.buttons.buttons_for_admins.birthday_button.delete_birthday_view import DeleteBirthdayButton
+from modules.buttons.buttons_for_admins.edit_settings_button.edit_settings_view import EditSettingsButton
+from modules.buttons.buttons_for_users.randomizer_buttons.first_randomizer_view import RandomizeButton
+from modules.buttons.buttons_for_admins.send_message_button.send_message import SendMessageButton
+from modules.buttons.buttons_for_admins.delete_message_button.delete_message_view import \
     DeleteMessageButton
 
 

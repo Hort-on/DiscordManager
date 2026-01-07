@@ -7,7 +7,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from database.data_base_model import DB
-from factories.db_factory import DBScenarioFactory
+from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 from modules.birthdays.birthday_repo import BirthdayRepo
@@ -19,7 +19,16 @@ load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
 
-bot = commands.Bot(command_prefix='', intents=discord.Intents.all())
+intents = discord.Intents.default()
+intents.guilds = True
+intents.members = True
+intents.messages = True
+intents.dm_messages = True
+intents.message_content = True
+intents.reactions = True
+
+bot = commands.Bot(command_prefix='', intents=intents)
+
 
 # --------------------------- DEPENDENCIES --------------------------- #
 logger = Logger()

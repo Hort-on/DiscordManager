@@ -1,10 +1,10 @@
 import discord
 
-from factories.db_factory import DBScenarioFactory
+from services.factories import DBScenarioFactory
 
-from utils.messages import EDIT_CONFIG_MSGS as ECM
+from services.utils.messages import EDIT_CONFIG_MSGS as ECM
 
-from modules.buttons.buttons_for_admins.edit_settings_button.service.setting_selection import SettingSelectorView
+from services.button_services.edit_settings_service.SettingsSelectionService import SettingSelectorView
 
 
 class BaseScenario:

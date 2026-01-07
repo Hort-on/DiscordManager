@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from database.settings_storage.settings_storage import SettingsStorage
 
-from utils.messages import SYSTEM_MSGS as SM
+from services.utils.messages import SYSTEM_MSGS as SM
 
 
 # TODO: охрюммъ ындн аегоейх

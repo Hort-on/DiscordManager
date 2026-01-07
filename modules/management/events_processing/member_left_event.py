@@ -1,6 +1,6 @@
 from database.settings_storage.settings_storage import SettingsStorage
 
-from utils.messages import GENERAL_MSGS as GM
+from services.utils.messages import GENERAL_MSGS as GM
 
 
 class MemberLeftNotification:

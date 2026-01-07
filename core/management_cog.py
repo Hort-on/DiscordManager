@@ -4,13 +4,13 @@ from discord.ext import commands
 
 from database.settings_storage.settings_storage import SettingsStorage
 
-from factories.db_factory.db_scenario_factory import DBScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.logger.logger import Logger
 from modules.management.channels_processing.management import Management
 
-from utils.messages import GENERAL_MSGS, CONFIG_MSGS
+from services.utils.messages import GENERAL_MSGS, CONFIG_MSGS
 
 
 class ManagementCog(commands.Cog):

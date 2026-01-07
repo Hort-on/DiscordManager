@@ -1,7 +1,7 @@
 import asyncio
 import aiosqlite
 from contextlib import asynccontextmanager
-from utils.messages import DB_MSGS as DM
+from services.utils.messages import DB_MSGS as DM
 from modules.logger.logger import Logger
 
 

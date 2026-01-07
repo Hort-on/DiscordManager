@@ -1,13 +1,14 @@
 import discord
 from discord import ui
 
-from utils.messages import GENERAL_MSGS
+from services.factories.channel_factory import ChannelScenario
+from services.utils.messages import GENERAL_MSGS
 
 
 class ChannelTypeView(ui.View):
     def __init__(
             self,
-            scenario,
+            scenario: ChannelScenario,
             text_only=False,
             channels_with_users_only=False
     ):
@@ -64,7 +65,7 @@ class ChannelTypeView(ui.View):
 
 
 class ChannelSelectView(ui.View):
-    def __init__(self, channels, scenario):
+    def __init__(self, channels, scenario: ChannelScenario):
         super().__init__(timeout=60)
         self.scenario = scenario
 
