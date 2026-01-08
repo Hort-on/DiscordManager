@@ -3,7 +3,7 @@ import discord
 from modules.buttons.buttons_for_users.random_buttons.random_mode_view import RandomModeView
 
 
-class RandomizerStartButton(discord.ui.Button):
+class RandomStartButton(discord.ui.Button):
     def __init__(self):
         super().__init__(
             label='🎲 Randomizer',

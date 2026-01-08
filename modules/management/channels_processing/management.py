@@ -14,7 +14,7 @@ from modules.buttons.buttons_for_admins.send_message_button.send_message import 
 from modules.buttons.buttons_for_admins.delete_message_button.delete_message_view import \
     DeleteMessageButton
 
-from modules.buttons.buttons_for_users.randomizer_buttons.first_random_view import RandomizerStartButton
+from modules.buttons.buttons_for_users.random_buttons.first_random_view import RandomStartButton
 
 
 class Management(View):
@@ -40,7 +40,7 @@ class Management(View):
         """Додає кнопки залежно від налаштувань"""
         self.add_item(EditSettingsButton(self.db_factory, self.settings))
         self.add_item(DeleteMessageButton())
-        self.add_item(RandomizerStartButton())  # TODO: зробити загально доступною
+        self.add_item(RandomStartButton())  # TODO: зробити загально доступною
 
         if self.settings.get_guild_settings(self.guild_id).get('birthday'):
             self.add_item(AddBirthdayButton(self.birthday))

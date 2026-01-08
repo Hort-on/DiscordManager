@@ -20,5 +20,5 @@ class RandomTeamAutoModal(discord.ui.Modal, title='Random teams automatically'):
         await self.random_proceed.random_team_proceed(
             interaction,
             self.channel,
-            self.teams_quantity
+            int(self.teams_quantity.value)
         )

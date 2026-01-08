@@ -5,7 +5,7 @@ import discord
 
 class RandomTeamAutoService:
     @staticmethod
-    def build_embed(teams: list[list[discord.Member]]) -> discord.Embed:
+    def _build_embed(teams: list[list[discord.Member]]) -> discord.Embed:
         embed = discord.Embed(
             title="🎲 Random Team Distribution",
             color=discord.Color.blurple()
@@ -46,6 +46,6 @@ class RandomTeamAutoService:
         for i, member in enumerate(members):
             teams[i % teams_quantity].append(member)
 
-        embed = self.build_embed(teams)
+        embed = self._build_embed(teams)
 
         await interaction.followup.send(embed=embed, ephemeral=False)
