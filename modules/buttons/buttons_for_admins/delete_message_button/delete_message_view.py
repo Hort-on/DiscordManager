@@ -21,8 +21,7 @@ class DeleteMessageButton(discord.ui.Button):
         scenario = ChannelScenarioFactory.for_message_deletion(DeleteMessagesModal)
 
         view = ChannelTypeView(scenario, text_only=True)
-        await interaction.response.send_message(
+        await interaction.edit_original_response(
             content=GM.get('ask_channel_msg'),
             view=view,
-            ephemeral=True
         )

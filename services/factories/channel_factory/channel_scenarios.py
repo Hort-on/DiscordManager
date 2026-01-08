@@ -1,7 +1,7 @@
 import discord
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-
+from services.modals.random_modal.RandomTeamAutoModal import RandomTeamAutoModal
 from services.utils.messages import DB_MSGS, SYSTEM_MSGS
 
 
@@ -86,7 +86,22 @@ class DeleteMessagesScenario(ChannelScenario):
     def __init__(self, modal):
         self.modal = modal
 
-    async def on_channel_selected(self, interaction, channel) -> None:
+    async def on_channel_selected(
+            self,
+            interaction: discord.Interaction,
+            channel
+    ) -> None:
         await interaction.response.send_modal(
             self.modal(channel)
+        )
+
+
+class RandomSelection(ChannelScenario):
+    async def on_channel_selected(
+            self,
+            interaction: discord.Interaction,
+            channel
+    ) -> None:
+        await interaction.response.send_modal(
+            RandomTeamAutoModal(channel)
         )

@@ -2,7 +2,7 @@ import discord
 
 from modules.birthdays.birthday_repo import BirthdayRepo
 
-from .BirthdayService import DeleteBirthdayService
+from services.button_services.birthday_service.DeleteBirthdayService import DeleteBirthdayService
 
 
 class DeleteBirthdayModal(discord.ui.Modal, title='Delete birthday'):
@@ -18,7 +18,7 @@ class DeleteBirthdayModal(discord.ui.Modal, title='Delete birthday'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.b_day_service.process(
+        await self.b_day_service.delete_process(
             interaction=interaction,
             username=self.username.value,
         )

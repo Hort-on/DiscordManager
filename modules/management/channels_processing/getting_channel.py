@@ -15,6 +15,7 @@ class ChannelTypeView(ui.View):
         super().__init__(timeout=60)
 
         self.scenario = scenario
+        self.channels_with_users_only = channels_with_users_only
 
         self.options = []
 
@@ -49,6 +50,12 @@ class ChannelTypeView(ui.View):
             channels = interaction.guild.text_channels
         else:
             channels = interaction.guild.voice_channels
+
+            if self.channels_with_users_only:
+                channels = [
+                    vc for vc in channels
+                    if len(vc.members) > 2
+                ]
 
         if not channels:
             await interaction.edit_original_response(

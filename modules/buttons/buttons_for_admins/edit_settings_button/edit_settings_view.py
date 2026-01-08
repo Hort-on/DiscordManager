@@ -25,12 +25,11 @@ class EditSettingsButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()
-        summary = self.settings_formatter.format_settings(interaction)
+        summary = await self.settings_formatter.format_settings(interaction)
 
         view = SettingSelectorView(self.db_factory)
 
-        await interaction.response.send_message(
-            summary,
+        await interaction.edit_original_response(
+            content=summary,
             view=view,
-            ephemeral=True
         )

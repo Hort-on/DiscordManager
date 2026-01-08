@@ -7,7 +7,7 @@ class AddBirthdayService:
     def __init__(self, birthday: BirthdayRepo):
         self.birthday = birthday
 
-    async def process(
+    async def add_process(
             self,
             interaction: discord.Interaction,
             username: str,
@@ -20,16 +20,14 @@ class AddBirthdayService:
         )
 
         if member is None:
-            await interaction.response.send_message(
-                "❌ User not found. Please check username.",
-                ephemeral=True
+            await interaction.edit_original_response(
+                content='```❌ User not found. Please check username.```',
             )
             return
 
         if not AddBirthdayService._is_valid_date(birthday):
-            await interaction.response.send_message(
-                "❌ Invalid date format. Use DD.MM",
-                ephemeral=True
+            await interaction.edit_original_response(
+                content='```❌ Invalid date format. Use DD.MM```',
             )
             return
 

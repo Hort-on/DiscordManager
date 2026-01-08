@@ -1,7 +1,8 @@
 from discord.ui import View
 
-from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
+
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.logger.logger import Logger
@@ -9,10 +10,11 @@ from modules.logger.logger import Logger
 from modules.buttons.buttons_for_admins.birthday_button.add_birthday_view import AddBirthdayButton
 from modules.buttons.buttons_for_admins.birthday_button.delete_birthday_view import DeleteBirthdayButton
 from modules.buttons.buttons_for_admins.edit_settings_button.edit_settings_view import EditSettingsButton
-from modules.buttons.buttons_for_users.randomizer_buttons.first_randomizer_view import RandomizeButton
 from modules.buttons.buttons_for_admins.send_message_button.send_message import SendMessageButton
 from modules.buttons.buttons_for_admins.delete_message_button.delete_message_view import \
     DeleteMessageButton
+
+from modules.buttons.buttons_for_users.randomizer_buttons.first_random_view import RandomizerStartButton
 
 
 class Management(View):
@@ -25,7 +27,7 @@ class Management(View):
             logger: Logger
     ):
 
-        super().__init__()
+        super().__init__(timeout=60)
         self.db_factory = db_factory
         self.guild_id = guild_id
         self.settings = settings
@@ -38,7 +40,7 @@ class Management(View):
         """Додає кнопки залежно від налаштувань"""
         self.add_item(EditSettingsButton(self.db_factory, self.settings))
         self.add_item(DeleteMessageButton())
-        self.add_item(RandomizeButton())  # TODO: зробити загально доступною
+        self.add_item(RandomizerStartButton())  # TODO: зробити загально доступною
 
         if self.settings.get_guild_settings(self.guild_id).get('birthday'):
             self.add_item(AddBirthdayButton(self.birthday))

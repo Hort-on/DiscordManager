@@ -21,8 +21,8 @@
     <file url="file://$PROJECT_DIR$/modules/birthdays/removing_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/randomizer_buttons/first_randomizer_view.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/randomizer_buttons/randomizer_mode_view.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/random_buttons/first_random_view.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/random_buttons/random_mode_view.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/utils/start_config_steps.py" charset="windows-1251" />
@@ -43,7 +43,7 @@
     <file url="file://$PROJECT_DIR$/services/button_services/edit_settings_service/ChoiceHandlerService.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/button_services/edit_settings_service/SettingsFormaterService.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/button_services/edit_settings_service/SettingsSelectionService.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/button_services/randomizer_service/RandomSelectorService.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/button_services/randomizer_service/RandomTeamManualService.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/button_services/randomizer_service/randomizer_functionality.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/channel_scenario_factory.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/channel_scenarios.py" charset="windows-1251" />

@@ -10,7 +10,7 @@ from modules.birthdays.birthday_repo import BirthdayRepo
 from modules.logger.logger import Logger
 from modules.management.channels_processing.management import Management
 
-from services.utils.messages import GENERAL_MSGS, CONFIG_MSGS
+from services.utils.messages import GENERAL_MSGS as GM
 
 
 class ManagementCog(commands.Cog):
@@ -37,7 +37,7 @@ class ManagementCog(commands.Cog):
         super_users_data = self.settings.get_guild_superusers(interaction.guild_id)
         if not super_users_data:
             await interaction.response.send_message(
-                GENERAL_MSGS.get('superusers_not_found_msg'),
+                GM.get('superusers_not_found_msg'),
                 ephemeral=True
             )
             return
@@ -45,21 +45,14 @@ class ManagementCog(commands.Cog):
         super_users = [user.get('user_id') for user in super_users_data]
         if interaction.user.id not in super_users:
             await interaction.response.send_message(
-                GENERAL_MSGS.get('not_superuser_msg'),
-                ephemeral=True
-            )
-            return
-
-        if not self.settings.get_guild_settings(interaction.guild_id).get('configuration_done'):
-            await interaction.response.send_message(
-                CONFIG_MSGS.get('no_configuration_msg'),
+                GM.get('not_superuser_msg'),
                 ephemeral=True
             )
             return
 
         view = Management(interaction.guild_id, self.settings, self.db, self.birthday, self.logger)
         await interaction.response.send_message(
-            GENERAL_MSGS.get('ask_action_msg'),
+            GM.get('ask_action_msg'),
             view=view,
             ephemeral=True
         )

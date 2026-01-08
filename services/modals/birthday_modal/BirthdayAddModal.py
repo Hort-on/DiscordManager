@@ -1,8 +1,7 @@
 import discord
 
 from modules.birthdays.birthday_repo import BirthdayRepo
-
-from .BirthdayService import AddBirthdayService
+from services.button_services.birthday_service.AddBirthdayService import AddBirthdayService
 
 
 class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
@@ -24,7 +23,7 @@ class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.b_day_service.process(
+        await self.b_day_service.add_process(
             interaction=interaction,
             username=self.username.value,
             birthday=self.birthday_input.value

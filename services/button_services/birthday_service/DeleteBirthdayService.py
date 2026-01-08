@@ -7,7 +7,7 @@ class DeleteBirthdayService:
     def __init__(self, birthday: BirthdayRepo):
         self.birthday = birthday
 
-    async def process(
+    async def delete_process(
             self,
             interaction: discord.Interaction,
             username: str,
@@ -19,9 +19,8 @@ class DeleteBirthdayService:
         )
 
         if member is None:
-            await interaction.response.send_message(
-                "❌ User not found. Check username.",
-                ephemeral=True
+            await interaction.edit_original_response(
+                content='❌ User not found. Check username.',
             )
             return
 
@@ -32,8 +31,5 @@ class DeleteBirthdayService:
             interaction.guild.id
         )
 
-        await interaction.response.send_message(
-            response,
-            ephemeral=True
-        )
+        await interaction.edit_original_response(content=response)
         

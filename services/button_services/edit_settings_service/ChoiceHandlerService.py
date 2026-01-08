@@ -1,10 +1,10 @@
 import discord
 
-from services.factories import DBScenarioFactory
+from services.factories.channel_factory.channel_scenario_factory import ChannelScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from services.utils.messages import GENERAL_MSGS, EDIT_CONFIG_MSGS, SYSTEM_MSGS
 
-from services.factories.channel_factory import ChannelScenarioFactory
 from modules.management.YesNoView.YesNoViewFactory.yes_no_scenario_factory import YesNoViewFactory
 from modules.management.YesNoView.view.YesNoView import YesNoView
 from modules.management.channels_processing.getting_channel import ChannelTypeView
