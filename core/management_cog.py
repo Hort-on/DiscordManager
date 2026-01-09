@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings_storage_manager import StorageTarget
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
@@ -34,7 +35,11 @@ class ManagementCog(commands.Cog):
         description="Open management panel"
     )
     async def management(self, interaction: discord.Interaction):
-        super_users_data = self.settings.get_guild_superusers(interaction.guild_id)
+        super_users_data = self.settings.set_storage.get_set(
+            StorageTarget.SUPERUSERS,
+            interaction.guild_id
+        )
+
         if not super_users_data:
             await interaction.response.send_message(
                 GM.get('superusers_not_found_msg'),

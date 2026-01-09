@@ -2,6 +2,7 @@ import discord
 from discord import ui
 
 from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings_storage_manager import StorageTarget
 
 
 class BaseRoleScenario(ui.View):
@@ -23,7 +24,10 @@ class AddRoleManagerScenario(BaseRoleScenario):
         if not guild:
             return
 
-        hidden_roles = self.settings.get_guild_roles(interaction.guild_id)
+        hidden_roles = self.settings.set_storage.get_set(
+            StorageTarget.HIDDEN_ROLES,
+            interaction.guild_id
+        )
         member = guild.get_member(interaction.user.id)
         if not member:
             return

@@ -1,10 +1,10 @@
 import discord
 
-from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 from services.button_services.edit_settings_service.SettingsSelectionService import SettingSelectorView
 from services.button_services.edit_settings_service.SettingsFormaterService import SettingsFormatter
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 
 class EditSettingsButton(discord.ui.Button):

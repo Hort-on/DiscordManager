@@ -1,6 +1,7 @@
 from discord.ui import View
 
 from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings_storage_manager import StorageTarget
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
@@ -42,9 +43,17 @@ class Management(View):
         self.add_item(DeleteMessageButton())
         self.add_item(RandomStartButton())  # TODO: зробити загально доступною
 
-        if self.settings.get_guild_settings(self.guild_id).get('birthday'):
+        if self.settings.dict_storage.get_dict(
+                StorageTarget.SETTINGS,
+                self.guild_id,
+                'birthday'
+        ):
             self.add_item(AddBirthdayButton(self.birthday))
             self.add_item(DeleteBirthdayButton(self.birthday))
 
-        if self.settings.get_guild_settings(self.guild_id).get('send_messages'):
+        if self.settings.dict_storage.get_dict(
+                StorageTarget.SETTINGS,
+                self.guild_id,
+                'send_messages'
+        ):
             self.add_item(SendMessageButton(self.db_factory))

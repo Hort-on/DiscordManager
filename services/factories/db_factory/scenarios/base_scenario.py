@@ -8,9 +8,10 @@ from services.utils.messages import DB_MSGS as DM
 class DataBaseScenario:
     table_map = {
         'settings': "GuildSettings",
-        'guild_channels': "GuildChannels",
-        'super_users': "SuperUsers",
+        'guild_channels': "GuildSelectedChannels",
+        'hidden_channels': "HiddenChannels",
         'channels_to_send': "ChannelsToSend",
+        'super_users': "SuperUsers",
         'birthdays': "Birthdays",
         'spam_info': "SpamInfo",
         'roles': "HiddenRoles"

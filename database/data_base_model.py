@@ -43,7 +43,7 @@ class DB:
                 ''')
 
                 await temp_conn.execute('''
-                    CREATE TABLE IF NOT EXISTS GuildChannels (
+                    CREATE TABLE IF NOT EXISTS GuildSelectedChannels (
                         guild_id INTEGER PRIMARY KEY,
                         
                         congrats_channel_id INTEGER DEFAULT NULL,
@@ -58,22 +58,10 @@ class DB:
 
                 await temp_conn.execute('''
                     CREATE TABLE IF NOT EXISTS HiddenChannels (
-                        channel_id INTEGER NOT NULL,
-
-                        PRIMARY KEY (guild_id, channel_id),
-
-                        FOREIGN KEY (guild_id)
-                            REFERENCES GuildSettings(guild_id)
-                            ON DELETE CASCADE
-                    );
-                ''')
-
-                await temp_conn.execute('''
-                    CREATE TABLE IF NOT EXISTS SuperUsers (
                         guild_id INTEGER NOT NULL,
-                        user_id INTEGER NOT NULL,
+                        channel_id INTEGER NOT NULL,
                     
-                        PRIMARY KEY (guild_id, user_id),
+                        PRIMARY KEY (guild_id, channel_id),
                     
                         FOREIGN KEY (guild_id)
                             REFERENCES GuildSettings(guild_id)
@@ -86,6 +74,19 @@ class DB:
                         guild_id INTEGER NOT NULL,
                         user_id INTEGER NOT NULL,
                         channel_id INTEGER NOT NULL,
+
+                        PRIMARY KEY (guild_id, user_id),
+
+                        FOREIGN KEY (guild_id)
+                            REFERENCES GuildSettings(guild_id)
+                            ON DELETE CASCADE
+                    );
+                ''')
+
+                await temp_conn.execute('''
+                    CREATE TABLE IF NOT EXISTS SuperUsers (
+                        guild_id INTEGER NOT NULL,
+                        user_id INTEGER NOT NULL,
                     
                         PRIMARY KEY (guild_id, user_id),
                     

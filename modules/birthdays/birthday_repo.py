@@ -2,9 +2,10 @@ import discord
 
 from datetime import datetime
 
+from database.settings_storage.settings_storage_manager import StorageTarget
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
-from services.factories import DBScenarioFactory
 from database.settings_storage.settings_storage import SettingsStorage
 
 
@@ -108,9 +109,13 @@ class BirthdayRepo:
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
-            is_enabled = self.settings.get_guild_settings(guild.id)
+            is_enabled = self.settings.dict_storage.get_dict(
+                StorageTarget.SETTINGS,
+                guild.id,
+                'birthday'
+            )
 
-            if not is_enabled.get('birthday', False):
+            if not is_enabled:
                 continue
 
             # TODO: зробити точну часову зону для кожної гільдії
