@@ -1,6 +1,6 @@
 from database.data_base_model import DB
 
-from services.factories.db_factory.scenarios.common_scenarios.common_scenarios import (
+from services.factories.db_factory.scenarios.common import (
     GetDataScenario,
     WriteDataScenario,
     WriteUserScenario,
@@ -8,7 +8,7 @@ from services.factories.db_factory.scenarios.common_scenarios.common_scenarios i
     InitGuildScenario
 )
 
-from services.factories.db_factory.scenarios.birthday_scenarios.birthday_scenarios import (
+from services.factories.db_factory.scenarios.birthday import (
     AddBirthdayScenario,
     DeleteBirthdayScenario,
     ExistBirthdayCheckScenario,
@@ -17,7 +17,7 @@ from services.factories.db_factory.scenarios.birthday_scenarios.birthday_scenari
     ResetAllCongratsScenario
 )
 
-from services.factories.db_factory.scenarios.cleanup_scenarios.cleanup_scenarios import (
+from services.factories.db_factory.scenarios.cleanup import (
     CleanupRemovedGuildScenario,
     CleanupRemovedUserScenario,
     CleanupRemovedChannelScenario,

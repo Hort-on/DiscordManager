@@ -2,7 +2,7 @@ import discord
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
-from services.modals.random_modal.RandomTeamAutoModal import RandomTeamAutoModal
+from services.modals.random_modal.team_by_channel import RandomTeamAutoModal
 from services.utils.messages import DB_MSGS, SYSTEM_MSGS
 
 

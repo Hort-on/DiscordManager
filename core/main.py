@@ -2,14 +2,14 @@ import discord
 from discord.ext import tasks
 
 from database.data_base_model import DB
-from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings import SettingsStorage
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 from services.utils.bad_words import invitation_pattern
 
 from modules.logger.logger import Logger
-from modules.management.events_processing.member_left_event import MemberLeftNotification
-from modules.management.message_processing.BadWordsHandler import BadWordsHandler
+from modules.management.events.member_left import MemberLeftNotification
+from modules.management.message_processing.bad_words_handler import BadWordsHandler
 from modules.birthdays.birthday_repo import BirthdayManager
 
 

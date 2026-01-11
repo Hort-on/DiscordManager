@@ -1,9 +1,9 @@
 import discord
 from discord import ui
 
-from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings import SettingsStorage
 
-from database.settings_storage.settings_storage_manager import StorageTarget
+from database.settings_storage.settings_manager import StorageTarget
 
 
 class BaseRoleScenario(ui.View):

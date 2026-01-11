@@ -2,7 +2,7 @@ import asyncio
 
 from datetime import timedelta
 
-from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings import SettingsStorage
 
 from services.utils.messages import SYSTEM_MSGS as SM
 

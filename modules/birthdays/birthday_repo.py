@@ -2,11 +2,11 @@ import discord
 
 from datetime import datetime
 
-from database.settings_storage.settings_storage_manager import StorageTarget
+from database.settings_storage.settings_manager import StorageTarget
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
-from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings import SettingsStorage
 
 
 class BirthdayManager:

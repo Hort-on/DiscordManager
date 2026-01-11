@@ -1,12 +1,12 @@
 import discord
 
-from database.settings_storage.settings_storage import SettingsStorage
-from database.settings_storage.settings_storage_manager import StorageTarget
+from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
 
 from discord import app_commands
 from discord.ext import commands
 
-from modules.management.management import ButtonManager
+from modules.management.button_manager import ButtonManager
 
 from services.utils.messages import GENERAL_MSGS as GM
 
