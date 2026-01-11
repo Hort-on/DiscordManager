@@ -1,7 +1,7 @@
 import discord
 from discord import ui
 
-from services.factories.channel_factory import ChannelScenario
+from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
 

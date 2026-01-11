@@ -9,7 +9,7 @@ from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL
 from database.settings_storage.settings_storage import SettingsStorage
 
 
-class BirthdayRepo:
+class BirthdayManager:
     def __init__(
             self,
             bot,

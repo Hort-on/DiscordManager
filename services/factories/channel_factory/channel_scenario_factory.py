@@ -1,7 +1,8 @@
 from services.factories.channel_factory.channel_scenarios import (
     SaveChannelToDBScenario,
     DeleteMessagesScenario,
-    SaveChannelToDBForMessageScenario, RandomSelection
+    SaveChannelToDBForMessageScenario,
+    RandomSelection
 )
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 

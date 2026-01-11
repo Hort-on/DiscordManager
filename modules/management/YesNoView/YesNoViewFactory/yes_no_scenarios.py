@@ -1,6 +1,6 @@
 import discord
 
-from services.factories import DBScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from services.utils.messages import EDIT_CONFIG_MSGS as ECM
 

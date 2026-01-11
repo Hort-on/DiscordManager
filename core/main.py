@@ -5,13 +5,12 @@ from database.data_base_model import DB
 from database.settings_storage.settings_storage import SettingsStorage
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
+from services.utils.bad_words import invitation_pattern
 
 from modules.logger.logger import Logger
 from modules.management.events_processing.member_left_event import MemberLeftNotification
 from modules.management.message_processing.BadWordsHandler import BadWordsHandler
-from modules.birthdays.birthday_repo import BirthdayRepo
-
-from services.utils import invitation_pattern
+from modules.birthdays.birthday_repo import BirthdayManager
 
 
 class BotController:
@@ -21,8 +20,8 @@ class BotController:
             db_connect: DB,
             db_factory: DBScenarioFactory,
             logger: Logger,
-            guild_settings: SettingsStorage,
-            birthday_repo: BirthdayRepo,
+            settings: SettingsStorage,
+            birthday_manager: BirthdayManager,
             bad_words_handler: BadWordsHandler,
             member_left_notify: MemberLeftNotification
 
@@ -34,8 +33,8 @@ class BotController:
 
         self.logger = logger
 
-        self.guilds_settings = guild_settings
-        self.birthday_repo = birthday_repo
+        self.settings = settings
+        self.birthday_manager = birthday_manager
         self.bad_words = bad_words_handler
         self.member_left_notify = member_left_notify
 
@@ -54,7 +53,7 @@ class BotController:
         if not self.daily_birthday_check.is_running():
             self.daily_birthday_check.start()
 
-        await self.guilds_settings.load_all_settings()
+        await self.settings.load_all_settings()
 
     async def on_message(self, message):
         # TODO: потрібно зробити перевірку суперюзерів з бд
@@ -94,7 +93,7 @@ class BotController:
         await self.bot.process_commands(message)
 
     async def on_raw_reaction_add(self, payload):
-        result = await self.db.get_data(
+        result = await self.db.get_data(  # TODO: переробити
             payload.guild_id,
             'settings',
             'verification',

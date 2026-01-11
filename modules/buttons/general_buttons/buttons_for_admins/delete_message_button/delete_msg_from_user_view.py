@@ -1,7 +1,6 @@
 import discord
 
-from services.factories.channel_factory import ChannelScenarioFactory
-
+from services.factories.channel_factory.channel_scenario_factory import ChannelScenarioFactory
 from services.modals.delete_msg_modal.DeleteMessageUserModal import DeleteUserMessagesModal
 
 from modules.management.channels_processing.getting_channel import ChannelTypeView

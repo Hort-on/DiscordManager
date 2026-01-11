@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/bot.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/core/management_cog.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/cogs/management_cog.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/cogs/management_cog.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/core/bot.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/core/bot.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/core/starting_cog.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/database/birthday_db_repo.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/database/data_base_model.py" charset="UTF-8" />
@@ -20,9 +22,11 @@
     <file url="file://$PROJECT_DIR$/modules/birthdays/checking_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/removing_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/random_buttons/first_random_view.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/buttons_for_users/random_buttons/random_mode_view.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/general_buttons/back_button.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/general_buttons/buttons_for_admins/birthday_button/birthday_menu_button.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/general_buttons/buttons_for_admins/delete_message_button/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/general_buttons/buttons_for_users/random_buttons/first_random_view.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/general_buttons/buttons_for_users/random_buttons/random_mode_view.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/utils/start_config_steps.py" charset="windows-1251" />
@@ -31,8 +35,8 @@
     <file url="file://$PROJECT_DIR$/modules/management/channel_selection.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/channel_type_selection.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/channels_processing/getting_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/management/channels_processing/management.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/finishing_configuration.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/management/management.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/message_processing/BadWordsHandler.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/message_processing/bad_games_handling.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/message_processing/invitation_checking.py" charset="UTF-8" />
@@ -54,6 +58,7 @@
     <file url="file://$PROJECT_DIR$/services/modals/delete_msg_modal/DeleteMessageModal.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/modals/delete_msg_modal/DeleteMessageUserModal.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/modals/superuser_modal/superuser_modal.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/superuser_service" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/utils/bad_words.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/utils/channels_permissions.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/utils/messages.py" charset="UTF-8" />

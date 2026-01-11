@@ -43,7 +43,6 @@ class DBScenarioFactory:
             table_name: str,
             *columns: str
     ) -> GetDataScenario:
-
         return GetDataScenario(
             self.db_connect,
             self.logger,
@@ -58,7 +57,6 @@ class DBScenarioFactory:
             table_name: str,
             data: dict
     ) -> WriteDataScenario:
-
         return WriteDataScenario(
             self.db_connect,
             self.logger,
@@ -73,7 +71,6 @@ class DBScenarioFactory:
             table_name: str,
             user_ids: list[int]
     ):
-
         return WriteUserScenario(
             self.db_connect,
             self.logger,
@@ -87,7 +84,6 @@ class DBScenarioFactory:
             guild_id: int,
             table_name: str
     ) -> FetchAllDataScenario:
-
         return FetchAllDataScenario(
             self.db_connect,
             self.logger,
@@ -101,7 +97,6 @@ class DBScenarioFactory:
             user_id: int,
             user_birthday: str
     ) -> AddBirthdayScenario:
-
         return AddBirthdayScenario(
             self.db_connect,
             self.logger,
@@ -115,7 +110,6 @@ class DBScenarioFactory:
             guild_id: int,
             user_id: int,
     ) -> DeleteBirthdayScenario:
-
         return DeleteBirthdayScenario(
             self.db_connect,
             self.logger,
@@ -128,7 +122,6 @@ class DBScenarioFactory:
             guild_id: int,
             user_id: int
     ) -> ExistBirthdayCheckScenario:
-
         return ExistBirthdayCheckScenario(
             self.db_connect,
             self.logger,
@@ -141,7 +134,6 @@ class DBScenarioFactory:
             guild_id: int,
             today: str
     ) -> GetTodayBirthdayScenario:
-
         return GetTodayBirthdayScenario(
             self.db_connect,
             self.logger,
@@ -155,7 +147,6 @@ class DBScenarioFactory:
             user_id: int,
             today_str: str
     ) -> UpdateLastCongratsScenario:
-
         return UpdateLastCongratsScenario(
             self.db_connect,
             self.logger,
@@ -167,7 +158,6 @@ class DBScenarioFactory:
     def for_reset_congrats(
             self
     ) -> ResetAllCongratsScenario:
-
         return ResetAllCongratsScenario(
             self.db_connect,
             self.logger,
@@ -178,7 +168,6 @@ class DBScenarioFactory:
             guild_id: int,
 
     ) -> CleanupRemovedGuildScenario:
-
         return CleanupRemovedGuildScenario(
             self.db_connect,
             self.logger,
@@ -191,7 +180,6 @@ class DBScenarioFactory:
             user_id: int
 
     ) -> CleanupRemovedUserScenario:
-
         return CleanupRemovedUserScenario(
             self.db_connect,
             self.logger,
@@ -205,7 +193,6 @@ class DBScenarioFactory:
             channel_id: int
 
     ) -> CleanupRemovedChannelScenario:
-
         return CleanupRemovedChannelScenario(
             self.db_connect,
             self.logger,
@@ -219,7 +206,6 @@ class DBScenarioFactory:
             role_id: int
 
     ) -> CleanupRemovedRoleScenario:
-
         return CleanupRemovedRoleScenario(
             self.db_connect,
             self.logger,
@@ -231,7 +217,6 @@ class DBScenarioFactory:
             self,
             guild_id: int
     ) -> InitGuildScenario:
-
         return InitGuildScenario(
             self.db_connect,
             self.logger,

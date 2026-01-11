@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.buttons_for_users.random_buttons.random_mode_view import RandomModeView
+from modules.buttons.general_buttons.buttons_for_users.random_buttons.random_mode_view import RandomModeView
 
 
 class RandomStartButton(discord.ui.Button):

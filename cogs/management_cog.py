@@ -1,38 +1,26 @@
 import discord
-from discord import app_commands
-from discord.ext import commands
 
 from database.settings_storage.settings_storage import SettingsStorage
 from database.settings_storage.settings_storage_manager import StorageTarget
 
-from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
+from discord import app_commands
+from discord.ext import commands
 
-from modules.birthdays.birthday_repo import BirthdayRepo
-from modules.logger.logger import Logger
-from modules.management.channels_processing.management import Management
+from modules.management.management import ButtonManager
 
 from services.utils.messages import GENERAL_MSGS as GM
 
 
 class ManagementCog(commands.Cog):
     def __init__(
-            self,
-            bot,
-            settings: SettingsStorage,
-            db: DBScenarioFactory,
-            logger: Logger,
-            birthday: BirthdayRepo
+        self,
+        settings: SettingsStorage
     ):
-
-        self.bot = bot
         self.settings = settings
-        self.db = db
-        self.logger = logger
-        self.birthday = birthday
 
     @app_commands.command(
         name="management",
-        description="Open management panel"
+        description="Opens management panel"
     )
     async def management(self, interaction: discord.Interaction):
         super_users_data = self.settings.set_storage.get_set(
@@ -55,7 +43,10 @@ class ManagementCog(commands.Cog):
             )
             return
 
-        view = Management(interaction.guild_id, self.settings, self.db, self.birthday, self.logger)
+        view = ButtonManager(
+            guild_id=interaction.guild_id,
+        )
+
         await interaction.response.send_message(
             GM.get('ask_action_msg'),
             view=view,
@@ -64,13 +55,5 @@ class ManagementCog(commands.Cog):
 
 
 async def setup(bot):
-    services = bot.services
-    await bot.add_cog(
-        ManagementCog(
-            bot,
-            services.guilds_settings,
-            services.db,
-            services.logger,
-            services.birthday
-        )
-    )
+    settings = bot.controller.settings
+    await bot.add_cog(ManagementCog(settings))

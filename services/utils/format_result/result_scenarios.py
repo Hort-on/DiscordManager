@@ -1,7 +1,7 @@
 import discord
 
-from database.settings_storage.settings_storage_manager import StorageTarget
 from database.settings_storage.settings_storage import SettingsStorage
+from database.settings_storage.settings_storage_manager import StorageTarget
 
 from services.utils.messages import CONFIG_MSGS as CM
 
@@ -19,7 +19,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
     async def build_result(self, interaction: discord.Interaction) -> None:
         lines: list[str] = ['Your current settings:\n']
 
-        settings = self.settings.dict_storage.get_dict_all(
+        settings = self.settings.dict_storage.get_for_dict_all(
             StorageTarget.SETTINGS,
             interaction.guild_id
         )
@@ -36,9 +36,10 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
 
         self._append_superusers(interaction, lines)
         await self._append_channels(interaction, lines)
+        await self._send_result(interaction, lines)
 
     def _append_superusers(self, interaction, lines):
-        users = self.settings.set_storage.get_set(
+        users = self.settings.set_storage.get_for_set(
             StorageTarget.SUPERUSERS,
             interaction.guild_id
         )
@@ -54,25 +55,23 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
             name = member.display_name if member else f'Unknown ({user_id})'
             lines.append(f'-> {name}')
 
-    async def _append_channels(self, interaction: discord.Interaction, summary) -> None:
-        current_selected_channels = self.settings.dict_storage.get_dict_all(
+    async def _append_channels(self, interaction: discord.Interaction, lines) -> None:
+        current_selected_channels = self.settings.dict_storage.get_for_dict_all(
             StorageTarget.SELECTED_CHANNELS,
             interaction.guild_id
         )
 
-        summary.append('\n Channels:')
+        lines.append('\n Channels:')
 
         for key, value in current_selected_channels.items():
             channel = interaction.client.get_channel(value)
             status = channel.name if channel is not None else '❌ Not assigned'
             ch_name = key.replace('_channel_id', ' channel')
-            summary.append(f'-> {ch_name}: {status}')
-
-        await self._send_result(interaction, summary)
+            lines.append(f'-> {ch_name}: {status}')
 
     @staticmethod
-    async def _send_result(interaction: discord.Interaction, summary) -> None:
-        result_msg = '\n'.join(summary)
+    async def _send_result(interaction: discord.Interaction, lines) -> None:
+        result_msg = '\n'.join(lines)
         await interaction.edit_original_response(
             content=result_msg
         )

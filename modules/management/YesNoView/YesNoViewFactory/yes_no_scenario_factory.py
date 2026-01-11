@@ -1,6 +1,5 @@
-from services.factories import DBScenarioFactory
-
 from modules.management.YesNoView.YesNoViewFactory.yes_no_scenarios import ConfirmationScenario
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 
 class YesNoViewFactory:

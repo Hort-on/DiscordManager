@@ -1,14 +1,14 @@
 import discord
 
-from modules.birthdays.birthday_repo import BirthdayRepo
+from modules.birthdays.birthday_repo import BirthdayManager
+
 from services.button_services.birthday_service.AddBirthdayService import AddBirthdayService
 
 
 class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
-    def __init__(self, birthday: BirthdayRepo):
+    def __init__(self, birthday_manager: BirthdayManager):
         super().__init__()
-        self.birthday = birthday
-        self.b_day_service = AddBirthdayService(self.birthday)
+        self.b_day_service = AddBirthdayService(birthday_manager)
 
     username = discord.ui.TextInput(
         label='Discord username',

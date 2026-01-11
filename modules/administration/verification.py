@@ -1,6 +1,6 @@
 import discord
 
-from bot import bot
+from core.bot import bot
 
 from services.utils.messages import CONFIG_MSGS as CM
 

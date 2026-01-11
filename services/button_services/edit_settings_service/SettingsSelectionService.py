@@ -1,8 +1,7 @@
 import discord
 
-from services.factories import DBScenarioFactory
-
 from services.button_services.edit_settings_service.ChoiceHandlerService import ChoiceHandler
+from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 from services.utils.option_list import SETTINGS_OPTIONS
 from services.utils.messages import SYSTEM_MSGS as SM
@@ -25,7 +24,7 @@ class SettingSelector(discord.ui.Select):
 
         self.db_factory = db_factory
 
-        self.choice_handler = ChoiceHandler(self.db_factory)
+        self.choice_handler = ChoiceHandler(db_factory)
 
     async def callback(
             self,
@@ -54,5 +53,4 @@ class SettingSelectorView(discord.ui.View):
             db_factory: DBScenarioFactory
     ):
         super().__init__(timeout=None)
-        self.db_factory = db_factory
-        self.add_item(SettingSelector(self.db_factory))
+        self.add_item(SettingSelector(db_factory))

@@ -17,7 +17,7 @@ class SetStorageManager:
     ):
         self._map = mapping
 
-    def add_set(
+    def add_for_set(
             self,
             target: StorageTarget,
             guild_id: int,
@@ -27,7 +27,7 @@ class SetStorageManager:
             guild_id, set()
         ).add(value)
 
-    def get_set(
+    def get_for_set(
             self,
             target: StorageTarget,
             guild_id: int
@@ -38,7 +38,7 @@ class SetStorageManager:
             guild_id, set()
         )
 
-    def remove_set(
+    def remove_for_set(
             self,
             target: StorageTarget,
             guild_id: int,
@@ -56,7 +56,7 @@ class DictStorageManager:
     ):
         self._map = mapping
 
-    def set_dict(
+    def set_for_dict(
             self,
             target: StorageTarget,
             guild_id: int,
@@ -67,7 +67,7 @@ class DictStorageManager:
             guild_id, {}
         )[key] = value
 
-    def get_dict(
+    def get_for_dict(
             self,
             target: StorageTarget,
             guild_id: int,
@@ -81,7 +81,7 @@ class DictStorageManager:
             key
         )
 
-    def get_dict_all(
+    def get_for_dict_all(
             self,
             target: StorageTarget,
             guild_id: int,
@@ -92,7 +92,7 @@ class DictStorageManager:
             guild_id, {}
         )
 
-    def remove_dict(
+    def remove_for_dict(
             self,
             target: StorageTarget,
             guild_id: int,
