@@ -2,8 +2,10 @@ import random
 
 import discord
 
+from modules.buttons.for_users.randomizer.reshuffle import ReshuffleView
 
-class RandomTeamAutoService:
+
+class RandomTeamByChannelService:
     @staticmethod
     def _build_embed(teams: list[list[discord.Member]]) -> discord.Embed:
         embed = discord.Embed(
@@ -25,7 +27,7 @@ class RandomTeamAutoService:
 
         return embed
 
-    async def random_team_proceed(
+    async def team_by_channel_proceed(
             self,
             interaction: discord.Interaction,
             channel,
@@ -48,4 +50,10 @@ class RandomTeamAutoService:
 
         embed = self._build_embed(teams)
 
-        await interaction.followup.send(embed=embed, ephemeral=False)
+        view = ReshuffleView(self.team_by_channel_proceed, channel, teams_quantity)
+
+        if not interaction.response.is_done():
+            await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+            return
+
+        await interaction.edit_original_response(embed=embed, view=view)

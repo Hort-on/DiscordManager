@@ -6,13 +6,13 @@ from dependency_injector.wiring import inject, Provide
 
 from core.bot_container import BotContainer
 
-from modules.buttons.buttons_for_admins.birthday_button.add_birthday import AddBirthdayButton
-from modules.buttons.buttons_for_admins.birthday_button.delete_birthday import DeleteBirthdayButton
-from modules.buttons.buttons_for_users.randomizer_buttons.start import RandomStartButton
-from modules.buttons.buttons_for_admins.delete_message_button.delete_msg_button import DeleteMessageButton
-from modules.buttons.buttons_for_admins.edit_settings_button.edit_settings_button import \
+from modules.buttons.for_admins.birthday_buttons.add_birthday import AddBirthdayButton
+from modules.buttons.for_admins.birthday_buttons.delete_birthday import DeleteBirthdayButton
+from modules.buttons.for_users.randomizer.start import RandomStartButton
+from modules.buttons.for_admins.delete_message.msg import DeleteMessageButton
+from modules.buttons.for_admins.edit_settings_button.edit_settings import \
     EditSettingsButton
-from modules.buttons.buttons_for_admins.send_message_button.send_msg_button import SendMessageButton
+from modules.buttons.for_admins.send_message_button.send_msg import SendMessageButton
 
 
 class ButtonManager(View):

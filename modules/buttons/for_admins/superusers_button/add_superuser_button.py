@@ -12,6 +12,6 @@ class AddSUserButton(discord.ui.Button):
         self.view.disable_all_items()
 
         await interaction.edit_original_response(
-            content=GM.get('ask_channel_msg'),
+            content='',
             view=view,
         )

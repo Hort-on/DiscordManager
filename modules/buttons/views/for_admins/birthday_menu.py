@@ -1,8 +1,8 @@
 import discord
 
 from modules.birthdays.birthday_repo import BirthdayManager
-from modules.buttons.buttons_for_admins.birthday_button.add_birthday import AddBirthdayButton
-from modules.buttons.buttons_for_admins.birthday_button.delete_birthday import \
+from modules.buttons.for_admins.birthday_buttons.add_birthday import AddBirthdayButton
+from modules.buttons.for_admins.birthday_buttons.delete_birthday import \
     DeleteBirthdayButton
 from modules.buttons.back import BackButton
 from modules.management.button_manager import ButtonManager

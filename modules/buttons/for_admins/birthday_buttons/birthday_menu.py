@@ -2,7 +2,7 @@ import discord
 
 from modules.birthdays.birthday_repo import BirthdayManager
 
-from modules.buttons.views.admin_button_views.birthday_menu import BirthdayMenuView
+from modules.buttons.views.for_admins.birthday_menu import BirthdayMenuView
 
 
 class BirthdayMenuButton(discord.ui.Button):

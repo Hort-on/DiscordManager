@@ -1,12 +1,12 @@
 import discord
 
-from services.button_services.randomizer_service.msg_team import RandomTeamManualService
+from services.buttons.randomizer_service.msg_team import RandomTeamByMsgService
 
 
-class RandomTeamManualModal(discord.ui.Modal, title='Random teams manual'):
+class RandomTeamByMsgModal(discord.ui.Modal, title='Random teams manual'):
     def __init__(self):
         super().__init__()
-        self.random_proceed = RandomTeamManualService()
+        self.random_proceed = RandomTeamByMsgService()
 
     users_list = discord.ui.TextInput(
         label='List of users',
@@ -23,7 +23,7 @@ class RandomTeamManualModal(discord.ui.Modal, title='Random teams manual'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.random_proceed.random_team_proceed(
+        await self.random_proceed.team_by_text_proceed(
             interaction,
             str(self.users_list.value),
             int(self.teams_quantity.value)

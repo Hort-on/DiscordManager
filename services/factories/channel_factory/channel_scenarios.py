@@ -2,7 +2,7 @@ import discord
 
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
-from services.modals.random_modal.team_by_channel import RandomTeamAutoModal
+from services.modals.random_modal.team_by_channel import RandomTeamByChannelModal
 from services.utils.messages import DB_MSGS, SYSTEM_MSGS
 
 
@@ -104,5 +104,5 @@ class RandomSelection(ChannelScenario):
             channel
     ) -> None:
         await interaction.response.send_modal(
-            RandomTeamAutoModal(channel)
+            RandomTeamByChannelModal(channel)
         )

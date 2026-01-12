@@ -1,6 +1,6 @@
 import discord
 
-from services.modals.random_modal.team_by_text import RandomTeamManualModal
+from services.modals.random_modal.team_by_msg import RandomTeamByMsgModal
 
 
 class RandomTeamByMsg(discord.ui.Button):
@@ -11,4 +11,4 @@ class RandomTeamByMsg(discord.ui.Button):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.send_modal(RandomTeamManualModal())
+        await interaction.send_modal(RandomTeamByMsgModal())
