@@ -23,19 +23,20 @@ class SetStorageManager:
             guild_id: int,
             value: int
     ) -> None:
-        self._map[target].setdefault(
-            guild_id, set()
-        ).add(value)
+        (self._map[target]
+         .setdefault(guild_id, set())
+         .add(value)
+         )
 
     def get_for_set(
             self,
             target: StorageTarget,
             guild_id: int
     ) -> set[int]:
-        return self._map.get(
-            target, {}
-        ).get(
-            guild_id, set()
+        return (
+            self._map
+            .get(target, {})
+            .get(guild_id, set())
         )
 
     def remove_for_set(
@@ -44,9 +45,10 @@ class SetStorageManager:
             guild_id: int,
             value: int
     ) -> None:
-        self._map[target].get(
-            guild_id, set()
-        ).discard(value)
+        (self._map[target]
+         .get(guild_id, set())
+         .discard(value)
+         )
 
 
 class DictStorageManager:
@@ -63,9 +65,7 @@ class DictStorageManager:
             key,
             value
     ) -> None:
-        self._map[target].setdefault(
-            guild_id, {}
-        )[key] = value
+        self._map[target].setdefault(guild_id, {})[key] = value
 
     def get_for_dict(
             self,
@@ -73,12 +73,11 @@ class DictStorageManager:
             guild_id: int,
             key
     ):
-        return self._map.get(
-            target, {}
-        ).get(
-            guild_id, {}
-        ).get(
-            key
+        return (
+            self._map
+            .get(target, {})
+            .get(guild_id, {})
+            .get(key)
         )
 
     def get_for_dict_all(
@@ -86,10 +85,10 @@ class DictStorageManager:
             target: StorageTarget,
             guild_id: int,
     ) -> dict:
-        return self._map.get(
-            target, {}
-        ).get(
-            guild_id, {}
+        return (
+            self._map
+            .get(target, {})
+            .get(guild_id, {})
         )
 
     def remove_for_dict(
@@ -98,8 +97,7 @@ class DictStorageManager:
             guild_id: int,
             key
     ) -> None:
-        self._map[target].get(
-            guild_id, {}
-        ).pop(
-            key, None
-        )
+        (self._map[target]
+         .get(guild_id, {})
+         .pop(key, None)
+         )

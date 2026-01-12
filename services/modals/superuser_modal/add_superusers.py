@@ -1,15 +1,15 @@
 import discord
 
-from services.other_services.superusers_core import SuperUserService
+from services.buttons.for_admins.superusers.add_superuser_service import AddSuperusersService
 
 
-class SuperUserModal(discord.ui.Modal, title='Superuser names.'):
-    def __init__(self, parent):
+class AddSuperusersModal(discord.ui.Modal, title='Superuser names.'):
+    def __init__(self):
         super().__init__()
-        self.superuser_procedure = SuperUserService()
+        self.superuser_procedure = AddSuperusersService()
 
     superuser_names = discord.ui.TextInput(
-        label='Please provide superuser names',
+        label='Please type superuser names',
         placeholder='user123, user456, user_, _user, etc.',
         required=True,
     )

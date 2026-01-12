@@ -1,6 +1,6 @@
 import discord
 
-from services.buttons.randomizer_service.msg_team import RandomTeamByMsgService
+from services.buttons.for_users.randomizer_service import RandomTeamByMsgService
 
 
 class RandomTeamByMsgModal(discord.ui.Modal, title='Random teams manual'):

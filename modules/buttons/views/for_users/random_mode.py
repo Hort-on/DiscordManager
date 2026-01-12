@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.back import BackButton
+from modules.buttons.others.back import BackButton
 from modules.buttons.for_users.randomizer.random_number import RandomNumButton
 from modules.buttons.for_users.randomizer.random_team_by_channel import RandomTeamByChannel
 from modules.buttons.for_users.randomizer.random_team_by_msg import RandomTeamByMsg

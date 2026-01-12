@@ -4,7 +4,7 @@ from modules.birthdays.birthday_repo import BirthdayManager
 from modules.buttons.for_admins.birthday_buttons.add_birthday import AddBirthdayButton
 from modules.buttons.for_admins.birthday_buttons.delete_birthday import \
     DeleteBirthdayButton
-from modules.buttons.back import BackButton
+from modules.buttons.others.back import BackButton
 from modules.management.button_manager import ButtonManager
 
 

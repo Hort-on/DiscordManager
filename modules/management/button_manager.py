@@ -1,3 +1,5 @@
+import discord
+
 from discord.ui import View
 
 from database.settings_storage.settings_manager import StorageTarget
@@ -6,50 +8,34 @@ from dependency_injector.wiring import inject, Provide
 
 from core.bot_container import BotContainer
 
-from modules.buttons.for_admins.birthday_buttons.add_birthday import AddBirthdayButton
-from modules.buttons.for_admins.birthday_buttons.delete_birthday import DeleteBirthdayButton
 from modules.buttons.for_users.randomizer.start import RandomStartButton
-from modules.buttons.for_admins.delete_message.msg import DeleteMessageButton
-from modules.buttons.for_admins.edit_settings_button.edit_settings import \
-    EditSettingsButton
-from modules.buttons.for_admins.send_message_button.send_msg import SendMessageButton
+from modules.buttons.others.admin_menu import AdminMenuButton
 
 
 class ButtonManager(View):
     @inject
     def __init__(
             self,
-            guild_id: int,
-            birthday_manager=Provide[BotContainer.birthday_manager],
+            interaction: discord.Interaction,
             settings=Provide[BotContainer.settings],
-            db_factory=Provide[BotContainer.db_factory]
     ):
 
         super().__init__(timeout=60)
-        self.guild_id = guild_id
+        self.interaction = interaction
         self.settings = settings
-        self.db_factory = db_factory
-        self.birthday_manager = birthday_manager
 
         self._add_buttons()
 
     def _add_buttons(self):
-        """Додає кнопки залежно від налаштувань"""
-        self.add_item(EditSettingsButton(self.db_factory, self.settings))
-        self.add_item(DeleteMessageButton())
+        superusers = self.settings.set_storage.get_for_set(
+            target=StorageTarget.SUPERUSERS,
+            guild_id=self.interaction.guild_id
+        )
+
         self.add_item(RandomStartButton())
 
-        if self.settings.dict_storage.get_for_dict(
-                StorageTarget.SETTINGS,
-                self.guild_id,
-                'birthday'
-        ):
-            self.add_item(AddBirthdayButton(self.birthday_manager))
-            self.add_item(DeleteBirthdayButton(self.birthday_manager))
+        if self.interaction.user.id in superusers:
+            self._add_admin_panel()
 
-        if self.settings.dict_storage.get_for_dict(
-                StorageTarget.SETTINGS,
-                self.guild_id,
-                'send_messages'
-        ):
-            self.add_item(SendMessageButton(self.db_factory))
+    def _add_admin_panel(self):
+        self.add_item(AdminMenuButton())

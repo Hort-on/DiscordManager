@@ -20,12 +20,13 @@
     <file url="file://$PROJECT_DIR$/modules/birthdays/checking_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/removing_birthday.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/birthdays/resetting_last_congrats.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/back.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/birthday_buttons/birthday_menu.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/delete_message/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_users/randomizer/random_mode_view.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_users/randomizer/reshuffle.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_users/randomizer/start.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/others/back.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/others/back.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/finishing_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/starting_configuration.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/configuration/utils/start_config_steps.py" charset="windows-1251" />
@@ -40,13 +41,16 @@
     <file url="file://$PROJECT_DIR$/modules/management/yes_no_view" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/yes_no_view/view/yes_no.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/requirements.txt" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/buttons/birthday_service/add_birthday.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/buttons/birthday_service/delete_birthday.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/buttons/edit_settings_service/choice_handler.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/buttons/edit_settings_service/settings_formater.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/buttons/edit_settings_service/settings_selection.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/buttons/randomizer_service/msg_team.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/buttons/randomizer_service/randomizer_functionality.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/birthday_service/add_birthday.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/birthday_service/delete_birthday.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/edit_settings_service/choice_handler.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/edit_settings_service/settings_formater.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/edit_settings_service/settings_selection.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/superusers/add_superuser_service.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/superusers/add_superuser_service.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_admins/superusers/add_superuser_service.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_users/randomizer_service/msg_team.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/buttons/for_users/randomizer_service/randomizer_functionality.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/channel_scenarios.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/scenarios_factory.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/role_manager_factory/role_factory_scenario.py" charset="windows-1251" />
@@ -55,9 +59,8 @@
     <file url="file://$PROJECT_DIR$/services/modals/birthday_modal/deletion.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/modals/delete_msg_modal/del_msg.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/modals/delete_msg_modal/del_msg_from_user.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/modals/superuser_modal/superusers.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/modals/superuser_modal/add_superusers.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/other_services/get_channel.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/other_services/superusers_core.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/superuser_service" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/utils/bad_words.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/utils/channels_permissions.py" charset="windows-1251" />

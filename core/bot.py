@@ -25,8 +25,8 @@ container = BotContainer()
 container.bot.override(bot)
 
 container.wire(modules=[
-    "core.management_cog",
-    "modules.management.management"
+    'modules.management.button_manager',
+    'modules.buttons.views.for_admins.admin_menu'
 ])
 
 controller = container.controller()

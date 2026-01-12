@@ -1,6 +1,6 @@
 import discord
 
-from services.buttons.randomizer_service.channel_team import RandomTeamByChannelService
+from services.buttons.for_users.randomizer_service.channel_team import RandomTeamByChannelService
 
 
 class RandomTeamByChannelModal(discord.ui.Modal, title='Random teams automatically'):
