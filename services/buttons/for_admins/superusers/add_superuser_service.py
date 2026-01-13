@@ -1,18 +1,33 @@
 import discord
+from dependency_injector.wiring import Provide, inject
+
+from core.bot_container import BotContainer
+from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
+from services.other_services.get_member_by_name import get_member_by_name
 
 
 class AddSuperusersService:
+    @inject
+    def __init__(
+            self,
+            settings=Provide[BotContainer.settings],
+            db_factory=Provide[BotContainer.db_factory]
+    ):
+        self.settings: SettingsStorage = settings
+        self.db_factory = db_factory
+
     @staticmethod
-    def _build_embed(found_text: str, not_found_text: str) -> discord.Embed:
+    def _build_embed(added_users: str, not_found_text: str, already_super: str) -> discord.Embed:
         embed = discord.Embed(
             title='Superusers addition',
             color=discord.Color.blurple()
         )
 
-        if found_text:
+        if added_users:
             embed.add_field(
                 name='✅ Added superusers:',
-                value=found_text,
+                value=added_users,
                 inline=False
             )
 
@@ -20,6 +35,13 @@ class AddSuperusersService:
             embed.add_field(
                 name='❌ Users that were not found:',
                 value=not_found_text,
+                inline=False
+            )
+
+        if already_super:
+            embed.add_field(
+                name='⚠️ Already is superuser:',
+                value=already_super,
                 inline=False
             )
 
@@ -32,41 +54,83 @@ class AddSuperusersService:
     ) -> None:
         not_found_users: list[str] = []
         found_users: dict[int, str] = {}
+        in_superusers: dict[int, str] = {}
+
+        superusers = self.settings.set_storage.get_for_set(
+            target=StorageTarget.SUPERUSERS,
+            guild_id=interaction.guild_id
+        )
 
         usernames = [name.strip() for name in superuser_names.split(',')]
 
         for username in usernames:
-            member = (
-                    discord.utils.get(interaction.guild.members, name=username.lower())
-                    or discord.utils.get(interaction.guild.members, display_name=username.lower())
+            member = get_member_by_name(
+                interaction=interaction,
+                username=username
             )
 
             if member is None:
                 not_found_users.append(username)
                 continue
 
+            if member.id in superusers:
+                in_superusers[member.id] = username
+                continue
+
             found_users[member.id] = username
 
-        await self._format_the_result(interaction, found_users, not_found_users)
+        await self._format_the_result(interaction, found_users, not_found_users, in_superusers)
 
     async def _format_the_result(
             self,
             interaction: discord.Interaction,
             found_users: dict[int, str],
-            not_found_users: list[str]
+            not_found_users: list[str],
+            in_superusers: dict[int, str]
     ) -> None:
-        found_result = ""
+        added_result = ''
         for user_id in found_users.keys():
             member = interaction.guild.get_member(user_id)
             name = member.display_name if member else found_users[user_id]
-            found_result += f"-> {name}\n"
+            added_result += f'-> {name}\n'
 
-        not_found_result = ""
+        not_found_result = ''
         if not_found_users:
-            not_found_result = "\n".join([f"-> {name}" for name in not_found_users])
+            not_found_result = '\n'.join([f'-> {name}' for name in not_found_users])
 
-        embed = self._build_embed(found_result, not_found_result)
-        await self._send_the_result(interaction, embed)
+        already_super = ''
+        if in_superusers:
+            already_super = '\n'.join([f'-> {name}' for name in in_superusers])
+
+        embed = self._build_embed(added_result, not_found_result, already_super)
+
+        await self._save(
+            interaction=interaction,
+            user_ids=[u_id for u_id in found_users.keys()],
+            embed=embed
+        )
+
+    async def _save(
+            self,
+            interaction: discord.Interaction,
+            user_ids: list[int],
+            embed: discord.Embed
+    ) -> None:
+        self.settings.set_storage.add_for_set(
+            target=StorageTarget.SUPERUSERS,
+            guild_id=interaction.guild_id,
+            value=user_ids
+        )
+
+        scenario = self.db_factory.for_write_user(
+            guild_id=interaction.guild_id,
+            table_name='super_users',
+            user_ids=user_ids
+        )
+
+        save_to_db_result = await scenario.db_proceed()
+        if save_to_db_result:
+            await self._send_the_result(interaction=interaction, embed=embed)
 
     @staticmethod
     async def _send_the_result(

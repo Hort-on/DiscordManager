@@ -2,6 +2,7 @@ import discord
 
 from collections import Counter
 
+from services.other_services.get_member_by_name import get_member_by_name
 from services.utils.messages import SYSTEM_MSGS as SM
 
 
@@ -96,9 +97,9 @@ class DeleteMessageFromUserService(DeleteMessageBaseService):
         usernames = [name.strip() for name in self.users.split(',')]
 
         for username in usernames:
-            member = discord.utils.find(
-                lambda m: m.name == username or m.display_name == username,
-                interaction.guild.members
+            member = get_member_by_name(
+                interaction=interaction,
+                username=username
             )
 
             if member is None:

@@ -27,7 +27,7 @@ container.bot.override(bot)
 container.wire(modules=[
     'modules.management.button_manager',
     'modules.buttons.views.for_admins.admin_menu',
-    'services.other_services.is_superuser'
+    'services'
 ])
 
 

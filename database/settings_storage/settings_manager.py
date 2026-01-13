@@ -21,11 +21,11 @@ class SetStorageManager:
             self,
             target: StorageTarget,
             guild_id: int,
-            value: int
+            value
     ) -> None:
         (self._map[target]
          .setdefault(guild_id, set())
-         .add(value)
+         .update(value)
          )
 
     def get_for_set(
@@ -43,11 +43,11 @@ class SetStorageManager:
             self,
             target: StorageTarget,
             guild_id: int,
-            value: int
+            value
     ) -> None:
         (self._map[target]
          .get(guild_id, set())
-         .discard(value)
+         .difference_update(value)
          )
 
 

@@ -7,7 +7,8 @@ from core.bot_container import BotContainer
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_admins.birthday_buttons.birthday_menu import BirthdayMenuButton
-from modules.buttons.for_admins.delete_message.any_msg import DeleteMessageButton
+from modules.buttons.for_admins.birthday_buttons.superusers_menu import SuperusersMenuButton
+from modules.buttons.for_admins.delete_message.any_msg import DeleteAnyMessageButton
 from modules.buttons.for_admins.edit_settings_button.edit_settings import EditSettingsButton
 from modules.buttons.for_admins.send_message_button.send_msg import SendMessageButton
 from modules.buttons.others.back import BackButton
@@ -37,7 +38,7 @@ class AdminMenuView(discord.ui.View):
         )
 
         self.add_item(EditSettingsButton(self.db_factory, self.settings))
-        self.add_item(DeleteMessageButton())
+        self.add_item(DeleteAnyMessageButton())
         self.add_item(SuperusersMenuButton())
 
         if config.get('birthday'):

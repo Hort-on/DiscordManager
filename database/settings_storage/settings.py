@@ -33,7 +33,8 @@ class SettingsStorage:
             setting_scenario = self.db_factory.for_fetch_all(guild.id, 'settings')
             result = await setting_scenario.db_proceed()
 
-            self._guild_settings[guild.id] = result[0]
+            if result:
+                self._guild_settings[guild.id] = result[0]
 
             # ------------------------------- load guild channels -------------------------------- #
             channel_scenario = self.db_factory.for_fetch_all(guild.id, 'guild_channels')

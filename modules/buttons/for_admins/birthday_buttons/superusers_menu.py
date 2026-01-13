@@ -12,3 +12,4 @@ class SuperusersMenuButton(FirewallButton):
             style=discord.ButtonStyle.green
         )
 
+

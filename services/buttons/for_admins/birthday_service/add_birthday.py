@@ -1,6 +1,7 @@
 import discord
 
 from modules.birthdays.birthday_repo import BirthdayManager
+from services.other_services.get_member_by_name import get_member_by_name
 
 
 class AddBirthdayService:
@@ -14,9 +15,9 @@ class AddBirthdayService:
             birthday: str
     ) -> None:
 
-        member = (
-                discord.utils.get(interaction.guild.members, name=username)
-                or discord.utils.get(interaction.guild.members, display_name=username)
+        member = get_member_by_name(
+            interaction=interaction,
+            username=username
         )
 
         if member is None:
