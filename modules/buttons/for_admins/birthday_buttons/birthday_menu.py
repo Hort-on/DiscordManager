@@ -1,11 +1,14 @@
 import discord
 
 from modules.birthdays.birthday_repo import BirthdayManager
-
 from modules.buttons.views.for_admins.birthday_menu import BirthdayMenuView
 
+from services.buttons.protection.admin_buttons_protection import FirewallButton
 
-class BirthdayMenuButton(discord.ui.Button):
+
+class BirthdayMenuButton(FirewallButton):
+    scope = 'admin'
+
     def __init__(self, birthday_manager: BirthdayManager):
         super().__init__(
             label='🎂 Birthdays',
@@ -13,7 +16,7 @@ class BirthdayMenuButton(discord.ui.Button):
         )
         self.birthday_manager = birthday_manager
 
-    async def callback(self, interaction: discord.Interaction):
+    async def on_click(self, interaction: discord.Interaction):
         await interaction.edit_original_response(
             content='🎂 Birthday management',
             view=BirthdayMenuView(interaction.guild_id, self.birthday_manager)

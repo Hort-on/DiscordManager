@@ -54,16 +54,3 @@ class BotContainer(containers.DeclarativeContainer):
         bot=bot,
         settings=settings,
     )
-
-    # ====== controller ======
-    controller = providers.Singleton(
-        BotController,
-        bot=bot,
-        db_connect=db,
-        db_factory=db_factory,
-        logger=logger,
-        settings=settings,
-        birthday_manager=birthday_manager,
-        bad_words_handler=bad_words_handler,
-        member_left_notify=member_left_notify,
-    )

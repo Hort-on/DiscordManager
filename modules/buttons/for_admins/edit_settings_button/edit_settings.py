@@ -1,12 +1,16 @@
 import discord
 
 from database.settings_storage.settings import SettingsStorage
-from services.button_services.edit_settings_service.settings_selection import SettingSelectorView
-from services.button_services.edit_settings_service.settings_formater import SettingsFormatter
+
+from services.buttons.for_admins.edit_settings_service.settings_formater import SettingsFormatter
+from services.buttons.for_admins.edit_settings_service.settings_selection import SettingSelectorView
+from services.buttons.protection.admin_buttons_protection import FirewallButton
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 
-class EditSettingsButton(discord.ui.Button):
+class EditSettingsButton(FirewallButton):
+    scope = 'admin'
+
     def __init__(
             self,
             db_factory: DBScenarioFactory,
@@ -21,7 +25,7 @@ class EditSettingsButton(discord.ui.Button):
 
         self.settings_formatter = SettingsFormatter(settings)
 
-    async def callback(self, interaction: discord.Interaction) -> None:
+    async def on_click(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()
         summary = await self.settings_formatter.format_settings(interaction)
 

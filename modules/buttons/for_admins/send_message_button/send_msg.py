@@ -1,13 +1,15 @@
 import discord
 
+from services.buttons.protection.admin_buttons_protection import FirewallButton
 from services.other_services.get_channel import ChannelTypeView
-
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 from services.utils.messages import SYSTEM_MSGS as SM
 
 
-class SendMessageButton(discord.ui.Button):
+class SendMessageButton(FirewallButton):
+    scope = 'admin'
+
     def __init__(self, db_factory: DBScenarioFactory):
         super().__init__(
             label='Send message',
@@ -15,7 +17,7 @@ class SendMessageButton(discord.ui.Button):
         )
         self.db_factory = db_factory
 
-    async def callback(self, interaction: discord.Interaction):
+    async def on_click(self, interaction: discord.Interaction):
         self.view.disable_all_items()
         scenario = ChannelScenarioFactory.for_db_message_save(self.db_factory)
 

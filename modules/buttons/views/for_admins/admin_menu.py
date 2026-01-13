@@ -7,7 +7,7 @@ from core.bot_container import BotContainer
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_admins.birthday_buttons.birthday_menu import BirthdayMenuButton
-from modules.buttons.for_admins.delete_message.msg import DeleteMessageButton
+from modules.buttons.for_admins.delete_message.any_msg import DeleteMessageButton
 from modules.buttons.for_admins.edit_settings_button.edit_settings import EditSettingsButton
 from modules.buttons.for_admins.send_message_button.send_msg import SendMessageButton
 from modules.buttons.others.back import BackButton

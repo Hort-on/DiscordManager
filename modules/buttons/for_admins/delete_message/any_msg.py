@@ -1,21 +1,22 @@
 import discord
 
+from services.buttons.protection.admin_buttons_protection import FirewallButton
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 from services.modals.delete_msg_modal.del_msg import DeleteMessagesModal
-
 from services.other_services.get_channel import ChannelTypeView
-
 from services.utils.messages import GENERAL_MSGS as GM
 
 
-class DeleteMessageButton(discord.ui.Button):
+class DeleteAnyMessageButton(FirewallButton):
+    scope = 'admin'
+
     def __init__(self):
         super().__init__(
             label='Delete message',
             style=discord.ButtonStyle.blurple
         )
 
-    async def callback(self, interaction: discord.Interaction) -> None:
+    async def on_click(self, interaction: discord.Interaction) -> None:
         self.view.disable_all_items()
 
         scenario = ChannelScenarioFactory.for_message_deletion(DeleteMessagesModal)
