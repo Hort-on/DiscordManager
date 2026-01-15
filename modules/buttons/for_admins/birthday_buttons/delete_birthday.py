@@ -17,5 +17,4 @@ class DeleteBirthdayButton(FirewallButton):
         self.birthday_manager = birthday_manager
 
     async def on_click(self, interaction: discord.Interaction):
-        self.view.disable_all_items()
-        await interaction.response.send_modal(DeleteBirthdayModal(self.birthday_manager))
+        await interaction.response.send_modal(DeleteBirthdayModal(birthday_manager=self.birthday_manager))

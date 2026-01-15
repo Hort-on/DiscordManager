@@ -19,5 +19,9 @@ class BirthdayMenuButton(FirewallButton):
     async def on_click(self, interaction: discord.Interaction):
         await interaction.edit_original_response(
             content='🎂 Birthday management',
-            view=BirthdayMenuView(interaction.guild_id, self.birthday_manager)
+            view=BirthdayMenuView(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                birthday_manager=self.birthday_manager
+            )
         )

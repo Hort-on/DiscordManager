@@ -1,0 +1,23 @@
+text_channel_permissions = {
+    'create_instant_invite': False, 'manage_channels': False, 'add_reactions': True,
+    'view_channel': True, 'send_messages': True, 'send_tts_messages': False,
+    'manage_messages': False, 'embed_links': True, 'attach_files': True,
+    'read_message_history': True, 'mention_everyone': True, 'use_external_emojis': True,
+    'use_application_commands': True, 'manage_threads': False, 'create_public_threads': True,
+    'create_private_threads': False, 'use_external_stickers': True, 'send_messages_in_threads': True,
+    'send_voice_messages': True, 'manage_roles': False, 'manage_webhooks': False, 'send_polls': False,
+    'use_external_apps': False
+}
+
+voice_channel_permissions = {
+    'create_instant_invite': False, 'manage_channels': False, 'add_reactions': False,
+    'send_messages': False, 'send_polls': False, 'priority_speaker': False, 'stream': True,
+    'view_channel': True, 'send_tts_messages': False, 'manage_messages': False,
+    'embed_links': False, 'mention_everyone': False, 'create_events': False, 'attach_files': False,
+    'read_message_history': False, 'use_external_emojis': False, 'connect': True, 'speak': True,
+    'mute_members': False, 'manage_events': False, 'use_soundboard': False, 'deafen_members': False,
+    'move_members': False, 'manage_roles': False, 'manage_webhooks': False,
+    'use_application_commands': False, 'use_external_stickers': False, 'send_messages_in_threads': False,
+    'use_embedded_activities': False, 'use_external_apps': False, 'use_external_sounds': False,
+    'send_voice_messages': False
+}

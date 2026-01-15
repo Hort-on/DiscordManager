@@ -5,7 +5,7 @@ from modules.buttons.views.for_users.random_mode import RandomModeView
 from services.buttons.protection.admin_buttons_protection import FirewallButton
 
 
-class RandomStartButton(FirewallButton):
+class RandomMenuButton(FirewallButton):
     scope = 'user'
 
     def __init__(self):
@@ -18,6 +18,9 @@ class RandomStartButton(FirewallButton):
         self.view.disable_all_items()
 
         await interaction.edit_original_response(
-            content="Choose randomizer mode:",
-            view=RandomModeView()
+            content='Choose randomizer mode:',
+            view=RandomModeView(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id
+            )
         )

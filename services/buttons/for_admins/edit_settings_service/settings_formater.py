@@ -15,7 +15,7 @@ class SettingsFormatter:
         self.settings = settings
 
     async def format_settings(self, interaction: discord.Interaction) -> None:
-        scenario = ResultFactory.for_settings_edit(self.settings)
+        scenario = ResultFactory.for_settings_edit(settings=self.settings)
         summary_result = scenario.format_the_result(
             parent=self,
             interaction=interaction

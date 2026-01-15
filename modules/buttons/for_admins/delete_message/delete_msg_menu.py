@@ -1,6 +1,7 @@
 import discord
 
-from modules.buttons.views.for_admins.delete_msg import DeleteMsgMenuView
+from modules.buttons.views.for_admins.delete_msg_menu import DeleteMsgMenuView
+
 from services.buttons.protection.admin_buttons_protection import FirewallButton
 
 

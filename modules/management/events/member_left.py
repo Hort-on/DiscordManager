@@ -10,29 +10,29 @@ class MemberLeftNotification:
         self.settings = settings
 
     async def check_if_notification(self, member):
-        if not self.settings.dict_storage.get_dict(
-                StorageTarget.SETTINGS,
-                member.guild.id,
-                'member_left'
+        if not self.settings.dict_storage.for_dict_get(
+                target=StorageTarget.SETTINGS,
+                guild_id=member.guild.id,
+                key='member_left'
         ):
             return
 
-        await self.process_guild_channel(member)
+        await self.process_guild_channel(member=member)
 
     async def process_guild_channel(self, member):
-        channel_id = self.settings.dict_storage.get_dict(
-            StorageTarget.SETTINGS,
-            member.guild.id,
-            'notification_channel_id'
+        channel_id = self.settings.dict_storage.for_dict_get(
+            target=StorageTarget.SETTINGS,
+            guild_id=member.guild.id,
+            key='notification_channel_id'
         )
 
         if not channel_id:
             return
 
-        await self.send_notification_message(channel_id, member)
+        await self.send_notification_message(channel_id=channel_id, member=member)
 
     async def send_notification_message(self, channel_id, member):
-        channel = await self.bot.get_channel(channel_id)
+        channel = await self.bot.get_channel(id=channel_id)
 
         if not channel:
             return

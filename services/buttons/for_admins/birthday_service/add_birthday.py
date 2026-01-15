@@ -34,10 +34,10 @@ class AddBirthdayService:
 
         b_day = self.birthday_manager
         await b_day.add_new_birthday(
-            interaction,
-            member.id,
-            interaction.guild.id,
-            birthday
+            interaction=interaction,
+            user_id=member.id,
+            guild_id=interaction.guild.id,
+            user_birthday=birthday
         )
 
     @staticmethod

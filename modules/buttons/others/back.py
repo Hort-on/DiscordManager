@@ -14,10 +14,6 @@ class BackButton(FirewallButton):
         self.view_factory = view_factory
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        if self.view:
-            self.view.disable_all_items()
-            await interaction.edit_original_response(view=self.view)
-
         await interaction.edit_original_response(
             view=self.view_factory()
         )

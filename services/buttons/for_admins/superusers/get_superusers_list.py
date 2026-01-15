@@ -20,7 +20,7 @@ class GetSuperusersList:
         self.db_factory = db_factory
 
     def get_display(self, guild: discord.Guild) -> Optional[str]:
-        user_ids = self.settings.set_storage.get_for_set(
+        user_ids = self.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild.id
         )
@@ -56,7 +56,7 @@ class GetSuperusersList:
         return '\n-> '.join(names)
 
     async def _clean_up_not_found(self, guild_id: int, not_found_users: set[int]):
-        self.settings.set_storage.remove_for_set(
+        self.settings.set_storage.for_set_remove(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild_id,
             value=not_found_users

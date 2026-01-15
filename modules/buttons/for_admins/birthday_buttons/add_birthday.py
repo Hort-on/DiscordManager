@@ -17,4 +17,4 @@ class AddBirthdayButton(FirewallButton):
         self.birthday_manager = birthday_manager
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_modal(AddBirthdayModal(self.birthday_manager))
+        await interaction.response.send_modal(AddBirthdayModal(birthday_manager=self.birthday_manager))

@@ -26,9 +26,9 @@ class DeleteBirthdayService:
 
         b_day = self.birthday_manager
         response = await b_day.delete_birthday(
-            interaction,
-            member.id,
-            interaction.guild.id
+            interaction=interaction,
+            user_id=member.id,
+            guild_id=interaction.guild.id
         )
 
         await interaction.edit_original_response(content=response)

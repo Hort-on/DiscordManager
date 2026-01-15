@@ -8,11 +8,11 @@ from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 
 class SuperusersListButton(FirewallButton):
-    scope = "admin"
+    scope = 'admin'
 
     def __init__(self, settings: SettingsStorage, db_factory: DBScenarioFactory):
         super().__init__(
-            label="Show current superusers",
+            label='Show current superusers',
             style=discord.ButtonStyle.green,
         )
         self.service = GetSuperusersList(settings=settings, db_factory=db_factory)

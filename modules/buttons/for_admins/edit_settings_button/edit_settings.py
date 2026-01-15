@@ -26,7 +26,6 @@ class EditSettingsButton(FirewallButton):
         self.settings_formatter = SettingsFormatter(settings)
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        self.view.disable_all_items()
         summary = await self.settings_formatter.format_settings(interaction)
 
         view = SettingSelectorView(

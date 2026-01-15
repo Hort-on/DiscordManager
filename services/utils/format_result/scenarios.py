@@ -19,9 +19,9 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
     async def build_result(self, interaction: discord.Interaction) -> None:
         lines: list[str] = ['Your current settings:\n']
 
-        settings = self.settings.dict_storage.get_for_dict_all(
-            StorageTarget.SETTINGS,
-            interaction.guild_id
+        settings = self.settings.dict_storage.for_dict_get_all(
+            target=StorageTarget.SETTINGS,
+            guild_id=interaction.guild_id
         )
 
         if not settings:
@@ -39,7 +39,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
         await self._send_result(interaction, lines)
 
     def _append_superusers(self, interaction, lines):
-        users = self.settings.set_storage.get_for_set(
+        users = self.settings.set_storage.for_set_get(
             StorageTarget.SUPERUSERS,
             interaction.guild_id
         )
@@ -56,7 +56,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
             lines.append(f'-> {name}')
 
     async def _append_channels(self, interaction: discord.Interaction, lines) -> None:
-        current_selected_channels = self.settings.dict_storage.get_for_dict_all(
+        current_selected_channels = self.settings.dict_storage.for_dict_get_all(
             StorageTarget.SELECTED_CHANNELS,
             interaction.guild_id
         )

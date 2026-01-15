@@ -25,7 +25,7 @@ class AddRoleManagerScenario(BaseRoleScenario):
         if not guild:
             return
 
-        hidden_roles = self.settings.set_storage.get_for_set(
+        hidden_roles = self.settings.set_storage.for_set_get(
             StorageTarget.HIDDEN_ROLES,
             interaction.guild_id
         )

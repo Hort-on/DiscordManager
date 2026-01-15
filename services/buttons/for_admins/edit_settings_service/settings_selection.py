@@ -23,9 +23,7 @@ class SettingSelector(discord.ui.Select):
             max_values=1
         )
 
-        self.db_factory = db_factory
-
-        self.choice_handler = ChoiceHandler(db_factory)
+        self.choice_handler = ChoiceHandler(db_factory=db_factory)
 
     async def callback(
             self,
@@ -42,9 +40,9 @@ class SettingSelector(discord.ui.Select):
             return
 
         await self.choice_handler.choice_procedure(
-            interaction,
-            option_type,
-            config_key
+            interaction=interaction,
+            option_type=option_type,
+            config_key=config_key
         )
 
 
@@ -56,7 +54,7 @@ class SettingSelectorView(discord.ui.View):
             db_factory: DBScenarioFactory
     ):
         super().__init__(timeout=None)
-        self.add_item(SettingSelector(db_factory))
+        self.add_item(SettingSelector(db_factory=db_factory))
         self.add_item(BackButton(
             view_factory=lambda: AdminMenuView(
                 guild_id=guild_id,

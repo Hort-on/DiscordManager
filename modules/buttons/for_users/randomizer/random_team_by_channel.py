@@ -19,5 +19,5 @@ class RandomTeamByChannel(FirewallButton):
 
         await interaction.edit_original_response(
             content='```Please select the channel.```',
-            view=ChannelTypeView(scenario, channels_with_users_only=True)
+            view=ChannelTypeView(scenario=scenario, channels_with_users_only=True)
         )

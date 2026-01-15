@@ -2,12 +2,11 @@ import discord
 
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-
+from services.other_services.get_channel import ChannelTypeView
 from services.utils.messages import GENERAL_MSGS, EDIT_CONFIG_MSGS, SYSTEM_MSGS
 
 from modules.management.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
 from modules.management.yes_no_view.view.yes_no import YesNoView
-from services.other_services.get_channel import ChannelTypeView
 
 
 class ChoiceHandler:
@@ -24,26 +23,26 @@ class ChoiceHandler:
         match option_type:
             case 'boolean':
                 scenario = YesNoViewFactory.for_confirmation(
-                    self.db_factory,
-                    config_key
+                    db_factory=self.db_factory,
+                    config_key=config_key
                 )
 
-                view = YesNoView(scenario)
+                view = YesNoView(scenario=scenario)
 
                 await interaction.edit_original_response(
                     content=EDIT_CONFIG_MSGS.get('editing_feature_msg').format(
-                        feature={config_key.replace("_", " ").title()}),
+                        feature={config_key.replace('_', ' ').title()}),
                     view=view
                 )
 
             case 'channel':
                 scenario = ChannelScenarioFactory.for_db_save(
-                    self.db_factory,
-                    config_key
+                    db_factory=self.db_factory,
+                    config_key=config_key
                 )
 
                 view = ChannelTypeView(
-                    scenario,
+                    scenario=scenario,
                     text_only=True
                 )
 

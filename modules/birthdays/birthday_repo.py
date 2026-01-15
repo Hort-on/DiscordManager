@@ -109,7 +109,7 @@ class BirthdayManager:
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
-            is_enabled = self.settings.dict_storage.get_for_dict(
+            is_enabled = self.settings.dict_storage.for_dict_get(
                 target=StorageTarget.SETTINGS,
                 guild_id=guild.id,
                 key='birthday'

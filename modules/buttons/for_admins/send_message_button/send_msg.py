@@ -18,8 +18,7 @@ class SendMessageButton(FirewallButton):
         self.db_factory = db_factory
 
     async def on_click(self, interaction: discord.Interaction):
-        self.view.disable_all_items()
-        scenario = ChannelScenarioFactory.for_db_message_save(self.db_factory)
+        scenario = ChannelScenarioFactory.for_db_message_save(db_factory=self.db_factory)
 
         view = ChannelTypeView(
             scenario,

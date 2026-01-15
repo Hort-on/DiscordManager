@@ -17,9 +17,9 @@ class DeleteUserMessageButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        scenario = ChannelScenarioFactory.for_message_deletion(DeleteUserMessagesModal)
+        scenario = ChannelScenarioFactory.for_message_deletion(modal=DeleteUserMessagesModal)
 
-        view = ChannelTypeView(scenario, text_only=True)
+        view = ChannelTypeView(scenario=scenario, text_only=True)
         await interaction.edit_original_response(
             content=GM.get('ask_channel_msg'),
             view=view

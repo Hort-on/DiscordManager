@@ -11,7 +11,7 @@ class IsSuperuserService:
         self.settings = settings
 
     def is_superuser(self, guild_id: int, user_id: int) -> bool:
-        superusers = self.settings.set_storage.get_for_set(
+        superusers = self.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild_id
         )

@@ -6,7 +6,7 @@ from dependency_injector.wiring import inject, Provide
 
 from core.bot_container import BotContainer
 
-from modules.buttons.for_users.randomizer.start import RandomStartButton
+from modules.buttons.for_users.randomizer.random_menu import RandomMenuButton
 from modules.buttons.others.admin_menu import AdminMenuButton
 
 
@@ -20,19 +20,19 @@ class ButtonManager(View):
     ):
 
         super().__init__(timeout=60)
-        self.guild_id = guild_id,
+        self.guild_id = guild_id
         self.user_id = user_id
         self.settings = settings
 
         self._add_buttons()
 
     def _add_buttons(self):
-        superusers = self.settings.set_storage.get_for_set(
+        superusers = self.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=self.guild_id
         )
 
-        self.add_item(RandomStartButton())
+        self.add_item(RandomMenuButton())
 
         if self.user_id in superusers:
             self._add_admin_panel()
