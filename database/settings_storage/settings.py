@@ -15,13 +15,13 @@ class SettingsStorage:
         self._guild_superusers: dict[int, set[int]] = {}
         self._guild_hidden_roles: dict[int, set[int]] = {}
 
-        self.set_storage = SetStorageManager({
+        self.set_storage: SetStorageManager = SetStorageManager({
             StorageTarget.HIDDEN_CHANNELS: self._guild_hidden_channels,
             StorageTarget.SUPERUSERS: self._guild_superusers,
             StorageTarget.HIDDEN_ROLES: self._guild_hidden_roles,
         })
 
-        self.dict_storage = DictStorageManager({
+        self.dict_storage: DictStorageManager = DictStorageManager({
             StorageTarget.SETTINGS: self._guild_settings,
             StorageTarget.SELECTED_CHANNELS: self._guild_selected_channels,
             StorageTarget.CHANNELS_TO_SEND: self._guild_channels_to_send
@@ -30,35 +30,50 @@ class SettingsStorage:
     async def load_all_settings(self) -> None:
         for guild in self.bot.guilds:
             # --------------------------- load general guilds settings --------------------------- #
-            setting_scenario = self.db_factory.for_fetch_all(guild.id, 'settings')
+            setting_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='settings'
+            )
             result = await setting_scenario.db_proceed()
 
             if result:
                 self._guild_settings[guild.id] = result[0]
 
             # ------------------------------- load guild channels -------------------------------- #
-            channel_scenario = self.db_factory.for_fetch_all(guild.id, 'guild_channels')
+            channel_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='guild_channels'
+            )
             channels = await channel_scenario.db_proceed()
 
             if channels:
                 self._guild_selected_channels[guild.id] = channels[0]
 
             # ---------------------------- load guild hidden channels ----------------------------- #
-            channel_scenario = self.db_factory.for_fetch_all(guild.id, 'hidden_channels')
+            channel_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='hidden_channels'
+            )
             channels = await channel_scenario.db_proceed()
 
             if channels:
                 self._guild_hidden_channels[guild.id] = channels[0]
 
             # --------------------------- load guild channels to send ----------------------------- #
-            channel_to_send_scenario = self.db_factory.for_fetch_all(guild.id, 'channels_to_send')
+            channel_to_send_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='channels_to_send'
+            )
             channels_to_send = await channel_to_send_scenario.db_proceed()
 
             if channels_to_send:
                 self._guild_channels_to_send[guild.id] = channels_to_send[0]
 
             # ------------------------------ load guilds superusers ------------------------------- #
-            superuser_scenario = self.db_factory.for_fetch_all(guild.id, 'super_users')
+            superuser_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='super_users'
+            )
             superusers = await superuser_scenario.db_proceed()
 
             if superusers:
@@ -67,7 +82,10 @@ class SettingsStorage:
                 }
 
             # -------------------------------- load guilds roles ---------------------------------- #
-            role_scenario = self.db_factory.for_fetch_all(guild.id, 'roles')
+            role_scenario = self.db_factory.for_fetch_all(
+                guild_id=guild.id,
+                table_name='roles'
+            )
             hidden_roles = await role_scenario.db_proceed()
 
             if hidden_roles:

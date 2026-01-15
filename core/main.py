@@ -9,7 +9,7 @@ from services.utils.bad_words import invitation_pattern
 
 from modules.logger.logger import Logger
 from modules.management.events.member_left import MemberLeftNotification
-from modules.management.message_processing.bad_words_handler import BadWordsHandler
+from modules.management.message_handler.bad_words_handler import BadWordsHandler
 from modules.birthdays.birthday_repo import BirthdayManager
 
 
@@ -47,7 +47,7 @@ class BotController:
 
     # --------------------------- EVENTS --------------------------- #
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         print(f"Connected as {self.bot.user}")
 
         if not self.daily_birthday_check.is_running():
@@ -55,7 +55,7 @@ class BotController:
 
         await self.settings.load_all_settings()
 
-    async def on_message(self, message):
+    async def on_message(self, message) -> None:
         # TODO: потрібно зробити перевірку суперюзерів з бд
         # TODO: потрібно переписати on_message, зробити більш простим та читабельним
 
@@ -92,7 +92,7 @@ class BotController:
         await self.handle_message(message)
         await self.bot.process_commands(message)
 
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload) -> None:
         result = await self.db.get_data(  # TODO: переробити
             payload.guild_id,
             'settings',
@@ -112,21 +112,21 @@ class BotController:
 
         # тут твоя логіка
 
-    async def on_member_remove(self, member):
+    async def on_member_remove(self, member) -> None:
         await self.member_left_notify.check_if_notification(member)
 
-    async def on_guild_remove(self, guild: discord.Guild):
+    async def on_guild_remove(self, guild: discord.Guild) -> None:
         delete_guild_scenario = self.db_factory.for_remove_guild(guild.id)
         await delete_guild_scenario.db_proceed()
 
-    async def on_guild_join(self, guild: discord.Guild):
+    async def on_guild_join(self, guild: discord.Guild) -> None:
         scenario = self.db_factory.for_init_guild(guild.id)
         await scenario.db_proceed()
 
     # --------------------------- LOOPS ---------------------------
 
     @tasks.loop(hours=24)
-    async def daily_birthday_check(self):
+    async def daily_birthday_check(self) -> None:
         await self.birthday_repo.check_daily_birthday()
 
     # --------------------------- MESSAGE HANDLING ---------------------------

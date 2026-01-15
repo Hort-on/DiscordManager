@@ -1,7 +1,5 @@
 from dependency_injector import containers, providers
 
-from core.main import BotController
-
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
@@ -15,12 +13,16 @@ from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 
 class BotContainer(containers.DeclarativeContainer):
 
-    # ====== core ======
-    logger = providers.Singleton(Logger)
-
+    # =====================
+    # Core
+    # =====================
     bot = providers.Dependency()
 
-    # ====== database ======
+    logger = providers.Singleton(Logger)
+
+    # =====================
+    # Infrastructure
+    # =====================
     db = providers.Singleton(
         DB,
         logger=logger,
@@ -32,25 +34,30 @@ class BotContainer(containers.DeclarativeContainer):
         logger=logger,
     )
 
-    # ====== storage ======
     settings = providers.Singleton(
         SettingsStorage,
         bot=bot,
         db_factory=db_factory,
-        logger=logger
+        logger=logger,
     )
 
-    # ====== services ======
+    # =====================
+    # Domain services
+    # =====================
     birthday_manager = providers.Singleton(
         BirthdayManager,
         db_factory=db_factory,
         logger=logger,
     )
 
-    bad_words_handler = providers.Singleton(BadWordsHandler)
+    bad_words_handler = providers.Singleton(
+        BadWordsHandler,
+        logger=logger,
+    )
 
-    member_left_notify = providers.Singleton(
+    member_left_notification = providers.Singleton(
         MemberLeftNotification,
         bot=bot,
         settings=settings,
+        logger=logger,
     )

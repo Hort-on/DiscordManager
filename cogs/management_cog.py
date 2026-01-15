@@ -14,7 +14,10 @@ class ManagementCog(commands.Cog):
         description="Opens management panel"
     )
     async def management(self, interaction: discord.Interaction):
-        view = ButtonManager(interaction=interaction)
+        view = ButtonManager(
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id
+        )
 
         await interaction.response.send_message(
             GM.get('ask_action_msg'),

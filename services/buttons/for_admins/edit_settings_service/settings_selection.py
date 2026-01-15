@@ -1,8 +1,9 @@
 import discord
 
-from services.button_services.edit_settings_service.choice_handler import ChoiceHandler
+from modules.buttons.others.back import BackButton
+from modules.buttons.views.for_admins.admin_menu import AdminMenuView
+from services.buttons.for_admins.edit_settings_service.choice_handler import ChoiceHandler
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-
 from services.utils.option_list import SETTINGS_OPTIONS
 from services.utils.messages import SYSTEM_MSGS as SM
 
@@ -50,7 +51,14 @@ class SettingSelector(discord.ui.Select):
 class SettingSelectorView(discord.ui.View):
     def __init__(
             self,
+            guild_id: int,
+            user_id: int,
             db_factory: DBScenarioFactory
     ):
         super().__init__(timeout=None)
         self.add_item(SettingSelector(db_factory))
+        self.add_item(BackButton(
+            view_factory=lambda: AdminMenuView(
+                guild_id=guild_id,
+                user_id=user_id
+            )))

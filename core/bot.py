@@ -4,6 +4,7 @@ import os
 from core.bot_container import BotContainer
 
 from discord.ext import commands
+
 from dotenv import load_dotenv
 
 load_dotenv()

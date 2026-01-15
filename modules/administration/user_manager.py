@@ -17,8 +17,8 @@ class UserManager:
             message,
             duration_in_minutes,
             reason,
-            is_games_violation  # TODO: можливо переробити
-    ):
+            is_games_violation  # TODO: можливо переробити + додати типізації
+    ) -> None:
 
         user = message.author
 
@@ -42,7 +42,7 @@ class UserManager:
         await message.channel.send(notification)
 
     @staticmethod
-    async def delete_user_message(message, user_id):
+    async def delete_user_message(message, user_id) -> None:
         async for msg in message.channel.history(limit=20, oldest_first=False):
             if msg.author.id == user_id:
                 await msg.delete()

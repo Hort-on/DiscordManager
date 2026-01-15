@@ -1,5 +1,3 @@
-import discord
-
 from discord.ui import View
 
 from database.settings_storage.settings_manager import StorageTarget
@@ -16,12 +14,14 @@ class ButtonManager(View):
     @inject
     def __init__(
             self,
-            interaction: discord.Interaction,
+            guild_id: int,
+            user_id: int,
             settings=Provide[BotContainer.settings],
     ):
 
         super().__init__(timeout=60)
-        self.interaction = interaction
+        self.guild_id = guild_id,
+        self.user_id = user_id
         self.settings = settings
 
         self._add_buttons()
@@ -29,12 +29,12 @@ class ButtonManager(View):
     def _add_buttons(self):
         superusers = self.settings.set_storage.get_for_set(
             target=StorageTarget.SUPERUSERS,
-            guild_id=self.interaction.guild_id
+            guild_id=self.guild_id
         )
 
         self.add_item(RandomStartButton())
 
-        if self.interaction.user.id in superusers:
+        if self.user_id in superusers:
             self._add_admin_panel()
 
     def _add_admin_panel(self):

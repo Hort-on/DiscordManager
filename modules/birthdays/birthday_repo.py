@@ -3,10 +3,10 @@ import discord
 from datetime import datetime
 
 from database.settings_storage.settings_manager import StorageTarget
+from database.settings_storage.settings import SettingsStorage
+
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
 from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
-
-from database.settings_storage.settings import SettingsStorage
 
 
 class BirthdayManager:
@@ -45,8 +45,8 @@ class BirthdayManager:
             return
 
         exists_scenario = self.db_factory.for_exists_birthday_check(
-            guild_id,
-            user_id
+            guild_id=guild_id,
+            user_id=user_id
 
         )
         if await exists_scenario.db_proceed():
@@ -56,9 +56,9 @@ class BirthdayManager:
             return
 
         add_scenario = self.db_factory.for_add_birthday(
-            guild_id,
-            user_id,
-            user_birthday
+            guild_id=guild_id,
+            user_id=user_id,
+            user_birthday=user_birthday
         )
 
         if await add_scenario.db_proceed():
@@ -82,8 +82,8 @@ class BirthdayManager:
     ) -> None:
 
         exists_scenario = self.db_factory.for_exists_birthday_check(
-            guild_id,
-            user_id
+            guild_id=guild_id,
+            user_id=user_id
         )
 
         if not await exists_scenario.db_proceed():
@@ -93,8 +93,8 @@ class BirthdayManager:
             return
 
         delete_scenario = self.db_factory.for_delete_birthday(
-            guild_id,
-            user_id
+            guild_id=guild_id,
+            user_id=user_id
         )
 
         if await delete_scenario.db_proceed():
@@ -109,10 +109,10 @@ class BirthdayManager:
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
-            is_enabled = self.settings.dict_storage.get_dict(
-                StorageTarget.SETTINGS,
-                guild.id,
-                'birthday'
+            is_enabled = self.settings.dict_storage.get_for_dict(
+                target=StorageTarget.SETTINGS,
+                guild_id=guild.id,
+                key='birthday'
             )
 
             if not is_enabled:
@@ -127,8 +127,8 @@ class BirthdayManager:
                 await reset_scenario.db_proceed()
 
             today_birthdays_scenario = self.db_factory.for_get_today_birthday(
-                guild.id,
-                today_str
+                guild_id=guild.id,
+                today=today_str
             )
 
             birthdays = await today_birthdays_scenario.db_proceed()
@@ -137,9 +137,9 @@ class BirthdayManager:
                 continue
 
             await self.prepare_data(
-                guild.id,
-                today_str,
-                birthdays
+                guild_id=guild.id,
+                today_str=today_str,
+                birthdays=birthdays
             )
 
     async def prepare_data(
@@ -150,16 +150,16 @@ class BirthdayManager:
     ) -> None:
 
         settings_scenario = self.db_factory.for_get_data(
-            guild_id,
-            "settings",
-            "congrats_channel_id"
+            guild_id=guild_id,
+            table_name='settings',
+            *'congrats_channel_id'
         )
         settings = await settings_scenario.db_proceed()
 
         if not settings:
             return
 
-        channel = self.bot.get_channel(settings.get("congrats_channel_id"))
+        channel = self.bot.get_channel(settings.get('congrats_channel_id'))
         if not channel:
             return
 
@@ -168,18 +168,18 @@ class BirthdayManager:
             return
 
         await self.send_congrats(
-            guild,
-            channel,
-            birthdays,
-            today_str
+            guild=guild,
+            channel=channel,
+            birthdays=birthdays,
+            today_str=today_str
         )
 
     async def send_congrats(
             self,
-            guild,
+            guild: discord.Guild,
             channel,
-            birthdays,
-            today_str
+            birthdays: list,
+            today_str: str
     ) -> None:
 
         for user_id_tuple in birthdays:
@@ -202,14 +202,14 @@ class BirthdayManager:
     async def update_congrats(
             self,
             guild_id: int,
-            user_id,
-            today_str
+            user_id: int,
+            today_str: str
     ) -> None:
 
         update_scenario = self.db_factory.for_update_last_congrats(
-            guild_id,
-            user_id,
-            today_str
+            guild_id=guild_id,
+            user_id=user_id,
+            today_str=today_str
         )
 
         await update_scenario.db_proceed()

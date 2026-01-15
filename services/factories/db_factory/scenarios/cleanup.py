@@ -29,7 +29,7 @@ class CleanupRemovedUserScenario(DataBaseScenario):
             db_connect: DB,
             logger: Logger,
             guild_id: int,
-            user_id: int
+            user_ids: set[int]
     ):
         super().__init__(
             db_connect,
@@ -37,14 +37,24 @@ class CleanupRemovedUserScenario(DataBaseScenario):
             guild_id
         )
 
-        self.user_id = user_id
+        self.user_ids = user_ids
 
     async def _execute(self) -> None:
+        if not self.user_ids:
+            return
+
+        placeholders = ','.join('?' for _ in self.user_ids)
+
         async with self.db_connect.connect() as cursor:
             for table in self.USER_TABLES:
-                query = f'DELETE FROM {table} WHERE guild_id = ? AND user_id = ?'
+                query = f'''
+                    DELETE FROM {table}
+                    WHERE guild_id = ?
+                    AND user_id IN ({placeholders})
+                '''
 
-                await cursor.execute(query, (self.guild_id, self.user_id))
+                params = (self.guild_id, *self.user_ids)
+                await cursor.execute(query, params)
 
 
 class CleanupRemovedChannelScenario(DataBaseScenario):

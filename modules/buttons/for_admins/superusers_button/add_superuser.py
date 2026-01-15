@@ -4,7 +4,7 @@ from services.buttons.protection.admin_buttons_protection import FirewallButton
 from services.modals.superuser_modal.add_superusers import AddSuperusersModal
 
 
-class AddSUserButton(FirewallButton):
+class AddSuperuserButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self):
@@ -14,6 +14,4 @@ class AddSUserButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        self.view.disable_all_items()
-
         await interaction.response.send_modal(AddSuperusersModal())

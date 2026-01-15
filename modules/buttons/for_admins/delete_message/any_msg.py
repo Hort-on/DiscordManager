@@ -17,8 +17,6 @@ class DeleteAnyMessageButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        self.view.disable_all_items()
-
         scenario = ChannelScenarioFactory.for_message_deletion(DeleteMessagesModal)
 
         view = ChannelTypeView(scenario, text_only=True)

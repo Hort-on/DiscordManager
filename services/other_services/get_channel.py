@@ -1,6 +1,8 @@
 import discord
 from discord import ui
 
+from modules.buttons.others.back import BackButton
+from modules.buttons.views.for_admins.admin_menu import AdminMenuView
 from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
@@ -22,26 +24,29 @@ class ChannelTypeView(ui.View):
         if not channels_with_users_only:
             self.options.append(
                 discord.SelectOption(
-                    label="Text channel",
-                    value="text"
+                    label='Text channel',
+                    value='text'
                 )
             )
 
         if not text_only:
             self.options.append(
                 discord.SelectOption(
-                    label="Voice channel",
-                    value="voice"
+                    label='Voice channel',
+                    value='voice'
                 )
             )
 
         select = ui.Select(
-            placeholder=GENERAL_MSGS.get("ask_channel_type_msg"),
+            placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
             options=self.options
         )
 
         select.callback = self.select_channel_type
         self.add_item(select)
+        self.add_item(BackButton(  #  TODO: мабуть треба переробити цілий клас
+            view_factory=lambda: AdminMenuView()
+        ))
 
     async def select_channel_type(self, interaction: discord.Interaction):
         channel_type = self.children[0].values[0]
