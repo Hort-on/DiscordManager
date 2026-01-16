@@ -1,7 +1,7 @@
 import discord
 
 from services.buttons.protection.admin_buttons_protection import FirewallButton
-from services.other_services.get_channel import ChannelTypeView
+from services.other_services.get_channel import ChannelSelectorManager
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 
 
@@ -17,7 +17,9 @@ class RandomTeamByChannel(FirewallButton):
     async def on_click(self, interaction: discord.Interaction):
         scenario = ChannelScenarioFactory.for_random_selection()
 
-        await interaction.edit_original_response(
-            content='```Please select the channel.```',
-            view=ChannelTypeView(scenario=scenario, channels_with_users_only=True)
+        manager = ChannelSelectorManager(
+            scenario=scenario,
+            channels_with_users_only=True
         )
+
+        await manager.select_channel_type(interaction)

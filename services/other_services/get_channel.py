@@ -1,57 +1,71 @@
 import discord
-from discord import ui
+from dependency_injector.wiring import inject, Provide
 
-from modules.buttons.others.back import BackButton
-from modules.buttons.views.for_admins.admin_menu import AdminMenuView
+from core.bot_container import BotContainer
+from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
+from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
 
-class ChannelTypeView(ui.View):
+class ChannelSelectorManager:
+    @inject
     def __init__(
             self,
             scenario: ChannelScenario,
+            settings: SettingsStorage = Provide[BotContainer.settings],
             text_only=False,
             channels_with_users_only=False
     ):
         super().__init__(timeout=60)
 
+        self.settings = settings
         self.scenario = scenario
+        self.text = text_only
         self.channels_with_users_only = channels_with_users_only
 
-        self.options = []
+    async def select_channel_type(self, interaction: discord.Interaction):
+        type_options = []
 
-        if not channels_with_users_only:
-            self.options.append(
+        if not self.channels_with_users_only:
+            type_options.append(
                 discord.SelectOption(
                     label='Text channel',
                     value='text'
                 )
             )
 
-        if not text_only:
-            self.options.append(
+        if not self.text:
+            type_options.append(
                 discord.SelectOption(
                     label='Voice channel',
                     value='voice'
                 )
             )
 
-        select = ui.Select(
+        view = DropMenuView(
+            options=type_options,
             placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
-            options=self.options
+            callback=self._select_channel
         )
 
-        select.callback = self.select_channel_type
-        self.add_item(select)
-        self.add_item(BackButton(  #  TODO: мабуть треба переробити цілий клас
-            view_factory=lambda: AdminMenuView()
-        ))
+        await interaction.edit_original_response(
+            content='',
+            view=view
+        )
 
-    async def select_channel_type(self, interaction: discord.Interaction):
-        channel_type = self.children[0].values[0]
+    async def _select_channel(
+            self,
+            interaction: discord.Interaction,
+            value: list[str]
+    ):
+        hidden_channels = self.settings.set_storage.for_set_get(
+            target=StorageTarget.HIDDEN_CHANNELS,
+            guild_id=interaction.guild_id
+        )
 
-        if channel_type == "text":
+        if value == 'text':
             channels = interaction.guild.text_channels
         else:
             channels = interaction.guild.voice_channels
@@ -64,41 +78,37 @@ class ChannelTypeView(ui.View):
 
         if not channels:
             await interaction.edit_original_response(
-                content="No channels found",
+                content='No channels found',
                 view=None
             )
             return
 
-        view = ChannelSelectView(channels, self.scenario)
-        await interaction.edit_original_response(
-            content="Please select a channel:",
-            view=view
-        )
-
-
-class ChannelSelectView(ui.View):
-    def __init__(self, channels, scenario: ChannelScenario):
-        super().__init__(timeout=60)
-        self.scenario = scenario
-
-        options = [
+        channel_options = [
             discord.SelectOption(
                 label=channel.name,
                 value=str(channel.id)
             )
-            for channel in channels
+            for channel in channels if channel.id not in hidden_channels
         ]
 
-        select = ui.Select(
-            placeholder="Select channel",
-            options=options
+        view = DropMenuView(
+            options=channel_options,
+            placeholder='',
+            callback=self._save_channel
         )
 
-        select.callback = self.on_select
-        self.add_item(select)
+        await interaction.edit_original_response(
+            content='',
+            view=view
+        )
 
-    async def on_select(self, interaction: discord.Interaction):
-        channel_id = int(self.children[0].values[0])
+    async def _save_channel(
+            self,
+            interaction: discord.Interaction,
+            value: list[str]
+    ):
+
+        channel_id = int(value[0])
         channel = interaction.client.get_channel(channel_id)
 
         if not channel:

@@ -2,7 +2,7 @@ import discord
 
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-from services.other_services.get_channel import ChannelTypeView
+from services.other_services.get_channel import ChannelSelectorManager
 from services.utils.messages import GENERAL_MSGS, EDIT_CONFIG_MSGS, SYSTEM_MSGS
 
 from modules.management.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
@@ -41,14 +41,9 @@ class ChoiceHandler:
                     config_key=config_key
                 )
 
-                view = ChannelTypeView(
+                view = ChannelSelectorManager(
                     scenario=scenario,
                     text_only=True
-                )
-
-                await interaction.edit_original_response(
-                    content=GENERAL_MSGS.get('ask_channel_msg'),
-                    view=view
                 )
 
             case _:
