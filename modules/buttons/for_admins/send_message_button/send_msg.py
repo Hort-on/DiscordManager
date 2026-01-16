@@ -4,7 +4,6 @@ from services.buttons.protection.admin_buttons_protection import FirewallButton
 from services.other_services.get_channel import ChannelSelectorManager
 from services.factories.channel_factory.scenarios_factory import ChannelScenarioFactory
 from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-from services.utils.messages import SYSTEM_MSGS as SM
 
 
 class SendMessageButton(FirewallButton):
@@ -20,18 +19,12 @@ class SendMessageButton(FirewallButton):
     async def on_click(self, interaction: discord.Interaction):
         scenario = ChannelScenarioFactory.for_db_message_save(db_factory=self.db_factory)
 
-        manager = ChannelSelectorManager(
-            scenario=scenario,
-            text_only=True
-        )
-        # TODO: треба доробити це під новий дроп меню і ченел селектор
-        try:
-            await interaction.user.send(SM.get('ask_private_channel_msg'), view=view)
+        manager = ChannelSelectorManager(scenario=scenario, text_only=True)
 
-            await interaction.edit_original_response(
-                content=SM.get('ask_private_msg')
-            )
+        try:
+            await interaction.user.create_dm()
+            await manager.select_channel_type(interaction=interaction)
         except discord.Forbidden:
             await interaction.edit_original_response(
-                content=SM.get('send_message_failure_msg')
+                content=''
             )

@@ -41,10 +41,12 @@ class ChoiceHandler:
                     config_key=config_key
                 )
 
-                view = ChannelSelectorManager(
+                manager = ChannelSelectorManager(
                     scenario=scenario,
                     text_only=True
                 )
+
+                await manager.select_channel_type(interaction=interaction)
 
             case _:
                 await interaction.edit_original_response(
