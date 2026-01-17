@@ -1,11 +1,13 @@
+import discord
+
 from database.data_base_model import DB
 
 from services.factories.db_factory.scenarios.common import (
     GetDataScenario,
     WriteDataScenario,
-    WriteUserScenario,
+    WriteSuperuserScenario,
     FetchAllDataScenario,
-    InitGuildScenario
+    InitGuildScenario, DeleteSuperuserScenario
 )
 
 from services.factories.db_factory.scenarios.birthday import (
@@ -65,17 +67,29 @@ class DBScenarioFactory:
             data=data
         )
 
-    def for_write_user(
+    def for_write_superuser(
             self,
             guild_id: int,
             table_name: str,
             user_ids: list[int]
     ):
-        return WriteUserScenario(
+        return WriteSuperuserScenario(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
             table_name=table_name,
+            user_ids=user_ids
+        )
+
+    def for_delete_superuser(
+            self,
+            interaction: discord.Interaction,
+            user_ids: set[int]
+    ) -> DeleteSuperuserScenario:
+        return DeleteSuperuserScenario(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=interaction.guild_id,
             user_ids=user_ids
         )
 

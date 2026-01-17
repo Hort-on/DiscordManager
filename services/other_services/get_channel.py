@@ -1,6 +1,5 @@
 import discord
 from dependency_injector.wiring import inject, Provide
-from discord import ui
 
 from core.bot_container import BotContainer
 from database.settings_storage.settings import SettingsStorage
@@ -18,7 +17,6 @@ class ChannelSelectorManager:
             settings: SettingsStorage = Provide[BotContainer.settings],
             text_only=False,
             channels_with_users_only=False,
-            is_dm=False
     ):
         super().__init__(timeout=60)
 
@@ -26,7 +24,6 @@ class ChannelSelectorManager:
         self.scenario = scenario
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only
-        self.is_dm = is_dm
 
     async def select_channel_type(self, interaction: discord.Interaction):
         type_options = []
@@ -100,7 +97,10 @@ class ChannelSelectorManager:
             callback=self._save_channel
         )
 
-        await self._send_ui(interaction=interaction, view=view)
+        await interaction.edit_original_response(
+            content='',
+            view=view
+        )
 
     async def _save_channel(
             self,
@@ -124,12 +124,3 @@ class ChannelSelectorManager:
             content=f'```Selected channel: {channel.name}```',
             view=None
         )
-
-    async def _send_ui(self, interaction: discord.Interaction, view: ui.View):
-        if self.is_dm:
-            if interaction.response.is_done():
-                await interaction.edit_original_response(view=view)
-            else:
-                await interaction.response.send_message(view=view)
-        else:
-            await interaction.edit_original_response(view=view)

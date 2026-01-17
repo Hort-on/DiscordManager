@@ -82,7 +82,7 @@ class AddSuperusersService:
         await self._format_the_result(
             interaction=interaction,
             found_users=found_users,
-            not_found_users=not_found_users,
+            not_found_result=not_found_users,
             in_superusers=in_superusers
         )
 
@@ -131,7 +131,7 @@ class AddSuperusersService:
             value=user_ids
         )
 
-        scenario = self.db_factory.for_write_user(
+        scenario = self.db_factory.for_write_superuser(
             guild_id=interaction.guild_id,
             table_name='super_users',
             user_ids=user_ids
