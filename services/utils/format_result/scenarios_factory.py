@@ -1,4 +1,3 @@
-from core.main import BotController
 from database.settings_storage.settings import SettingsStorage
 
 from services.utils.format_result.scenarios import EditSettingsResultScenario

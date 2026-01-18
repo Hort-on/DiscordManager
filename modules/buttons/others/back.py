@@ -6,14 +6,14 @@ from services.buttons.protection.admin_buttons_protection import FirewallButton
 class BackButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, view_factory):
+    def __init__(self, back_view):
         super().__init__(
             label='↩️ Back',
             style=discord.ButtonStyle.secondary
         )
-        self.view_factory = view_factory
+        self.back_view = back_view
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         await interaction.edit_original_response(
-            view=self.view_factory()
+            view=self.back_view()
         )

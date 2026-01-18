@@ -1,20 +1,19 @@
 import discord
-from dependency_injector.wiring import Provide, inject
 
-from core.bot_container import BotContainer
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
+
+from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.other_services.get_member_by_name import get_member_by_name
 
 
 class AddSuperusersService:
-    @inject
     def __init__(
             self,
-            settings=Provide[BotContainer.settings],
-            db_factory=Provide[BotContainer.db_factory]
+            settings: SettingsStorage,
+            db_factory: DBFactory
     ):
-        self.settings: SettingsStorage = settings
+        self.settings = settings
         self.db_factory = db_factory
 
     @staticmethod

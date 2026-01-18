@@ -1,10 +1,9 @@
 import discord
 
-from dependency_injector.wiring import inject, Provide
-
-from core.bot_container import BotContainer
-
+from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
+
+from modules.birthdays.birthday_repo import BirthdayManager
 
 from modules.management.button_manager import ButtonManager
 
@@ -15,29 +14,30 @@ from modules.buttons.for_admins.edit_settings_button.edit_settings import EditSe
 from modules.buttons.for_admins.send_message_button.send_msg import SendMessageButton
 from modules.buttons.others.back import BackButton
 
+from services.factories.db_factory.db_scenario_factory import DBFactory
+
 
 class AdminMenuView(discord.ui.View):
-    @inject
     def __init__(
             self,
+            settings: SettingsStorage,
+            db_factory: DBFactory,
+            birthday_manager: BirthdayManager,
             guild_id: int,
-            user_id: int,
-            settings=Provide[BotContainer.settings],
-            db_factory=Provide[BotContainer.db_factory],
-            birthday_manager=Provide[BotContainer.birthday_manager]
+            user_id: int
     ):
 
         super().__init__(timeout=60)
-        self.guild_id = guild_id
-        self.user_id = user_id
         self.settings = settings
         self.db_factory = db_factory
         self.birthday_manager = birthday_manager
+        self.guild_id = guild_id
+        self.user_id = user_id
 
         self._add_buttons()
 
     def _add_buttons(self):
-        config = self.settings.dict_storage.get_for_dict_all(
+        config = self.settings.dict_storage.for_dict_get_all(
             target=StorageTarget.SETTINGS,
             guild_id=self.guild_id
         )
@@ -53,7 +53,10 @@ class AdminMenuView(discord.ui.View):
             self.add_item(SendMessageButton(db_factory=self.db_factory))
 
         self.add_item(BackButton(
-            view_factory=lambda: ButtonManager(
+            back_view=lambda: ButtonManager(
+                settings=self.settings,
+                db_factory=self.db_factory,
+                birthday_manager=self.birthday_manager,
                 guild_id=self.guild_id,
                 user_id=self.user_id
             )))

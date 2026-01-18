@@ -1,11 +1,19 @@
 import discord
 import os
 
-from core.bot_container import BotContainer
-
 from discord.ext import commands
 
 from dotenv import load_dotenv
+
+from core.main import BotController
+from database.data_base_model import DB
+from database.settings_storage.settings import SettingsStorage
+from modules.birthdays.birthday_repo import BirthdayManager
+
+from modules.logger.logger import Logger
+from modules.management.events.member_left import MemberLeftNotification
+from modules.management.message_handler.bad_words_handler import BadWordsHandler
+from services.factories.db_factory.db_scenario_factory import DBFactory
 
 load_dotenv()
 
@@ -21,15 +29,29 @@ intents.reactions = True
 
 bot = commands.Bot(command_prefix='', intents=intents)
 
+logger = Logger()
 
-container = BotContainer()
-container.bot.override(bot)
+db_connect = DB(logger=logger)
+db_factory = DBFactory(db_connect=db_connect, logger=logger)
 
-container.wire(modules=[
-    'modules.management.button_manager',
-    'modules.buttons.views.for_admins.admin_menu',
-    'services'
-])
+settings = SettingsStorage(bot=bot, db_factory=db_factory)
+
+birthday_manager = BirthdayManager(bot=bot, settings=settings, db_factory=db_factory)
+
+bad_words_handler = BadWordsHandler()
+
+member_left_notify = MemberLeftNotification(bot=bot, settings=settings)
+
+bot.container = BotController(
+    bot=bot,
+    db_connect=db_connect,
+    db_factory=db_factory,
+    logger=logger,
+    settings=settings,
+    birthday_manager=birthday_manager,
+    bad_words_handler=bad_words_handler,
+    member_left_notify=member_left_notify
+)
 
 
 @bot.event

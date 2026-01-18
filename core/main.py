@@ -4,7 +4,7 @@ from discord.ext import tasks
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
-from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.utils.bad_words import invitation_pattern
 
 from modules.logger.logger import Logger
@@ -18,7 +18,7 @@ class BotController:
             self,
             bot,
             db_connect: DB,
-            db_factory: DBScenarioFactory,
+            db_factory: DBFactory,
             logger: Logger,
             settings: SettingsStorage,
             birthday_manager: BirthdayManager,

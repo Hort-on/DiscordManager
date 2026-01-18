@@ -76,7 +76,7 @@ class WriteSuperuserScenario(DataBaseScenario):
             logger: Logger,
             guild_id: int,
             table_name: str,
-            user_ids: list[int]
+            user_ids: set[int]
     ):
         super().__init__(
             db_connect=db_connect,

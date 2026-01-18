@@ -29,7 +29,7 @@ from services.factories.db_factory.scenarios.cleanup import (
 from modules.logger.logger import Logger
 
 
-class DBScenarioFactory:
+class DBFactory:
     def __init__(
             self,
             db_connect: DB,
@@ -71,7 +71,7 @@ class DBScenarioFactory:
             self,
             guild_id: int,
             table_name: str,
-            user_ids: list[int]
+            user_ids: set[int]
     ):
         return WriteSuperuserScenario(
             db_connect=self.db_connect,

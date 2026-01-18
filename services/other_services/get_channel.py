@@ -10,11 +10,10 @@ from services.utils.messages import GENERAL_MSGS
 
 
 class ChannelSelectorManager:
-    @inject
     def __init__(
             self,
             scenario: ChannelScenario,
-            settings: SettingsStorage = Provide[BotContainer.settings],
+            settings: SettingsStorage,
             text_only=False,
             channels_with_users_only=False,
     ):
