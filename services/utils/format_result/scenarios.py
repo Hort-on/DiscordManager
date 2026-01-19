@@ -1,9 +1,9 @@
 import discord
 
+from core.bot_container import AppContainer
+
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
-
-from services.utils.messages import CONFIG_MSGS as CM
 
 
 class FormatResultBaseScenario:
@@ -13,8 +13,9 @@ class FormatResultBaseScenario:
 
 
 class EditSettingsResultScenario(FormatResultBaseScenario):
-    def __init__(self, settings: SettingsStorage):
-        self.settings = settings
+    def __init__(self):
+        container = AppContainer.get()
+        self.settings: SettingsStorage = container.settings
 
     async def build_result(self, interaction: discord.Interaction) -> None:
         lines: list[str] = ['Your current settings:\n']

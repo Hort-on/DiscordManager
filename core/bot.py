@@ -5,14 +5,17 @@ from discord.ext import commands
 
 from dotenv import load_dotenv
 
+from core.bot_container import AppContainer
 from core.main import BotController
+
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
-from modules.birthdays.birthday_repo import BirthdayManager
 
+from modules.birthdays.birthday_repo import BirthdayManager
 from modules.logger.logger import Logger
 from modules.management.events.member_left import MemberLeftNotification
 from modules.management.message_handler.bad_words_handler import BadWordsHandler
+
 from services.factories.db_factory.db_scenario_factory import DBFactory
 
 load_dotenv()
@@ -52,6 +55,8 @@ bot.container = BotController(
     bad_words_handler=bad_words_handler,
     member_left_notify=member_left_notify
 )
+
+AppContainer.set(bot.container)
 
 
 @bot.event

@@ -1,0 +1,47 @@
+import discord
+
+from modules.buttons.for_admins.superusers_button.modals import AddSuperusersModal
+from modules.buttons.for_admins.superusers_button.services import DeleteSuperuserService, GetSuperusersList
+from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
+
+
+class AddSuperuserButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='Add super user',
+            style=discord.ButtonStyle.green
+        )
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        await interaction.response.send_modal(AddSuperusersModal())
+
+
+class DeleteSuperusersButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='Delete superusers',
+            style=discord.ButtonStyle.green,
+        )
+        self.del_superuser = DeleteSuperuserService()
+
+    async def on_click(self, interaction: discord.Interaction):
+        await self.del_superuser.prepare_users(interaction=interaction)
+
+
+class SuperusersListButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='Show current superusers',
+            style=discord.ButtonStyle.green,
+        )
+        self.get_superuser_name = GetSuperusersList()
+
+    async def on_click(self, interaction: discord.Interaction):
+        result = self.get_superuser_name.get_display(guild=interaction.guild)
+        await interaction.edit_original_response(content=result)

@@ -2,24 +2,24 @@ import discord
 
 from datetime import datetime
 
+from core.bot_container import AppContainer
+from core.main import BotController
+
 from database.settings_storage.settings_manager import StorageTarget
 from database.settings_storage.settings import SettingsStorage
 
-from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
 
 class BirthdayManager:
-    def __init__(
-            self,
-            bot,
-            settings: SettingsStorage,
-            db_factory: DBScenarioFactory
-    ):
+    def __init__(self, bot):
+        controller: BotController = AppContainer.get()
 
         self.bot = bot
-        self.settings = settings
-        self.db_factory = db_factory
+
+        self.settings: SettingsStorage = controller.settings
+        self.db_factory: DBFactory = controller.db_factory
 
     async def add_new_birthday(
             self,

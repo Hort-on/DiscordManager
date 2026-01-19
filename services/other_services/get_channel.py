@@ -1,9 +1,11 @@
 import discord
-from dependency_injector.wiring import inject, Provide
 
-from core.bot_container import BotContainer
+from core.bot_container import AppContainer
+from core.main import BotController
+
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
+
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
@@ -13,13 +15,14 @@ class ChannelSelectorManager:
     def __init__(
             self,
             scenario: ChannelScenario,
-            settings: SettingsStorage,
             text_only=False,
             channels_with_users_only=False,
     ):
         super().__init__(timeout=60)
 
-        self.settings = settings
+        controller: BotController = AppContainer.get()
+
+        self.settings: SettingsStorage = controller.settings
         self.scenario = scenario
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only
