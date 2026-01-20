@@ -3,7 +3,7 @@ import discord
 from services.factories.delete_msg_factory.message_scenario_factory import DeleteMessageScenario
 
 
-class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
+class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
     def __init__(self, channel: discord.TextChannel):
         super().__init__()
         self.channel = channel
@@ -23,7 +23,7 @@ class DeleteMessagesModal(discord.ui.Modal, title="Delete messages"):
         await delete_msg_scenario.delete_msg_process(interaction)
 
 
-class DeleteUserMessagesModal(discord.ui.Modal, title="Delete messages from users"):
+class DeleteUserMessagesModal(discord.ui.Modal, title='Delete messages from users'):
     def __init__(self, channel: discord.TextChannel):
         super().__init__()
         self.channel = channel
