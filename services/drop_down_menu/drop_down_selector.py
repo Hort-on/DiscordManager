@@ -8,6 +8,8 @@ class DropMenuView(ui.View):
             options: list,
             placeholder: str,
             callback,
+            min_values=1,
+            max_values=1,
             timeout=60
     ):
         super().__init__(timeout=timeout)
@@ -15,6 +17,8 @@ class DropMenuView(ui.View):
         self.options = options
         self.page = 0
         self.placeholder = placeholder
+        self.min_values = min_values
+        self.max_values = max_values
 
         self.update_view()
 
@@ -29,7 +33,12 @@ class DropMenuView(ui.View):
         for item in current_chunk:
             select_options.append(item)
 
-        select = ui.Select(placeholder=self.placeholder, options=select_options)
+        select = ui.Select(
+            placeholder=self.placeholder,
+            options=select_options,
+            min_values=self.min_values,
+            max_values=self.max_values
+        )
 
         async def _on_select(interaction: discord.Interaction):
             await self._callback(interaction, select.values)

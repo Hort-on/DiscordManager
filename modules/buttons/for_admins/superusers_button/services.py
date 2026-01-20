@@ -11,8 +11,7 @@ from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from services.drop_down_menu.drop_down_selector import DropMenuView
-from services.embed_constructor.info import InfoEmbed
-from services.embed_constructor.success import SuccessEmbed
+from services.embed_constructor.embed_constructor import SuccessEmbed, InfoEmbed
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.other_services.get_member_by_name import get_member_by_name
 

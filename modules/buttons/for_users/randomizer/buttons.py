@@ -16,7 +16,7 @@ class RandomNumButton(FirewallButton):
             style=discord.ButtonStyle.secondary
         )
 
-    async def on_click(self, interaction: discord.Interaction):
+    async def on_click(self, interaction: discord.Interaction) -> None:
         await interaction.send_modal(RandomNumModal())
 
 
@@ -29,7 +29,7 @@ class RandomWordButton(FirewallButton):
             style=discord.ButtonStyle.secondary
         )
 
-    async def on_click(self, interaction: discord.Interaction):
+    async def on_click(self, interaction: discord.Interaction) -> None:
         await interaction.send_modal(RandomWordModal())
 
 

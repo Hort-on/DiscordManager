@@ -57,10 +57,10 @@ class ChoiceHandler:
 class SettingSelector(discord.ui.Select):
     def __init__(self):
         super().__init__(
-            placeholder="Please select a setting to edit...",
+            placeholder='Please select a setting to edit...',
             options=[
                 discord.SelectOption(
-                    label=key.replace("_", " ").title(),
+                    label=key.replace('_', ' ').title(),
                     value=key
                 )
                 for key in SETTINGS_OPTIONS.keys()
@@ -116,5 +116,5 @@ class SettingsFormatter:
         )
 
         await interaction.edit_original_response(
-            content=GM.get('config_edit_msg') + f'\n\n{summary_result}\n\n'  # TODO: зробити embed
+            embed=GM.get('config_edit_msg') + f'\n\n{summary_result}\n\n'  # TODO: зробити embed
         )

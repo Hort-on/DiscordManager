@@ -27,7 +27,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
 
         if not settings:
             await interaction.edit_original_response(
-                content=CM.get('no_configuration_msg')
+                embeds=...
             )
             return
 
@@ -74,5 +74,5 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
     async def _send_result(interaction: discord.Interaction, lines) -> None:
         result_msg = '\n'.join(lines)
         await interaction.edit_original_response(
-            content=result_msg
+            embeds=...
         )

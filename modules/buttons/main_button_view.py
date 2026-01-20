@@ -6,6 +6,7 @@ from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_users.randomizer.menu import RandomMenuButton
 from modules.buttons.for_admins.admin_menu import AdminMenuButton
+from modules.buttons.for_users.role_manager.menu import RoleManagerMenuButton
 
 
 class MainButtonView(View):
@@ -21,6 +22,7 @@ class MainButtonView(View):
         )
 
         self.add_item(RandomMenuButton())
+        self.add_item(RoleManagerMenuButton())
 
         if user_id in superusers:
             self.add_item(AdminMenuButton())
