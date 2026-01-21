@@ -1,7 +1,9 @@
 from discord.ui import View
 
 from core.bot_container import AppContainer
+from core.main import BotController
 
+from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_users.randomizer.menu import RandomMenuButton
@@ -12,11 +14,12 @@ from modules.buttons.for_users.role_manager.menu import RoleManagerMenuButton
 class MainButtonView(View):
     def __init__(self):
         super().__init__(timeout=60)
+        controller: BotController = AppContainer.get()
+
+        self.settings: SettingsStorage = controller.settings
 
     def prepare(self, guild_id: int, user_id: int):
-        container = AppContainer.get()
-
-        superusers = container.settings.set_storage.for_set_get(
+        superusers = self.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild_id
         )

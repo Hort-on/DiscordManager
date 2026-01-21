@@ -12,6 +12,7 @@ from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
 from modules.birthdays.birthday_repo import BirthdayManager
+from modules.buttons.verification_buttons.service import AntiBotService
 from modules.logger.logger import Logger
 from modules.management.events.member_left import MemberLeftNotification
 from modules.management.message_handler.bad_words_handler import BadWordsHandler
@@ -25,10 +26,12 @@ TOKEN = os.getenv('TOKEN')
 intents = discord.Intents.default()
 intents.guilds = True
 intents.members = True
+intents.presences = True
 intents.messages = True
 intents.dm_messages = True
 intents.message_content = True
-intents.reactions = True
+intents.moderation = True
+intents.typing = False
 
 bot = commands.Bot(command_prefix='', intents=intents)
 
@@ -45,6 +48,8 @@ bad_words_handler = BadWordsHandler()
 
 member_left_notify = MemberLeftNotification(bot=bot, settings=settings)
 
+anti_bot_service = AntiBotService(settings=settings)
+
 bot.container = BotController(
     bot=bot,
     db_connect=db_connect,
@@ -53,7 +58,8 @@ bot.container = BotController(
     settings=settings,
     birthday_manager=birthday_manager,
     bad_words_handler=bad_words_handler,
-    member_left_notify=member_left_notify
+    member_left_notify=member_left_notify,
+    anti_bot_service=anti_bot_service
 )
 
 AppContainer.set(bot.container)

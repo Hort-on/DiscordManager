@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.for_admins.delete_message.modals import DeleteMessagesModal, DeleteUserMessagesModal
+from modules.buttons.for_admins.delete_message_buttons.modals import DeleteMessagesModal, DeleteUserMessagesModal
 from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 from services.factories.channel_factory.scenarios_factory import ChannelFactory

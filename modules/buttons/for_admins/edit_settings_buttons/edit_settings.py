@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.for_admins.edit_settings_button.services import SettingsFormatter, SettingSelectorView
+from modules.buttons.for_admins.edit_settings_buttons.services import SettingsFormatter, SettingSelectorView
 from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 

@@ -25,15 +25,16 @@ class DB:
                         guild_id INTEGER PRIMARY KEY,
                     
                         birthday INTEGER NOT NULL DEFAULT 0,
+                        
                         congrats INTEGER NOT NULL DEFAULT 0,
-                        congrats_channel_id INTEGER,
+                        congrats_channel_id INTEGER DEFAULT NULL,
                     
                         verification INTEGER NOT NULL DEFAULT 0,
                         verification_channel_id INTEGER DEFAULT NULL,
-                        verification_msg_id INTEGER DEFAULT NULL,
-                    
+                        verification_role_id INTEGER DEFAULT NULL,
+                        
                         notification_channel_id INTEGER DEFAULT NULL,
-                    
+                        
                         block_users INTEGER NOT NULL DEFAULT 0,
                         invitation_checking INTEGER NOT NULL DEFAULT 0,
                         spam_check INTEGER NOT NULL DEFAULT 0,
@@ -53,19 +54,6 @@ class DB:
                         verification_channel_id INTEGER DEFAULT NULL,
                         notification_channel_id INTEGER DEFAULT NULL,
                         
-                        FOREIGN KEY (guild_id)
-                            REFERENCES GuildSettings(guild_id)
-                            ON DELETE CASCADE
-                    );
-                ''')
-
-                await temp_conn.execute('''
-                    CREATE TABLE IF NOT EXISTS HiddenChannels (
-                        guild_id INTEGER NOT NULL,
-                        channel_id INTEGER NOT NULL,
-                    
-                        PRIMARY KEY (guild_id, channel_id),
-                    
                         FOREIGN KEY (guild_id)
                             REFERENCES GuildSettings(guild_id)
                             ON DELETE CASCADE
@@ -115,12 +103,11 @@ class DB:
                 ''')
 
                 await temp_conn.execute('''
-                    CREATE TABLE IF NOT EXISTS SpamInfo (
+                    CREATE TABLE IF NOT EXISTS HiddenRoles (
                         guild_id INTEGER NOT NULL,
-                        user_id INTEGER NOT NULL,
-                        user_warning_count INTEGER NOT NULL DEFAULT 0,
+                        role_id INTEGER NOT NULL,
                     
-                        PRIMARY KEY (guild_id, user_id),
+                        PRIMARY KEY (guild_id, role_id),
                     
                         FOREIGN KEY (guild_id)
                             REFERENCES GuildSettings(guild_id)
@@ -129,12 +116,12 @@ class DB:
                 ''')
 
                 await temp_conn.execute('''
-                    CREATE TABLE IF NOT EXISTS HiddenRoles (
+                    CREATE TABLE IF NOT EXISTS HiddenChannels (
                         guild_id INTEGER NOT NULL,
-                        role_id INTEGER NOT NULL,
-                    
-                        PRIMARY KEY (guild_id, role_id),
-                    
+                        channel_id INTEGER NOT NULL,
+
+                        PRIMARY KEY (guild_id, channel_id),
+
                         FOREIGN KEY (guild_id)
                             REFERENCES GuildSettings(guild_id)
                             ON DELETE CASCADE

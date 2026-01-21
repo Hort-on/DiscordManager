@@ -1,20 +1,20 @@
 import discord
 
-from modules.buttons.for_admins.superusers_button.menu_view import SuperusersMenuView
+from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
 from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
-class SuperusersMenuButton(FirewallButton):
+class DeleteMsgMenuButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self):
         super().__init__(
-            label='Superusers management',
-            style=discord.ButtonStyle.green
+            label='Delete message',
+            style=discord.ButtonStyle.blurple
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = SuperusersMenuView().prepare(
+        view = DeleteMsgMenuView().prepare(
             guild_id=interaction.guild_id,
             user_id=interaction.user.id
         )

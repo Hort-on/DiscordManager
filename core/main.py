@@ -3,8 +3,11 @@ from discord.ext import tasks
 
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
+from modules.buttons.verification_buttons.service import AntiBotService
 
 from services.factories.db_factory.db_scenario_factory import DBFactory
+from services.other_services.check_verification import CheckVerification
 from services.utils.bad_words import invitation_pattern
 
 from modules.logger.logger import Logger
@@ -23,7 +26,8 @@ class BotController:
             settings: SettingsStorage,
             birthday_manager: BirthdayManager,
             bad_words_handler: BadWordsHandler,
-            member_left_notify: MemberLeftNotification
+            member_left_notify: MemberLeftNotification,
+            anti_bot_service: AntiBotService
 
     ):
         self.bot = bot
@@ -37,10 +41,12 @@ class BotController:
         self.birthday_manager = birthday_manager
         self.bad_words = bad_words_handler
         self.member_left_notify = member_left_notify
+        self.anti_bot_service = anti_bot_service
+
+        self.verification_chek = CheckVerification(bot=bot, settings=settings)
 
         self.bot.add_listener(self.on_ready)
         self.bot.add_listener(self.on_message)
-        self.bot.add_listener(self.on_raw_reaction_add)
         self.bot.add_listener(self.on_member_remove)
         self.bot.add_listener(self.on_guild_remove)
         self.bot.add_listener(self.on_guild_join)
@@ -48,7 +54,8 @@ class BotController:
     # --------------------------- EVENTS --------------------------- #
 
     async def on_ready(self) -> None:
-        print(f"Connected as {self.bot.user}")
+        print(f'Ми приєдналися як {self.bot.name}')
+        await self.verification_chek.prepare()
 
         if not self.daily_birthday_check.is_running():
             self.daily_birthday_check.start()
@@ -92,26 +99,6 @@ class BotController:
         await self.handle_message(message)
         await self.bot.process_commands(message)
 
-    async def on_raw_reaction_add(self, payload) -> None:
-        result = await self.db.get_data(  # TODO: переробити
-            payload.guild_id,
-            'settings',
-            'verification',
-            'verification_channel_id',
-            'verification_msg_id'
-        )
-
-        if not result or not all(result.values()):
-            return
-
-        if payload.channel_id != result.get('verification_channel_id'):
-            return
-
-        if payload.message_id != result.get('verification_msg_id'):
-            return
-
-        # тут твоя логіка
-
     async def on_member_remove(self, member) -> None:
         await self.member_left_notify.check_if_notification(member)
 
@@ -127,7 +114,7 @@ class BotController:
 
     @tasks.loop(hours=24)
     async def daily_birthday_check(self) -> None:
-        await self.birthday_repo.check_daily_birthday()
+        await self.birthday_manager.check_daily_birthday()
 
     # --------------------------- MESSAGE HANDLING ---------------------------
 

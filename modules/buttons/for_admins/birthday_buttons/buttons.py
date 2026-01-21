@@ -1,7 +1,7 @@
 import discord
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.birthday_buttons.modals import AddBirthdayModal, DeleteBirthdayModal
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
 class AddBirthdayButton(FirewallButton):

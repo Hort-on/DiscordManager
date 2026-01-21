@@ -1,7 +1,7 @@
 import discord
 
-from modules.buttons.for_admins.superusers_button.modals import AddSuperusersModal
-from modules.buttons.for_admins.superusers_button.services import DeleteSuperuserService, GetSuperusersList
+from modules.buttons.for_admins.superusers_buttons.modals import AddSuperusersModal
+from modules.buttons.for_admins.superusers_buttons.services import DeleteSuperuserService, GetSuperusersList
 from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 

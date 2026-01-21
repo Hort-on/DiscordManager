@@ -1,6 +1,7 @@
 import discord
 
 from core.bot_container import AppContainer
+from core.main import BotController
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
@@ -14,8 +15,9 @@ class FormatResultBaseScenario:
 
 class EditSettingsResultScenario(FormatResultBaseScenario):
     def __init__(self):
-        container = AppContainer.get()
-        self.settings: SettingsStorage = container.settings
+        controller: BotController = AppContainer.get()
+
+        self.settings: SettingsStorage = controller.settings
 
     async def build_result(self, interaction: discord.Interaction) -> None:
         lines: list[str] = ['Your current settings:\n']

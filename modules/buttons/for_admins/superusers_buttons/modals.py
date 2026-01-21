@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.for_admins.superusers_button.services import AddSuperusersService
+from modules.buttons.for_admins.superusers_buttons.services import AddSuperusersService
 
 
 class AddSuperusersModal(discord.ui.Modal, title='Superuser names.'):

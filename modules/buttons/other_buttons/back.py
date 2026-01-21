@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
+from modules.buttons.button_protection import FirewallButton
 
 
 class BackButton(FirewallButton):
