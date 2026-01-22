@@ -1,0 +1,66 @@
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None
+[2026-01-22 23:22] | ERROR | db_proceed | ❌ Failed to read data from DB
+Traceback (most recent call last):
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\base.py", line 38, in db_proceed
+    return await self._execute()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Horton\PycharmProjects\DiscordManager\services\factories\db_factory\scenarios\common.py", line 167, in _execute
+    columns = [desc[0] for desc in cursor.description]
+                                   ^^^^^^^^^^^^^^^^^^
+AttributeError: 'Connection' object has no attribute 'description'
+
+[2026-01-22 23:22] | ERROR | db_proceed | None

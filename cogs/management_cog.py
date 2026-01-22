@@ -1,9 +1,17 @@
+from __future__ import annotations
+
 import discord
 
 from discord import app_commands
 from discord.ext import commands
 
+from core.container import AppContainer
+
 from modules.buttons.navigator import Navigator
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from core.container import BotContainer
 
 
 class ManagementCog(commands.Cog):
@@ -23,9 +31,9 @@ class ManagementCog(commands.Cog):
 
 
 async def setup(bot):
+    container: BotContainer = AppContainer.get()
     await bot.add_cog(
         ManagementCog(
-            navigator=bot.navigator
+            navigator=container.navigator
         )
     )
-

@@ -52,8 +52,7 @@ class BadWordsHandler:
             f"```{nick}, for the next violation, you will be banned!```"
         ]
 
-        return messages asf
-
+        return
 
     async def check_for_bad_words(self, message, nick):
         guild_id = message.guild.id

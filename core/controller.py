@@ -13,21 +13,23 @@ from modules.management.verification.check_verification import CheckVerification
 
 class BotController:
     def __init__(self, bot, settings: SettingsStorage, db_factory: DBFactory):
+        print("CONTROLLER BOT ID:", id(bot))
+
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
 
-        bot.add_listener(self.on_ready)
-        bot.add_listener(self.on_message)
-        bot.add_listener(self.on_member_join)
-        bot.add_listener(self.on_member_remove)
-        bot.add_listener(self.on_guild_remove)
-        bot.add_listener(self.on_guild_join)
+        bot.add_listener(self.on_ready, name='on_ready')
+        bot.add_listener(self.on_message, name='on_message')
+        bot.add_listener(self.on_member_join, name='on_member_join')
+        bot.add_listener(self.on_member_remove, name='on_member_remove')
+        bot.add_listener(self.on_guild_remove, name='on_guild_remove')
+        bot.add_listener(self.on_guild_join, name='on_guild_join')
 
     # --------------------------- EVENTS --------------------------- #
-
     async def on_ready(self) -> None:
-        print(f'Ми приєдналися як {self.bot.name}')
+        print("ON_READY")
+        print(f'Ми приєдналися як {self.bot.user.name}')
         await CheckVerification(parent=self).prepare()
 
         # if not self.daily_birthday_check.is_running():
@@ -70,7 +72,7 @@ class BotController:
         #     await handle_spam(message)
         #
         # await self.handle_message(message)
-        # await self.bot.process_commands(message)
+        await self.bot.process_commands(message)
 
     async def on_member_join(self, member) -> None:
         await UserBirthdayService(self).check(member=member)

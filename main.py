@@ -59,11 +59,10 @@ async def main():
 
     AppContainer.set(container)
 
-    async with bot:
-        await bot.load_extension('core.management_cog')
-        await bot.start(TOKEN)
+    await bot.load_extension('cogs.management_cog')
+    await bot.start(TOKEN)
 
-
+print("BOT ID:", id(bot))
 if __name__ == '__main__':
     try:
         asyncio.run(main())
