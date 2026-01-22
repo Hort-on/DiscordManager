@@ -34,8 +34,9 @@ class DictStorageManager:
     def for_dict_set(self, target: StorageTarget, guild_id: int, key, value) -> None:
         self._map[target].setdefault(guild_id, {})[key] = value
 
-    def for_dict_get(self, target: StorageTarget, guild_id: int, key):
-        return self._map.get(target, {}).get(guild_id, {}).get(key)
+    def for_dict_get(self, *keys, target: StorageTarget, guild_id: int) -> dict[str, int]:
+        data = self._map.get(target, {}).get(guild_id, {})
+        return {key: data.get(key) for key in keys}
 
     def for_dict_get_all(self, target: StorageTarget, guild_id: int) -> dict:
         return self._map.get(target, {}).get(guild_id, {})

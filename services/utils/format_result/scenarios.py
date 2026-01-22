@@ -1,10 +1,14 @@
 import discord
 
-from core.bot_container import AppContainer
-from core.main import BotController
+from core.container import AppContainer
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.controller import BotController
 
 
 class FormatResultBaseScenario:
@@ -15,7 +19,7 @@ class FormatResultBaseScenario:
 
 class EditSettingsResultScenario(FormatResultBaseScenario):
     def __init__(self):
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
 
@@ -29,7 +33,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
 
         if not settings:
             await interaction.edit_original_response(
-                embeds=...
+                content='0'
             )
             return
 
@@ -76,5 +80,5 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
     async def _send_result(interaction: discord.Interaction, lines) -> None:
         result_msg = '\n'.join(lines)
         await interaction.edit_original_response(
-            embeds=...
+            content='1'
         )

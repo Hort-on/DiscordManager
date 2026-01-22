@@ -1,13 +1,17 @@
 import discord
 
-from core.bot_container import AppContainer
-from core.main import BotController
+from core.container import AppContainer
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import SuccessEmbed
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.controller import BotController
 
 
 async def _build_and_send_result(
@@ -29,7 +33,7 @@ async def _build_and_send_result(
 
 class AddRoleService:
     def __init__(self):
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
 
@@ -99,7 +103,7 @@ class AddRoleService:
 
 class RemoveRoleService:
     def __init__(self):
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
 

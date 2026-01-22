@@ -1,23 +1,28 @@
+from __future__ import annotations
+
 import discord
 
-from modules.buttons.for_users.randomizer.menu_view import RandomModeView
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from modules.buttons.navigator import Navigator
 
 
 class RandomMenuButton(FirewallButton):
     scope = 'user'
 
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         super().__init__(
             label='🎲 Randomizer',
             style=discord.ButtonStyle.blurple
         )
+        self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.edit_original_response(
-            content='Choose randomizer mode:',
-            view=RandomModeView().prepare(
-                guild_id=interaction.guild_id,
-                user_id=interaction.user.id
-            )
+        await self.navigator.go(
+            target='random_menu',
+            interaction=interaction,
+            ephemeral=True
         )

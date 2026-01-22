@@ -1,7 +1,8 @@
 import discord
 
-from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
-from modules.buttons.modals.random_modal import RandomTeamByChannelModal
+from modules.buttons.for_users.randomizer.modals import RandomTeamByChannelModal
+
+from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.utils.messages import DB_MSGS, SYSTEM_MSGS
 
 
@@ -11,7 +12,7 @@ class ChannelScenario:
 
 
 class SaveChannelToDBForMessageScenario(ChannelScenario):
-    def __init__(self, db_factory: DBScenarioFactory):
+    def __init__(self, db_factory: DBFactory):
         self.db_factory = db_factory
 
     async def on_channel_selected(
@@ -58,7 +59,7 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
 class SaveChannelToDBScenario(ChannelScenario):
     def __init__(
             self,
-            db_factory: DBScenarioFactory,
+            db_factory: DBFactory,
             config_key: str
     ):
 

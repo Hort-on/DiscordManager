@@ -1,33 +1,38 @@
-from discord.ui import View
+from __future__ import annotations
 
-from core.bot_container import AppContainer
-from core.main import BotController
+import discord
 
-from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_users.randomizer.menu import RandomMenuButton
 from modules.buttons.for_admins.admin_menu import AdminMenuButton
 from modules.buttons.for_users.role_manager.menu import RoleManagerMenuButton
 
+from typing import TYPE_CHECKING
 
-class MainButtonView(View):
-    def __init__(self):
+if TYPE_CHECKING:
+    from modules.buttons.navigator import Navigator
+    from database.settings_storage.settings import SettingsStorage
+
+
+class MainMenuView(discord.ui.View):
+    def __init__(
+            self,
+            settings: SettingsStorage,
+            navigator: Navigator,
+            guild_id: int,
+            user_id: int
+    ):
         super().__init__(timeout=60)
-        controller: BotController = AppContainer.get()
 
-        self.settings: SettingsStorage = controller.settings
-
-    def prepare(self, guild_id: int, user_id: int):
-        superusers = self.settings.set_storage.for_set_get(
+        superusers = settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild_id
         )
 
-        self.add_item(RandomMenuButton())
-        self.add_item(RoleManagerMenuButton())
+        self.add_item(RandomMenuButton(navigator=navigator))
+        self.add_item(RoleManagerMenuButton(navigator=navigator))
 
         if user_id in superusers:
-            self.add_item(AdminMenuButton())
+            self.add_item(AdminMenuButton(navigator=navigator))
 
-        return self

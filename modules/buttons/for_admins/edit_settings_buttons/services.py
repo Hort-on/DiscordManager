@@ -1,21 +1,28 @@
+from __future__ import annotations
+
 import discord
 
-from modules.buttons.for_admins.admin_menu_view import AdminMenuView
 from modules.buttons.other_buttons.back import BackButton
-from modules.management.yes_no_view.view.yes_no import YesNoView
-from modules.management.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
 
+from services.yes_no_view.view.yes_no import YesNoView
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
 from services.other_services.get_channel import ChannelSelectorManager
 from services.utils.format_result.scenarios_factory import ResultFactory
 from services.utils.messages import EDIT_CONFIG_MSGS, SYSTEM_MSGS
 from services.utils.option_list import SETTINGS_OPTIONS
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
+    from modules.buttons.navigator import Navigator
+
 
 class ChoiceHandler:
+    def __init__(self, yes_no_factory: 'YesNoViewFactory'):
+        self.yes_no_factory = yes_no_factory
 
-    @staticmethod
     async def choice_procedure(
+            self,
             interaction: discord.Interaction,
             option_type: str,
             config_key: str
@@ -23,9 +30,7 @@ class ChoiceHandler:
 
         match option_type:
             case 'boolean':
-                scenario = YesNoViewFactory.for_confirmation(
-                    config_key=config_key
-                )
+                scenario = self.yes_no_factory.for_confirmation(config_key=config_key)
 
                 view = YesNoView(scenario=scenario)
 
@@ -55,7 +60,7 @@ class ChoiceHandler:
 
 
 class SettingSelector(discord.ui.Select):
-    def __init__(self):
+    def __init__(self, yes_no_factory: 'YesNoViewFactory'):
         super().__init__(
             placeholder='Please select a setting to edit...',
             options=[
@@ -69,7 +74,7 @@ class SettingSelector(discord.ui.Select):
             max_values=1
         )
 
-        self.choice_handler = ChoiceHandler()
+        self.choice_handler = ChoiceHandler(yes_no_factory=yes_no_factory)
 
     async def callback(
             self,
@@ -81,7 +86,7 @@ class SettingSelector(discord.ui.Select):
 
         if not option_type:
             await interaction.edit_original_response(
-                content=SM.get('failure_msg')   # TODO: зробити embed
+                content=''   # TODO: зробити embed
             )
             return
 
@@ -93,28 +98,20 @@ class SettingSelector(discord.ui.Select):
 
 
 class SettingSelectorView(discord.ui.View):
-    def __init__(self):
+    def __init__(self, navigator: Navigator, yes_no_factory: 'YesNoViewFactory'):
         super().__init__(timeout=None)
 
-    def prepare(self, guild_id: int, user_id: int):
         self.add_item(SettingSelector())
-        self.add_item(BackButton(
-            back_view=lambda: AdminMenuView().prepare(
-                guild_id=guild_id,
-                user_id=user_id
-            )))
-        return self
+        self.add_item(BackButton(target='admin_menu', navigator=navigator))
 
 
 class SettingsFormatter:
 
-    async def format_settings(self, interaction: discord.Interaction) -> None:
+    @staticmethod
+    async def format_settings(interaction: discord.Interaction) -> None:
         scenario = ResultFactory.for_settings_edit()
-        summary_result = scenario.format_the_result(
-            parent=self,
-            interaction=interaction
-        )
+        summary_result = scenario.build_result(interaction=interaction)
 
         await interaction.edit_original_response(
-            embed=GM.get('config_edit_msg') + f'\n\n{summary_result}\n\n'  # TODO: зробити embed
+            content=f'\n\n{summary_result}\n\n'  # TODO: зробити embed
         )

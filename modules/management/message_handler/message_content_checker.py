@@ -1,10 +1,10 @@
-from services.factories import DBScenarioFactory
-
 from modules.administration.user_manager import UserManager
+
+from services.factories.db_factory.db_scenario_factory import DBFactory
 
 
 class MessageContentChecker:
-    def __init__(self, db_factory: DBScenarioFactory):
+    def __init__(self, db_factory: DBFactory):
         self.db_factory = db_factory
 
     def db_info(self, interaction, user_id):

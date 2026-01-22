@@ -2,8 +2,9 @@ import re
 import time
 import asyncio
 
-from modules.logger.logger import Logger
 from modules.administration.user_manager import UserManager
+from services.logger.logger import Logger
+
 
 #TODO: треба оптимізувати роботу цього хендлера
 class BadWordsHandler:

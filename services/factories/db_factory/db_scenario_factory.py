@@ -26,7 +26,7 @@ from services.factories.db_factory.scenarios.cleanup import (
     CleanupRemovedRoleScenario
 )
 
-from modules.logger.logger import Logger
+from services.logger.logger import Logger
 
 
 class DBFactory:

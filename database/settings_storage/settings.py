@@ -1,10 +1,10 @@
 from database.settings_storage.settings_manager import SetStorageManager, StorageTarget, DictStorageManager
 
-from services.factories.db_factory.db_scenario_factory import DBScenarioFactory
+from services.factories.db_factory.db_scenario_factory import DBFactory
 
 
 class SettingsStorage:
-    def __init__(self, bot, db_factory: DBScenarioFactory):
+    def __init__(self, bot, db_factory: DBFactory):
         self.db_factory = db_factory
         self.bot = bot
 

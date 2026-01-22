@@ -7,7 +7,8 @@ SUMMARY_FIELDS = {
     'spam_check_enabled': "Spam check",
     'member_left_enabled': "Member left notification",
     'send_messages_enabled': "Send messages",
-    'write_audit_log_enabled': "Write audit log"
+    'write_audit_log_enabled': "Write audit log",
+    'anti_bot_enabled': "Anti-bot feature"
 }
 
 CHANNEL_FIELDS = {

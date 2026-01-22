@@ -1,7 +1,7 @@
 import discord.ui
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_users.role_manager.services import AddRoleService, RemoveRoleService
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
 class AddRoleButton(FirewallButton):

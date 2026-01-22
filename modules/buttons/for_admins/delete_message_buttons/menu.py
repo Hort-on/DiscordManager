@@ -1,7 +1,7 @@
 import discord
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
 class DeleteMsgMenuButton(FirewallButton):
@@ -14,8 +14,5 @@ class DeleteMsgMenuButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = DeleteMsgMenuView().prepare(
-            guild_id=interaction.guild_id,
-            user_id=interaction.user.id
-        )
+        view = DeleteMsgMenuView()
         await interaction.edit_original_response(view=view)

@@ -1,7 +1,6 @@
 from database.data_base_model import DB
 
-from modules.logger.logger import Logger
-
+from services.logger.logger import Logger
 from services.utils.messages import DB_MSGS as DM
 
 

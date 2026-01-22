@@ -1,16 +1,20 @@
 import discord
 
-from core.bot_container import AppContainer
-from core.main import BotController
+from core.container import AppContainer
 
-from modules.birthdays.birthday_repo import BirthdayManager
+from modules.management.birthdays.birthday_manager import BirthdayManager
 
 from services.other_services.get_member_by_name import get_member_by_name
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.controller import BotController
 
 
 class AddBirthdayService:
     def __init__(self):
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.birthday_manager: BirthdayManager = controller.birthday_manager
 
@@ -57,7 +61,7 @@ class AddBirthdayService:
 
 class DeleteBirthdayService:
     def __init__(self):
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.birthday_manager = controller.birthday_manager
 

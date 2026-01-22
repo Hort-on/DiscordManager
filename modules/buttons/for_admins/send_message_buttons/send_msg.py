@@ -1,6 +1,6 @@
 import discord
 
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 
 from services.other_services.get_channel import ChannelSelectorManager
 from services.factories.channel_factory.scenarios_factory import ChannelFactory

@@ -1,7 +1,7 @@
 import discord
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_users.randomizer.modals import RandomNumModal, RandomWordModal, RandomTeamByMsgModal
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
 from services.other_services.get_channel import ChannelSelectorManager

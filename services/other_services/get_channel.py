@@ -1,7 +1,6 @@
 import discord
 
-from core.bot_container import AppContainer
-from core.main import BotController
+from core.container import AppContainer
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
@@ -9,6 +8,11 @@ from database.settings_storage.settings_manager import StorageTarget
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.controller import BotController
 
 
 class ChannelSelectorManager:
@@ -20,7 +24,7 @@ class ChannelSelectorManager:
     ):
         super().__init__(timeout=60)
 
-        controller: BotController = AppContainer.get()
+        controller: 'BotController' = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
         self.scenario = scenario

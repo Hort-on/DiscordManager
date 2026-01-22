@@ -11,5 +11,6 @@ SETTINGS_OPTIONS = {
             'member_left': "boolean",
             'set_permissions': "boolean",
             'send_messages': "boolean",
-            'write_audit_log': "boolean"
+            'write_audit_log': "boolean",
+            'anti_bot': "boolean"
         }

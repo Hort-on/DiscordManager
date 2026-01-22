@@ -1,7 +1,7 @@
 from database.data_base_model import DB
-from services.factories.db_factory.scenarios.base import DataBaseScenario
 
-from modules.logger.logger import Logger
+from services.factories.db_factory.scenarios.base import DataBaseScenario
+from services.logger.logger import Logger
 
 
 class GetDataScenario(DataBaseScenario):

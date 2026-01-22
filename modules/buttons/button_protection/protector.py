@@ -1,10 +1,12 @@
 import discord
 
-from services.other_services.is_superuser import IsSuperuserService
+from database.settings_storage.settings import SettingsStorage
 
 
 class ButtonPermissionService:
-    admin_service = IsSuperuserService()
+    def __init__(self, settings: SettingsStorage):
+        from services.other_services.is_superuser import IsSuperuserService
+        self.admin_service = IsSuperuserService(settings=settings)
 
     def has_access(
             self,

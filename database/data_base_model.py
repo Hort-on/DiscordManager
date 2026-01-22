@@ -3,9 +3,8 @@ import aiosqlite
 
 from contextlib import asynccontextmanager
 
+from services.logger.logger import Logger
 from services.utils.messages import DB_MSGS as DM
-
-from modules.logger.logger import Logger
 
 
 class DB:
@@ -42,7 +41,8 @@ class DB:
                     
                         send_messages INTEGER NOT NULL DEFAULT 1,
                         write_audit_log INTEGER NOT NULL DEFAULT 1,
-                        role_manager INTEGER NOT NULL DEFAULT 0
+                        role_manager INTEGER NOT NULL DEFAULT 0,
+                        anti_bot INTEGER NOT NULL DEFAULT 0
                     );
                 ''')
 

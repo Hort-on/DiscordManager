@@ -1,11 +1,8 @@
+from __future__ import annotations
+
 import discord
 
-from core.bot_container import AppContainer
-from core.main import BotController
-
 from database.settings_storage.settings_manager import StorageTarget
-
-from modules.buttons.main_button_view import MainButtonView
 
 from modules.buttons.for_admins.birthday_buttons.menu import BirthdayMenuButton
 from modules.buttons.for_admins.delete_message_buttons.menu import DeleteMsgMenuButton
@@ -14,16 +11,22 @@ from modules.buttons.for_admins.edit_settings_buttons.edit_settings import EditS
 from modules.buttons.for_admins.send_message_buttons.send_msg import SendMessageButton
 from modules.buttons.other_buttons.back import BackButton
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from modules.buttons.navigator import Navigator
+    from database.settings_storage.settings import SettingsStorage
+
 
 class AdminMenuView(discord.ui.View):
-    def __init__(self):
+    def __init__(
+            self,
+            settings: SettingsStorage,
+            navigator: Navigator,
+            guild_id: int
+    ):
         super().__init__(timeout=60)
-        controller: BotController = AppContainer.get()
 
-        self.settings = controller.settings
-
-    def prepare(self, guild_id: int, user_id: int):
-        config = self.settings.dict_storage.for_dict_get_all(
+        config = settings.dict_storage.for_dict_get_all(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )
@@ -38,11 +41,4 @@ class AdminMenuView(discord.ui.View):
         if config.get('send_messages'):
             self.add_item(SendMessageButton())
 
-        self.add_item(BackButton(
-            back_view=lambda: MainButtonView().prepare(
-                guild_id=guild_id,
-                user_id=user_id
-            )
-        ))
-
-        return self
+        self.add_item(BackButton(target='main_menu', navigator=navigator))

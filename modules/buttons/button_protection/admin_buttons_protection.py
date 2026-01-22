@@ -1,14 +1,22 @@
+from typing import TYPE_CHECKING
+
 import discord
 
-from modules.buttons.services.protection.protector import ButtonPermissionService
+from core.container import AppContainer
+
+from modules.buttons.button_protection.protector import ButtonPermissionService
+
+if TYPE_CHECKING:
+    from core.controller import BotController
 
 
 class FirewallButton(discord.ui.Button):
     scope: str = 'user'
-    button_permission = ButtonPermissionService()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        controller: 'BotController' = AppContainer.get()
+        self.button_permission = ButtonPermissionService(controller.settings)
 
     async def callback(self, interaction: discord.Interaction):
         if not self.button_permission.has_access(
@@ -23,4 +31,3 @@ class FirewallButton(discord.ui.Button):
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         raise NotImplementedError
-

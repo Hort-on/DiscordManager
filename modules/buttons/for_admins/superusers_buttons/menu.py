@@ -1,7 +1,7 @@
 import discord
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.superusers_buttons.menu_view import SuperusersMenuView
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
 class SuperusersMenuButton(FirewallButton):
@@ -14,8 +14,5 @@ class SuperusersMenuButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = SuperusersMenuView().prepare(
-            guild_id=interaction.guild_id,
-            user_id=interaction.user.id
-        )
+        view = SuperusersMenuView()
         await interaction.edit_original_response(view=view)

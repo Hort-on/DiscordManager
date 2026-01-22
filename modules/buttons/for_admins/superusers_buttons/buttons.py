@@ -1,8 +1,8 @@
 import discord
 
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.superusers_buttons.modals import AddSuperusersModal
 from modules.buttons.for_admins.superusers_buttons.services import DeleteSuperuserService, GetSuperusersList
-from modules.buttons.services.protection.admin_buttons_protection import FirewallButton
 
 
 class AddSuperuserButton(FirewallButton):
