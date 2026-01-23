@@ -120,7 +120,7 @@ class SettingSelectorView(discord.ui.View):
 
 class SettingsFormatter:
     @staticmethod
-    async def format_settings(interaction: discord.Interaction) -> str:
+    async def format_settings(interaction: discord.Interaction) -> discord.Embed:
         scenario = ResultFactory.for_settings_edit()
-        summary_result = await scenario.build_result(interaction=interaction)
-        return f'\n\n{summary_result}\n\n'
+        embed = await scenario.build_result(interaction=interaction)
+        return embed

@@ -9,23 +9,19 @@ from database.settings_storage.settings_manager import StorageTarget
 
 from typing import TYPE_CHECKING
 
+from services.embed_constructor.embed_constructor import InfoEmbed, WarningEmbed
+
 if TYPE_CHECKING:
     from core.container import BotContainer
 
 
-class FormatResultBaseScenario:
-
-    async def build_result(self, interaction: discord.Interaction):
-        raise NotImplementedError
-
-
-class EditSettingsResultScenario(FormatResultBaseScenario):
+class EditSettingsResultScenario:
     def __init__(self):
         controller: BotContainer = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
 
-    async def build_result(self, interaction: discord.Interaction) -> str:
+    async def build_result(self, interaction: discord.Interaction) -> discord.Embed:
         lines: list[str] = ['Your current settings:\n']
 
         settings = self.settings.dict_storage.for_dict_get_all(
@@ -34,18 +30,20 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
         )
 
         if not settings:
-            return 'No settings found.'
+            embed = WarningEmbed(
+                description='No settings found.'
+            )
+            return embed
 
         for key, value in settings.items():
             status = '✅ Enabled' if value else '❌ Disabled'
             lines.append(f'-> {key}: {status}')
 
-        self._append_superusers(interaction, lines)
-        await self._append_channels(interaction, lines)
+        result = self._append_superusers(interaction, lines)
 
-        return '\n'.join(lines)
+        return result
 
-    def _append_superusers(self, interaction, lines):
+    def _append_superusers(self, interaction, lines) -> discord.Embed | None:
         users = self.settings.set_storage.for_set_get(
             StorageTarget.SUPERUSERS,
             interaction.guild_id
@@ -55,14 +53,19 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
 
         if not users:
             lines.append('-> not assigned')
-            return
+
+            result = self._append_channels(interaction=interaction, lines=lines)
+            return result
 
         for user_id in users:
             member = interaction.guild.get_member(user_id)
             name = member.display_name if member else f'Unknown ({user_id})'
             lines.append(f'-> {name}')
 
-    async def _append_channels(self, interaction: discord.Interaction, lines) -> None:
+        result = self._append_channels(interaction=interaction, lines=lines)
+        return result
+
+    def _append_channels(self, interaction: discord.Interaction, lines) -> discord.Embed:
         current_selected_channels = self.settings.dict_storage.for_dict_get_all(
             StorageTarget.SELECTED_CHANNELS,
             interaction.guild_id
@@ -75,3 +78,11 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
             status = channel.name if channel is not None else '❌ Not assigned'
             ch_name = key.replace('_channel_id', ' channel')
             lines.append(f'-> {ch_name}: {status}')
+
+        final_result = '\n' + '-> '.join(lines)
+
+        embed = InfoEmbed(
+            description=final_result
+        )
+
+        return embed

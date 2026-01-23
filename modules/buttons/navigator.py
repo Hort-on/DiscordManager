@@ -159,7 +159,7 @@ class Navigator:
                 print('Ми у редагуванні повідомлень меню')
 
                 formatter = SettingsFormatter()
-                summary = await formatter.format_settings(interaction)
+                embed = await formatter.format_settings(interaction)
 
                 view = SettingSelectorView(
                     navigator=self,
@@ -168,7 +168,7 @@ class Navigator:
                 )
 
                 await interaction.edit_original_response(
-                    content=summary,
+                    embed=embed,
                     view=view
                 )
                 return
