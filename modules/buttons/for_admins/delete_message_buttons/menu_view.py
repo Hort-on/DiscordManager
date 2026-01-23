@@ -16,4 +16,7 @@ class DeleteMsgMenuView(discord.ui.View):
 
         self.add_item(DeleteAnyMessageButton())
         self.add_item(DeleteUserMessageButton())
-        self.add_item(BackButton(back_view=lambda: ))
+        self.add_item(BackButton(
+            target='admin_menu',
+            navigator=navigator
+        ))

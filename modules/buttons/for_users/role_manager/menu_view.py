@@ -17,5 +17,8 @@ class RoleManagerView(discord.ui.View):
         self.add_item(AddRoleButton())
         self.add_item(RemoveRoleButton())
 
-        self.add_item(BackButton(back_view=lambda:))
+        self.add_item(BackButton(
+            target='main_menu',
+            navigator=navigator
+        ))
 

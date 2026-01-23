@@ -2,6 +2,16 @@ import discord
 from discord.ext import commands
 
 
+class Bot(commands.Bot):
+    async def setup_hook(self):
+        await self.load_extension('cogs.management_cog')
+
+        guild = discord.Object(id=1017855127081717820)
+
+        self.tree.copy_global_to(guild=guild)
+        await self.tree.sync(guild=guild)
+
+
 def create_bot():
     intents = discord.Intents.default()
     intents.guilds = True
@@ -13,7 +23,7 @@ def create_bot():
     intents.moderation = True
     intents.typing = False
 
-    return commands.Bot(command_prefix='', intents=intents)
+    return Bot(command_prefix='', intents=intents)
 
 
 bot = create_bot()

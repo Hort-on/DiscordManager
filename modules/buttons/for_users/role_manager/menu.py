@@ -21,6 +21,7 @@ class RoleManagerMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.navigator.go(
             target='role_manager_menu',
             interaction=interaction,

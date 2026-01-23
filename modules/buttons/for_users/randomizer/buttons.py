@@ -56,6 +56,7 @@ class RandomTeamByChannel(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         scenario = ChannelFactory.for_random_selection()
 
         manager = ChannelSelectorManager(

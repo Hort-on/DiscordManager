@@ -7,11 +7,10 @@ from discord.ext import commands
 
 from core.container import AppContainer
 
-from modules.buttons.navigator import Navigator
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from core.container import BotContainer
+    from modules.buttons.navigator import Navigator
 
 
 class ManagementCog(commands.Cog):
@@ -19,10 +18,12 @@ class ManagementCog(commands.Cog):
         self.navigator = navigator
 
     @app_commands.command(
-        name='management',
+        name='mg',
         description='Opens management panel'
     )
     async def management(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         await self.navigator.go(
             target='main_menu',
             interaction=interaction,
@@ -33,7 +34,5 @@ class ManagementCog(commands.Cog):
 async def setup(bot):
     container: BotContainer = AppContainer.get()
     await bot.add_cog(
-        ManagementCog(
-            navigator=container.navigator
-        )
+        ManagementCog(navigator=container.navigator)
     )

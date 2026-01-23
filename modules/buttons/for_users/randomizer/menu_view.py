@@ -24,5 +24,8 @@ class RandomModeView(discord.ui.View):
         self.add_item(RandomWordButton())
         self.add_item(RandomTeamByMsg())
         self.add_item(RandomTeamByChannel())
-        self.add_item(BackButton(back_view=lambda:))
+        self.add_item(BackButton(
+            target='main_menu',
+            navigator=navigator
+        ))
 

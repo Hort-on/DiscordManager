@@ -16,6 +16,7 @@ class SendMessageButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         scenario = ChannelFactory.for_db_message_save()
 
         manager = ChannelSelectorManager(scenario=scenario, text_only=True)

@@ -54,15 +54,12 @@ async def main():
     )
 
     navigator.container = container
-
     BotController(bot=bot, settings=settings, db_factory=db_factory)
 
     AppContainer.set(container)
 
-    await bot.load_extension('cogs.management_cog')
     await bot.start(TOKEN)
 
-print("BOT ID:", id(bot))
 if __name__ == '__main__':
     try:
         asyncio.run(main())

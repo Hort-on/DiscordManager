@@ -29,6 +29,7 @@ class DeleteSuperusersButton(FirewallButton):
         self.del_superuser = DeleteSuperuserService()
 
     async def on_click(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         await self.del_superuser.prepare_users(interaction=interaction)
 
 
@@ -43,5 +44,6 @@ class SuperusersListButton(FirewallButton):
         self.get_superuser_name = GetSuperusersList()
 
     async def on_click(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         result = self.get_superuser_name.get_display(guild=interaction.guild)
         await interaction.edit_original_response(content=result)

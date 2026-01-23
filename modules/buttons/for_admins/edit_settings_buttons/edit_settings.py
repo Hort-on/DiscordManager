@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
@@ -18,6 +20,7 @@ class EditSettingsButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.navigator.go(
             target='edit_settings',
             interaction=interaction

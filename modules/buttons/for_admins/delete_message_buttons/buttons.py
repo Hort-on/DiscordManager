@@ -17,6 +17,7 @@ class DeleteAnyMessageButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         scenario = ChannelFactory.for_message_deletion(modal=DeleteMessagesModal)
 
         manager = ChannelSelectorManager(
@@ -36,6 +37,7 @@ class DeleteUserMessageButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         scenario = ChannelFactory.for_message_deletion(modal=DeleteUserMessagesModal)
 
         manager = ChannelSelectorManager(

@@ -22,4 +22,7 @@ class SuperusersMenuView(discord.ui.View):
         self.add_item(AddSuperuserButton())
         self.add_item(DeleteSuperusersButton())
         self.add_item(SuperusersListButton())
-        self.add_item(BackButton(back_view=lambda: ))
+        self.add_item(BackButton(
+            target='admin_menu',
+            navigator=navigator
+        ))

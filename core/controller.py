@@ -13,8 +13,6 @@ from modules.management.verification.check_verification import CheckVerification
 
 class BotController:
     def __init__(self, bot, settings: SettingsStorage, db_factory: DBFactory):
-        print("CONTROLLER BOT ID:", id(bot))
-
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
@@ -28,7 +26,6 @@ class BotController:
 
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:
-        print("ON_READY")
         print(f'Ми приєдналися як {self.bot.user.name}')
         await CheckVerification(parent=self).prepare()
 

@@ -4,6 +4,8 @@ import discord
 
 from typing import TYPE_CHECKING
 
+from database.settings_storage.settings_manager import StorageTarget
+
 if TYPE_CHECKING:
     from core.container import BotContainer
 
@@ -19,81 +21,180 @@ class Navigator:
         ephemeral: bool = True,
     ):
         if not self.container:
-            raise RuntimeError("Navigator: container is not initialized.")
+            raise RuntimeError('Navigator: container is not initialized.')
+
+        print('ми в навігаторі')
 
         view = None
+
         guild_id = interaction.guild_id
         user_id = interaction.user.id
 
+        print('ми перед матч кейсами')
         match target:
             case 'main_menu':
-                from modules.buttons.main_button_view import MainMenuView
+                try:
+                    print('--- Спроба імпорту MainMenuView ---')
+                    from modules.buttons.main_button_view import MainMenuView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+
+                superusers = self.container.settings.set_storage.for_set_get(
+                    target=StorageTarget.SUPERUSERS,
+                    guild_id=guild_id
+                )
+
+                print('Ми у головному меню')
                 view = MainMenuView(
-                    settings=self.container.settings,
+                    superusers=superusers,
                     navigator=self,
-                    guild_id=guild_id,
+                    guild=interaction.guild,
                     user_id=user_id
                 )
 
             case 'admin_menu':
-                from modules.buttons.for_admins.admin_menu_view import AdminMenuView
-                view = AdminMenuView(
-                    settings=self.container.settings,
-                    navigator=self,
+                try:
+                    print('--- Спроба імпорту AdminMenuView ---')
+                    from modules.buttons.for_admins.admin_menu_view import AdminMenuView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у адмін меню')
+                config = self.container.settings.dict_storage.for_dict_get_all(
+                    target=StorageTarget.SETTINGS,
                     guild_id=guild_id
                 )
 
+                view = AdminMenuView(
+                    navigator=self,
+                    config=config
+                )
+
             case 'birthday_menu':
-                from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView
+                try:
+                    print('--- Спроба імпорту BirthdayMenuView ---')
+                    from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у дні народженні меню')
                 view = BirthdayMenuView(
                     navigator=self
                 )
 
             case 'delete_msg_menu':
-                from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
+                try:
+                    print('--- Спроба імпорту BirthdayMenuView ---')
+                    from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у видалення повідомлень меню')
                 view = DeleteMsgMenuView(
                     navigator=self
                 )
 
             case 'superusers_menu':
-                from modules.buttons.for_admins.superusers_buttons.menu_view import SuperusersMenuView
+                try:
+                    print('--- Спроба імпорту BirthdayMenuView ---')
+                    from modules.buttons.for_admins.superusers_buttons.menu_view import SuperusersMenuView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у суперкористувач меню')
                 view = SuperusersMenuView(
                     navigator=self
                 )
 
             case 'random_menu':
-                from modules.buttons.for_users.randomizer.menu_view import RandomModeView
+                try:
+                    print('--- Спроба імпорту BirthdayMenuView ---')
+                    from modules.buttons.for_users.randomizer.menu_view import RandomModeView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у рандомайзер меню')
                 view = RandomModeView(
                     navigator=self
                 )
 
             case 'role_manager_menu':
-                from modules.buttons.for_users.role_manager.menu_view import RoleManagerView
+                try:
+                    print('--- Спроба імпорту BirthdayMenuView ---')
+                    from modules.buttons.for_users.role_manager.menu_view import RoleManagerView
+                    print('--- Імпорт успішний ---')
+                except Exception as e:
+                    import traceback
+                    print("ПОМИЛКА ПРИ ІМПОРТІ:")
+                    traceback.print_exc()
+                    return
+                print('Ми у рол менеджер меню')
                 view = RoleManagerView(
                     navigator=self
                 )
 
-            case 'edit_settings':
-                from modules.buttons.for_admins.edit_settings_buttons.services import (
-                    SettingsFormatter,
-                    SettingSelectorView
-                )
+            # case 'edit_settings':
+            #     from modules.buttons.for_admins.edit_settings_buttons.services import (
+            #         SettingsFormatter,
+            #         SettingSelectorView
+            #     )
+            #     print('Ми у редагуванні повідомлень меню')
+            #
+            #     formatter = SettingsFormatter()
+            #     summary = await formatter.format_settings(interaction)
+            #
+            #     view = SettingSelectorView(navigator=self)
+            #
+            #     await interaction.edit_original_response(
+            #         content=summary,
+            #         view=view
+            #     )
+            #     return
 
-                formatter = SettingsFormatter()
-                summary = await formatter.format_settings(interaction)
+        print('пройшли матч кейси')
 
-                view = SettingSelectorView(navigator=self)
-
-                await interaction.edit_original_response(
-                    content=summary,
-                    view=view
-                )
+        # Файл: navigator.py
+        try:
+            if view is None:
+                print(f"Помилка: View для target '{target}' не була створена!")
                 return
 
-        if not interaction.response.is_done():
-            await interaction.response.send_message(
-                view=view,
-                ephemeral=ephemeral
+            await interaction.edit_original_response(
+                content="Оберіть розділ:",
+                view=view
             )
-        else:
-            await interaction.edit_original_response(view=view)
+        except discord.NotFound as e:
+            print(f"Вебхук застарів (404), пробуємо followup... Деталі: {e}")
+            try:
+                # ВАЖЛИВО: додаємо await і перевіряємо чи не падає тут
+                await interaction.followup.send(
+                    content="⚠️ Сесія оновлена, виберіть дію ще раз:",
+                    view=view,
+                    ephemeral=True
+                )
+                print("Followup успішно надіслано")
+            except Exception as followup_error:
+                print(f"НАВІТЬ FOLLOWUP НЕ СПРАЦЮВАВ: {followup_error}")
+        except Exception as e:
+            print(f"КРИТИЧНА ПОМИЛКА НАВІГАЦІЇ: {e}")
+            import traceback
+            traceback.print_exc()
