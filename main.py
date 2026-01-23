@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import os
 import asyncio
 from dotenv import load_dotenv
@@ -22,11 +24,14 @@ from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFac
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
 
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / 'database' / 'DATA' / 'assistant_data.sqlite'
+
 
 async def main():
     logger = Logger()
 
-    db_connect = DB(logger=logger)
+    db_connect = DB(logger=logger, path=DB_PATH)
     db_factory = DBFactory(db_connect=db_connect, logger=logger)
 
     settings = SettingsStorage(bot=bot, db_factory=db_factory)

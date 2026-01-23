@@ -1,4 +1,6 @@
 import asyncio
+from pathlib import Path
+
 import aiosqlite
 
 from contextlib import asynccontextmanager
@@ -8,9 +10,9 @@ from services.utils.messages import DB_MSGS as DM
 
 
 class DB:
-    def __init__(self, logger: Logger, path='database.DATA.sqlite'):
+    def __init__(self, logger: Logger, path: Path):
         self.logger = logger
-        self.path = path
+        self.path = str(path)
         self._write_lock = asyncio.Lock()
         asyncio.create_task(self._init_tables())
 
