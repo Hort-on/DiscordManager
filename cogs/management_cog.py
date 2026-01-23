@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import traceback
+
 import discord
 
 from discord import app_commands
@@ -23,12 +25,13 @@ class ManagementCog(commands.Cog):
     )
     async def management(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-
-        await self.navigator.go(
-            target='main_menu',
-            interaction=interaction,
-            ephemeral=True
-        )
+        try:
+            await self.navigator.go(
+                target='main_menu',
+                interaction=interaction
+            )
+        except Exception as e:
+            traceback.print_exc()
 
 
 async def setup(bot):

@@ -6,6 +6,7 @@ from modules.buttons.for_admins.birthday_buttons.modals import AddBirthdayModal,
 
 class AddBirthdayButton(FirewallButton):
     scope = 'admin'
+    use_modal = True
 
     def __init__(self):
         super().__init__(
@@ -19,6 +20,7 @@ class AddBirthdayButton(FirewallButton):
 
 class DeleteBirthdayButton(FirewallButton):
     scope = 'admin'
+    use_modal = True
 
     def __init__(self):
         super().__init__(

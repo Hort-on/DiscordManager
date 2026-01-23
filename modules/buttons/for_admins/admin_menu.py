@@ -19,14 +19,11 @@ class AdminMenuButton(FirewallButton):
             style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
-        print('адмін меню')
 
     async def on_click(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        print('початок callback')
+        print('ми на початку callback y Admin menu')
         await self.navigator.go(
             target='admin_menu',
-            interaction=interaction,
-            ephemeral=True
+            interaction=interaction
         )
-        print('кінець Callback')
+        print('ми у кінці callback y Admin menu')

@@ -9,6 +9,7 @@ from services.other_services.get_channel import ChannelSelectorManager
 
 class RandomNumButton(FirewallButton):
     scope = 'user'
+    use_modal = True
 
     def __init__(self):
         super().__init__(
@@ -22,10 +23,11 @@ class RandomNumButton(FirewallButton):
 
 class RandomWordButton(FirewallButton):
     scope = 'user'
+    use_modal = True
 
     def __init__(self):
         super().__init__(
-            label='Random number',
+            label='Random word',
             style=discord.ButtonStyle.secondary
         )
 
@@ -35,10 +37,11 @@ class RandomWordButton(FirewallButton):
 
 class RandomTeamByMsg(FirewallButton):
     scope = 'user'
+    use_modal = True
 
     def __init__(self):
         super().__init__(
-            label='Random number',
+            label='Random team by message',
             style=discord.ButtonStyle.secondary
         )
 

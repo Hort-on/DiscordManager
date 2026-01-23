@@ -21,9 +21,7 @@ class RandomMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
         await self.navigator.go(
             target='random_menu',
-            interaction=interaction,
-            ephemeral=True
+            interaction=interaction
         )

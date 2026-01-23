@@ -18,7 +18,6 @@ class Navigator:
         self,
         target: str,
         interaction: discord.Interaction,
-        ephemeral: bool = True,
     ):
         if not self.container:
             raise RuntimeError('Navigator: container is not initialized.')
@@ -152,49 +151,51 @@ class Navigator:
                     navigator=self
                 )
 
-            # case 'edit_settings':
-            #     from modules.buttons.for_admins.edit_settings_buttons.services import (
-            #         SettingsFormatter,
-            #         SettingSelectorView
-            #     )
-            #     print('Ми у редагуванні повідомлень меню')
-            #
-            #     formatter = SettingsFormatter()
-            #     summary = await formatter.format_settings(interaction)
-            #
-            #     view = SettingSelectorView(navigator=self)
-            #
-            #     await interaction.edit_original_response(
-            #         content=summary,
-            #         view=view
-            #     )
-            #     return
+            case 'edit_settings':
+                from modules.buttons.for_admins.edit_settings_buttons.services import (
+                    SettingsFormatter,
+                    SettingSelectorView
+                )
+                print('Ми у редагуванні повідомлень меню')
+
+                formatter = SettingsFormatter()
+                summary = await formatter.format_settings(interaction)
+
+                view = SettingSelectorView(
+                    navigator=self,
+                    db_factory=self.container.db_factory,
+                    yes_no_factory=self.container.yes_no_factory
+                )
+
+                await interaction.edit_original_response(
+                    content=summary,
+                    view=view
+                )
+                return
 
         print('пройшли матч кейси')
 
-        # Файл: navigator.py
         try:
             if view is None:
-                print(f"Помилка: View для target '{target}' не була створена!")
+                print(f'Помилка: View для target "{target}" не була створена!')
                 return
 
             await interaction.edit_original_response(
-                content="Оберіть розділ:",
+                content='Оберіть розділ:',
                 view=view
             )
         except discord.NotFound as e:
-            print(f"Вебхук застарів (404), пробуємо followup... Деталі: {e}")
+            print(f'Вебхук застарів (404), пробуємо followup... Деталі: {e}')
             try:
-                # ВАЖЛИВО: додаємо await і перевіряємо чи не падає тут
                 await interaction.followup.send(
-                    content="⚠️ Сесія оновлена, виберіть дію ще раз:",
+                    content='⚠️ Сесія оновлена, виберіть дію ще раз:',
                     view=view,
                     ephemeral=True
                 )
-                print("Followup успішно надіслано")
+                print('Followup успішно надіслано')
             except Exception as followup_error:
-                print(f"НАВІТЬ FOLLOWUP НЕ СПРАЦЮВАВ: {followup_error}")
+                print(f'НАВІТЬ FOLLOWUP НЕ СПРАЦЮВАВ: {followup_error}')
         except Exception as e:
-            print(f"КРИТИЧНА ПОМИЛКА НАВІГАЦІЇ: {e}")
+            print(f'КРИТИЧНА ПОМИЛКА НАВІГАЦІЇ: {e}')
             import traceback
             traceback.print_exc()

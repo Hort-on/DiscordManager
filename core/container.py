@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from discord.ext import commands
 
@@ -16,6 +17,8 @@ if TYPE_CHECKING:
     from services.factories.db_factory.db_scenario_factory import DBFactory
     from services.logger.logger import Logger
 
+    from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
+
 
 class BotContainer:
     def __init__(
@@ -29,7 +32,8 @@ class BotContainer:
             bad_words_handler: BadWordsHandler,
             member_left_notify: MemberLeftNotification,
             anti_bot_service: AntiBotService,
-            navigator: Navigator
+            navigator: Navigator,
+            yes_no_factory: YesNoViewFactory
     ):
         self.bot = bot
         self.db_connect = db_connect
@@ -41,6 +45,7 @@ class BotContainer:
         self.member_left_notify = member_left_notify
         self.anti_bot_service = anti_bot_service
         self.navigator = navigator
+        self.yes_no_factory = yes_no_factory
 
 
 class AppContainer:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import discord
 
 from modules.buttons.other_buttons.back import BackButton
+from services.factories.db_factory.db_scenario_factory import DBFactory
 
 from services.yes_no_view.view.yes_no import YesNoView
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
@@ -18,7 +19,8 @@ if TYPE_CHECKING:
 
 
 class ChoiceHandler:
-    def __init__(self, yes_no_factory: 'YesNoViewFactory'):
+    def __init__(self, db_factory: DBFactory, yes_no_factory: YesNoViewFactory):
+        self.db_factory = db_factory
         self.yes_no_factory = yes_no_factory
 
     async def choice_procedure(
@@ -60,7 +62,7 @@ class ChoiceHandler:
 
 
 class SettingSelector(discord.ui.Select):
-    def __init__(self, yes_no_factory: 'YesNoViewFactory'):
+    def __init__(self, db_factory: DBFactory, yes_no_factory: YesNoViewFactory):
         super().__init__(
             placeholder='Please select a setting to edit...',
             options=[
@@ -74,7 +76,10 @@ class SettingSelector(discord.ui.Select):
             max_values=1
         )
 
-        self.choice_handler = ChoiceHandler(yes_no_factory=yes_no_factory)
+        self.choice_handler = ChoiceHandler(
+            db_factory=db_factory,
+            yes_no_factory=yes_no_factory
+        )
 
     async def callback(
             self,
@@ -98,20 +103,24 @@ class SettingSelector(discord.ui.Select):
 
 
 class SettingSelectorView(discord.ui.View):
-    def __init__(self, navigator: Navigator, yes_no_factory: 'YesNoViewFactory'):
+    def __init__(
+            self,
+            navigator: Navigator,
+            db_factory: DBFactory,
+            yes_no_factory: YesNoViewFactory
+    ):
         super().__init__(timeout=None)
 
-        self.add_item(SettingSelector())
+        self.add_item(SettingSelector(
+            db_factory=db_factory,
+            yes_no_factory=yes_no_factory
+        ))
         self.add_item(BackButton(target='admin_menu', navigator=navigator))
 
 
 class SettingsFormatter:
-
     @staticmethod
-    async def format_settings(interaction: discord.Interaction) -> None:
+    async def format_settings(interaction: discord.Interaction) -> str:
         scenario = ResultFactory.for_settings_edit()
-        summary_result = scenario.build_result(interaction=interaction)
-
-        await interaction.edit_original_response(
-            content=f'\n\n{summary_result}\n\n'  # TODO: зробити embed
-        )
+        summary_result = await scenario.build_result(interaction=interaction)
+        return f'\n\n{summary_result}\n\n'

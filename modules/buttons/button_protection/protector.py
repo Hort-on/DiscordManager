@@ -18,7 +18,7 @@ class ButtonPermissionService:
 
         if scope == 'admin':
             return self.admin_service.is_superuser(
-                guild_id=interaction.guild_id,
+                guild=interaction.guild,
                 user_id=interaction.user.id
             )
 

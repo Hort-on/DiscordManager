@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 class FirewallButton(discord.ui.Button):
     scope: str = 'user'
+    use_modal = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,9 +21,9 @@ class FirewallButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         controller: BotContainer = AppContainer.get()
         button_permission = ButtonPermissionService(controller.settings)
-
-        if not interaction.response.is_done():
-            await interaction.response.defer(ephemeral=True)
+        if not self.use_modal:
+            if not interaction.response.is_done():
+                await interaction.response.defer(ephemeral=True)
 
         if not button_permission.has_access(
                 interaction=interaction,

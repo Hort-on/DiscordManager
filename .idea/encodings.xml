@@ -30,6 +30,8 @@
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/choice_handler.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/settings_formater.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/settings_selection.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/superusers_buttons/buttons.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/superusers_buttons/modals.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/superusers_buttons/modals/add_superusers.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/superusers_buttons/services.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/superusers_buttons/services/add_superuser_service.py" charset="UTF-8" />

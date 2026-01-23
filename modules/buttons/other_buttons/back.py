@@ -17,6 +17,6 @@ class BackButton(discord.ui.Button):
         self.target = target
         self.navigator = navigator
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer(ephemeral=True)
         await self.navigator.go(target=self.target, interaction=interaction)

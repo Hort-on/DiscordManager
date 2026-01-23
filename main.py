@@ -17,6 +17,7 @@ from modules.management.verification.service import AntiBotService
 
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.logger.logger import Logger
+from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -40,6 +41,8 @@ async def main():
 
     navigator = Navigator()
 
+    yes_no_factory = YesNoViewFactory()
+
     container = BotContainer(
         bot=bot,
         db_connect=db_connect,
@@ -50,11 +53,17 @@ async def main():
         bad_words_handler=bad_words_handler,
         member_left_notify=member_left_notify,
         anti_bot_service=anti_bot_service,
-        navigator=navigator
+        navigator=navigator,
+        yes_no_factory=yes_no_factory
     )
 
     navigator.container = container
-    BotController(bot=bot, settings=settings, db_factory=db_factory)
+    BotController(
+        bot=bot,
+        settings=settings,
+        db_factory=db_factory,
+        yes_no_factory=yes_no_factory
+    )
 
     AppContainer.set(container)
 

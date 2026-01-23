@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import discord
 
-from core.container import BotContainer
 from database.settings_storage.settings import SettingsStorage
 from modules.management.events.member_left import MemberLeftNotification
 from services.factories.db_factory.db_scenario_factory import DBFactory
@@ -8,14 +9,24 @@ from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.other_services.ask_user_birthday import UserBirthdayService
 # from services.utils.bad_words import invitation_pattern
 
-from modules.management.verification.check_verification import CheckVerification
+# from modules.management.verification.check_verification import CheckVerification
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
 
 
 class BotController:
-    def __init__(self, bot, settings: SettingsStorage, db_factory: DBFactory):
+    def __init__(
+            self,
+            bot,
+            settings: SettingsStorage,
+            db_factory: DBFactory,
+            yes_no_factory: YesNoViewFactory
+    ):
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
+        self.yes_no_factory = yes_no_factory
 
         bot.add_listener(self.on_ready, name='on_ready')
         bot.add_listener(self.on_message, name='on_message')
@@ -27,7 +38,7 @@ class BotController:
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:
         print(f'Ми приєдналися як {self.bot.user.name}')
-        await CheckVerification(parent=self).prepare()
+        # await CheckVerification(parent=self).prepare()
 
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import discord
 
 from core.container import AppContainer
@@ -8,7 +10,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import BotContainer
 
 
 class FormatResultBaseScenario:
@@ -19,11 +21,11 @@ class FormatResultBaseScenario:
 
 class EditSettingsResultScenario(FormatResultBaseScenario):
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
+        controller: BotContainer = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
 
-    async def build_result(self, interaction: discord.Interaction) -> None:
+    async def build_result(self, interaction: discord.Interaction) -> str:
         lines: list[str] = ['Your current settings:\n']
 
         settings = self.settings.dict_storage.for_dict_get_all(
@@ -32,10 +34,7 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
         )
 
         if not settings:
-            await interaction.edit_original_response(
-                content='0'
-            )
-            return
+            return 'No settings found.'
 
         for key, value in settings.items():
             status = '✅ Enabled' if value else '❌ Disabled'
@@ -43,7 +42,8 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
 
         self._append_superusers(interaction, lines)
         await self._append_channels(interaction, lines)
-        await self._send_result(interaction, lines)
+
+        return '\n'.join(lines)
 
     def _append_superusers(self, interaction, lines):
         users = self.settings.set_storage.for_set_get(
@@ -75,10 +75,3 @@ class EditSettingsResultScenario(FormatResultBaseScenario):
             status = channel.name if channel is not None else '❌ Not assigned'
             ch_name = key.replace('_channel_id', ' channel')
             lines.append(f'-> {ch_name}: {status}')
-
-    @staticmethod
-    async def _send_result(interaction: discord.Interaction, lines) -> None:
-        result_msg = '\n'.join(lines)
-        await interaction.edit_original_response(
-            content='1'
-        )
