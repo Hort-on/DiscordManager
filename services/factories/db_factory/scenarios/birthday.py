@@ -76,9 +76,9 @@ class ExistBirthdayCheckScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'SELECT 1 FROM {table} WHERE user_id = ? AND guild_id = ? LIMIT 1'
 
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.user_id, self.guild_id))
-            return await cursor.fetchone() is not None
+        async with self.db_connect.connect() as conn:
+            async with conn.execute(query, (self.user_id, self.guild_id)) as cursor:
+                return await cursor.fetchone() is not None
 
 
 class GetTodayBirthdayScenario(DataBaseScenario):
@@ -102,9 +102,9 @@ class GetTodayBirthdayScenario(DataBaseScenario):
         query = f"""SELECT user_id FROM {table} WHERE guild_id = ?
                 AND birthday = ? AND (last_congrats IS NULL OR last_congrats != ?)"""
 
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.guild_id, self.today, self.today))
-            return await cursor.fetchall()
+        async with self.db_connect.connect() as conn:
+            async with conn.execute(query, (self.guild_id, self.today, self.today)) as cursor:
+                return await cursor.fetchall()
 
 
 class UpdateLastCongratsScenario(DataBaseScenario):

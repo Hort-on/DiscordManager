@@ -42,7 +42,6 @@ class BotController:
 
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()
-
         await self.settings.load_all_settings()
 
     async def on_message(self, message) -> None:

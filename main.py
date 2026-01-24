@@ -32,6 +32,7 @@ async def main():
     logger = Logger()
 
     db_connect = DB(logger=logger, path=DB_PATH)
+    await db_connect.init_tables()
     db_factory = DBFactory(db_connect=db_connect, logger=logger)
 
     settings = SettingsStorage(bot=bot, db_factory=db_factory)

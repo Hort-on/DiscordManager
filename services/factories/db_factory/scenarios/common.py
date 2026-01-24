@@ -27,13 +27,13 @@ class GetDataScenario(DataBaseScenario):
         columns_sql = ', '.join(self.columns) if self.columns else '*'
         query = f'SELECT {columns_sql} FROM {table} WHERE guild_id = ?'
 
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.guild_id,))
+        async with self.db_connect.connect() as conn:
+            async with conn.execute(query, (self.guild_id,)) as cursor:
 
-            col_names = [desc[0] for desc in cursor.description]
-            row = await cursor.fetchone()
+                col_names = [desc[0] for desc in cursor.description]
+                row = await cursor.fetchone()
 
-            return dict(zip(col_names, row)) if row else None
+                return dict(zip(col_names, row)) if row else None
 
 
 class WriteDataScenario(DataBaseScenario):
@@ -162,15 +162,15 @@ class FetchAllDataScenario(DataBaseScenario):
         table = self._get_table(self.table_name)
         query = f'SELECT * FROM {table} WHERE guild_id = ?'
 
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.guild_id,))
-            columns = [desc[0] for desc in cursor.description]
-            rows = await cursor.fetchall()
+        async with self.db_connect.connect() as conn:
+            async with conn.execute(query, (self.guild_id,)) as cursor:
+                columns = [desc[0] for desc in cursor.description]
+                rows = await cursor.fetchall()
 
-            if not rows:
-                return []
+                if not rows:
+                    return []
 
-            return [dict(zip(columns, row)) for row in rows]
+                return [dict(zip(columns, row)) for row in rows]
 
 
 class InitGuildScenario(DataBaseScenario):

@@ -52,7 +52,7 @@ class EditSettingsResultScenario:
         lines.append('\nSuperusers:')
 
         if not users:
-            lines.append('-> not assigned')
+            lines.append('❌ NOT ASSIGNED')
 
             result = self._append_channels(interaction=interaction, lines=lines)
             return result
@@ -73,13 +73,16 @@ class EditSettingsResultScenario:
 
         lines.append('\n Channels:')
 
-        for key, value in current_selected_channels.items():
-            channel = interaction.client.get_channel(value)
-            status = channel.name if channel is not None else '❌ Not assigned'
-            ch_name = key.replace('_channel_id', ' channel')
-            lines.append(f'-> {ch_name}: {status}')
+        if current_selected_channels:
+            for key, value in current_selected_channels.items():
+                channel = interaction.client.get_channel(value)
+                status = channel.name if channel is not None else '❌ NOT ASSIGNED'
+                ch_name = key.replace('_channel_id', ' channel')
+                lines.append(f'-> {ch_name}: {status}')
+        else:
+            lines.append('❌ NOT ASSIGNED')
 
-        final_result = '\n' + '-> '.join(lines)
+        final_result = '\n'.join(lines)
 
         embed = InfoEmbed(
             description=final_result
