@@ -27,6 +27,7 @@
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/delete_message_buttons/delete_any_message/service/DeleteMessageService.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/delete_message_buttons/modals/del_msg.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/delete_message_buttons/modals/del_msg_from_user.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/choice_handler.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/settings_formater.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/for_admins/edit_settings_buttons/services/settings_selection.py" charset="UTF-8" />
@@ -86,7 +87,8 @@
     <file url="file://$PROJECT_DIR$/services/utils/channels_permissions.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/utils/messages.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/utils/option_list.py" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/services/yes_no_view" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/yes_no_view/view/yes_no.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/yes_no_service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/yes_no_service/yes_no_view.py" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/yes_no_service/yes_no_view.py" charset="windows-1251" />
   </component>
 </project>

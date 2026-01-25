@@ -1,16 +1,22 @@
+from __future__ import annotations
+
 import discord
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from services.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
-from services.yes_no_view.view.yes_no import YesNoView
-from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
+from services.yes_no_service.yes_no_view import YesNoView
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 class AntiBotService:
-    def __init__(self, settings: SettingsStorage):
+    def __init__(self, settings: SettingsStorage, yes_no_factory: YesNoViewFactory):
         self.settings = settings
+        self.yes_no_factory = yes_no_factory
         self.users_count: dict[tuple[int, int], int] = {}
 
     async def check_the_word(self, interaction: discord.Interaction, word: str):
@@ -78,7 +84,7 @@ class AntiBotService:
             ephemeral=True
         )
 
-        scenario = YesNoViewFactory.for_birthday()
+        scenario = self.yes_no_factory.for_birthday()
         view = YesNoView(
             scenario=scenario
         )

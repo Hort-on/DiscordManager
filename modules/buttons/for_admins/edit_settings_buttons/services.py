@@ -2,25 +2,37 @@ from __future__ import annotations
 
 import discord
 
-from modules.buttons.other_buttons.back import BackButton
-from services.factories.db_factory.db_scenario_factory import DBFactory
+from core.container import AppContainer, BotContainer
 
-from services.yes_no_view.view.yes_no import YesNoView
+from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
+
+from modules.buttons.other_buttons.back import BackButton
+
+from services.yes_no_service.yes_no_view import YesNoView
+from services.embed_constructor.embed_constructor import InfoEmbed, WarningEmbed
+from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
 from services.other_services.get_channel import ChannelSelectorManager
-from services.utils.format_result.scenarios_factory import ResultFactory
 from services.utils.messages import EDIT_CONFIG_MSGS, SYSTEM_MSGS
 from services.utils.option_list import SETTINGS_OPTIONS
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
+    from services.yes_no_service.yes_no_factory import YesNoViewFactory
     from modules.buttons.navigator import Navigator
 
 
 class ChoiceHandler:
-    def __init__(self, db_factory: DBFactory, yes_no_factory: YesNoViewFactory):
+    def __init__(
+            self,
+            db_factory: DBFactory,
+            navigator: Navigator,
+            yes_no_factory: YesNoViewFactory
+    ):
         self.db_factory = db_factory
+        self.navigator = navigator
         self.yes_no_factory = yes_no_factory
 
     async def choice_procedure(
@@ -28,21 +40,31 @@ class ChoiceHandler:
             interaction: discord.Interaction,
             option_type: str,
             config_key: str
-    ) -> None:
-
+    ):
+        print('Ми у ChoiceHandler перед матч кейсами')
         match option_type:
             case 'boolean':
-                scenario = self.yes_no_factory.for_confirmation(config_key=config_key)
+                print('Кейс boolean')
+                scenario = self.yes_no_factory.for_confirmation(
+                    db_factory=self.db_factory,
+                    navigator=self.navigator,
+                    config_key=config_key
+                )
 
-                view = YesNoView(scenario=scenario)
+                message = (EDIT_CONFIG_MSGS.get('editing_feature_msg')
+                           .format(feature={config_key.replace('_', ' ').title()}))
+
+                return YesNoView(scenario=scenario)
 
                 await interaction.edit_original_response(
                     content=EDIT_CONFIG_MSGS.get('editing_feature_msg').format(
                         feature={config_key.replace('_', ' ').title()}),
                     view=view
                 )
+                print('Кінець кейсу boolean')
 
             case 'channel':
+                print('Кейс channel')
                 scenario = ChannelFactory.for_db_save(
                     config_key=config_key
                 )
@@ -52,9 +74,11 @@ class ChoiceHandler:
                     text_only=True
                 )
 
-                await manager.select_channel_type(interaction=interaction)
+                await manager.select_channel_type()
+                return ''
 
             case _:
+                print('Інший кейс')
                 await interaction.edit_original_response(
                     content=SYSTEM_MSGS.get('failure_msg')
                 )
@@ -62,7 +86,12 @@ class ChoiceHandler:
 
 
 class SettingSelector(discord.ui.Select):
-    def __init__(self, db_factory: DBFactory, yes_no_factory: YesNoViewFactory):
+    def __init__(
+            self,
+            db_factory: DBFactory,
+            navigator: Navigator,
+            yes_no_factory: YesNoViewFactory
+    ):
         super().__init__(
             placeholder='Please select a setting to edit...',
             options=[
@@ -78,6 +107,7 @@ class SettingSelector(discord.ui.Select):
 
         self.choice_handler = ChoiceHandler(
             db_factory=db_factory,
+            navigator=navigator,
             yes_no_factory=yes_no_factory
         )
 
@@ -85,13 +115,12 @@ class SettingSelector(discord.ui.Select):
             self,
             interaction: discord.Interaction
     ) -> None:
-
         config_key = self.values[0]
         option_type = SETTINGS_OPTIONS.get(config_key)
 
         if not option_type:
             await interaction.edit_original_response(
-                content=''   # TODO: ������� embed
+                content=''  # TODO: зробити embed
             )
             return
 
@@ -113,14 +142,75 @@ class SettingSelectorView(discord.ui.View):
 
         self.add_item(SettingSelector(
             db_factory=db_factory,
+            navigator=navigator,
             yes_no_factory=yes_no_factory
         ))
         self.add_item(BackButton(target='admin_menu', navigator=navigator))
 
 
+class EditSettingsResultScenario:
+    def __init__(self):
+        controller: BotContainer = AppContainer.get()
+        self.settings: SettingsStorage = controller.settings
+
+    async def build_result(self, interaction: discord.Interaction) -> discord.Embed:
+        settings = self.settings.dict_storage.for_dict_get_all(
+            target=StorageTarget.SETTINGS,
+            guild_id=interaction.guild_id
+        )
+
+        if not settings:
+            return WarningEmbed(description='No settings found.')
+        lines: list[str] = ['Setting                  Status', '-----------------------  ----------']
+        # ---- SETTINGS TABLE ----
+
+        for key, value in settings.items():
+            if key == 'guild_id':
+                continue
+            status = '✅ Enabled' if value else '❌ Disabled'
+            lines.append(f'🔸{key:<23}:  {status}')
+
+        # ---- SUPERUSERS ----
+        lines.append('')
+        lines.append('Superusers:')
+        users = self.settings.set_storage.for_set_get(
+            StorageTarget.SUPERUSERS,
+            interaction.guild_id
+        )
+
+        if not users:
+            lines.append('❌ not assigned')
+        else:
+            for user_id in users:
+                member = interaction.guild.get_member(user_id)
+                name = member.display_name if member else f'Unknown ({user_id})'
+                lines.append(f'🔸 {name}')
+
+        # ---- CHANNELS ----
+        lines.append('')
+        lines.append('Channels:')
+
+        current_selected_channels = self.settings.dict_storage.for_dict_get_all(
+            StorageTarget.SELECTED_CHANNELS,
+            interaction.guild_id
+        )
+
+        if not current_selected_channels:
+            lines.append('❌ NOT ASSIGNED')
+        else:
+            for key, value in current_selected_channels.items():
+                channel = interaction.client.get_channel(value)
+                channel_name = channel.name if channel else '❌ Not assigned'
+                ch_label = key.replace('_channel_id', '')
+                lines.append(f'🔸 {ch_label}: {channel_name}')
+
+        description = '```text\n' + '\n'.join(lines) + '\n```'
+
+        return InfoEmbed(description=description)
+
+
 class SettingsFormatter:
     @staticmethod
     async def format_settings(interaction: discord.Interaction) -> discord.Embed:
-        scenario = ResultFactory.for_settings_edit()
-        embed = await scenario.build_result(interaction=interaction)
+        embed = await EditSettingsResultScenario().build_result(interaction=interaction)
         return embed

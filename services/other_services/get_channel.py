@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import discord
 
 from core.container import AppContainer
@@ -10,9 +12,8 @@ from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import BotContainer
 
 
 class ChannelSelectorManager:
@@ -24,14 +25,14 @@ class ChannelSelectorManager:
     ):
         super().__init__(timeout=60)
 
-        controller: 'BotController' = AppContainer.get()
+        controller: BotContainer = AppContainer.get()
 
         self.settings: SettingsStorage = controller.settings
         self.scenario = scenario
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only
 
-    async def select_channel_type(self, interaction: discord.Interaction):
+    async def select_channel_type(self):
         type_options = []
 
         if not self.channels_with_users_only:
@@ -50,15 +51,10 @@ class ChannelSelectorManager:
                 )
             )
 
-        view = DropMenuView(
+        return DropMenuView(
             options=type_options,
             placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
             callback=self._select_channel
-        )
-
-        await interaction.edit_original_response(
-            content='',
-            view=view
         )
 
     async def _select_channel(
@@ -87,7 +83,7 @@ class ChannelSelectorManager:
                 content='No channels found',
                 view=None
             )
-            return
+            return ''
 
         channel_options = [
             discord.SelectOption(
@@ -97,15 +93,10 @@ class ChannelSelectorManager:
             for channel in channels if channel.id not in hidden_channels
         ]
 
-        view = DropMenuView(
+        return DropMenuView(
             options=channel_options,
             placeholder='',
             callback=self._save_channel
-        )
-
-        await interaction.edit_original_response(
-            content='',
-            view=view
         )
 
     async def _save_channel(
@@ -118,15 +109,8 @@ class ChannelSelectorManager:
         channel = interaction.client.get_channel(channel_id)
 
         if not channel:
-            await interaction.edit_original_response(
-                content='Channel not found',
-                view=None
-            )
-            return
+            return ''
 
         await self.scenario.on_channel_selected(interaction, channel=channel)
 
-        await interaction.edit_original_response(
-            content=f'```Selected channel: {channel.name}```',
-            view=None
-        )
+        return f'```Selected channel: {channel.name}```'

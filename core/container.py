@@ -16,8 +16,7 @@ if TYPE_CHECKING:
 
     from services.factories.db_factory.db_scenario_factory import DBFactory
     from services.logger.logger import Logger
-
-    from services.yes_no_view.yes_no_view_factory.yes_no_factory import YesNoViewFactory
+    from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 class BotContainer:

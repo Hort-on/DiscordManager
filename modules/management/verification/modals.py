@@ -1,20 +1,23 @@
-import discord
+from __future__ import annotations
 
-from core.container import AppContainer
+import discord
 
 from modules.management.verification.service import AntiBotService
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import AppContainer, BotContainer
 
 
 class AgreeModal(discord.ui.Modal, title='Anti-bot check'):
     def __init__(self):
         super().__init__()
-        controller: 'BotController' = AppContainer.get()
-        self.anti_bot_check = AntiBotService(controller.settings)
+        controller: BotContainer = AppContainer.get()
+        self.anti_bot_check = AntiBotService(
+            settings=controller.settings,
+            yes_no_factory=controller.yes_no_factory
+        )
 
     check_word = discord.ui.TextInput(
         label='Please write the word "Hello"',
