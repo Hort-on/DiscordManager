@@ -3,6 +3,7 @@ import discord
 from discord.ui import View
 
 
+# TODO: оепепнахрх же бяе мют╡ц
 class YesNoView(View):
     def __init__(self, scenario):
         super().__init__(timeout=60)

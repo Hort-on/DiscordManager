@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import traceback
-
 import discord
 
 from discord import app_commands
@@ -12,7 +10,7 @@ from core.container import AppContainer
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from core.container import BotContainer
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class ManagementCog(commands.Cog):
@@ -24,14 +22,18 @@ class ManagementCog(commands.Cog):
         description='Opens management panel'
     )
     async def management(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        try:
-            await self.navigator.go(
-                target='main_menu',
-                interaction=interaction
-            )
-        except Exception as e:
-            traceback.print_exc()
+        # await interaction.response.defer(ephemeral=True)
+        render = self.navigator.go(
+            target='main_menu',
+            guild=interaction.guild,
+            user_id=interaction.user.id
+        )
+
+        await interaction.response.edit_message(
+            content=render.content,
+            embed=render.embed,
+            view=render.view
+        )
 
 
 async def setup(bot):

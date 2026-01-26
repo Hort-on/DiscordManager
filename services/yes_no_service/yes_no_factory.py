@@ -5,7 +5,7 @@ from services.yes_no_service.yes_no_scenarios import ConfirmationScenario, ForBi
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class YesNoViewFactory:

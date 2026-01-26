@@ -53,7 +53,6 @@
     <file url="file://$PROJECT_DIR$/modules/buttons/for_users/randomizer/services/words.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/main_button_view.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/modals" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/modules/buttons/navigator.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/other_buttons/back.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/services/for_admins" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/buttons/services/for_users" charset="UTF-8" />
@@ -76,6 +75,7 @@
     <file url="file://$PROJECT_DIR$/modules/management/verification/check_verification.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/modules/management/verification/service.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/requirements.txt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/services/buttons/navigator.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/channel_scenarios.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/channel_factory/scenarios_factory.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/factories/role_manager_factory/role_factory_scenario.py" charset="windows-1251" />
@@ -88,7 +88,6 @@
     <file url="file://$PROJECT_DIR$/services/utils/messages.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/utils/option_list.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/yes_no_service" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/services/yes_no_service/yes_no_view.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/services/yes_no_service/yes_no_view.py" charset="windows-1251" />
   </component>
 </project>

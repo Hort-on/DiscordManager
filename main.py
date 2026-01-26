@@ -11,7 +11,7 @@ from core.controller import BotController
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
-from modules.buttons.navigator import Navigator
+from services.buttons.navigator import Navigator
 from modules.management.birthdays.birthday_manager import BirthdayManager
 from modules.management.events.member_left import MemberLeftNotification
 from modules.management.message_handler.bad_words_handler import BadWordsHandler

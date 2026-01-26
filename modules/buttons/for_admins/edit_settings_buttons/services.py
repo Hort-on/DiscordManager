@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.yes_no_service.yes_no_factory import YesNoViewFactory
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class ChoiceHandler:

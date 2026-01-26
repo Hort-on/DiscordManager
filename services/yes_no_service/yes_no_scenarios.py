@@ -10,7 +10,7 @@ from services.utils.messages import EDIT_CONFIG_MSGS as ECM
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
     from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 

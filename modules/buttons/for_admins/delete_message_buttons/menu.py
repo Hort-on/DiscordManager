@@ -7,7 +7,7 @@ from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMs
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class DeleteMsgMenuButton(FirewallButton):

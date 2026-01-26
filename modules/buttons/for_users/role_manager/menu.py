@@ -7,7 +7,7 @@ from modules.buttons.button_protection.admin_buttons_protection import FirewallB
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class RoleManagerMenuButton(FirewallButton):

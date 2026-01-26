@@ -7,7 +7,7 @@ from modules.buttons.other_buttons.back import BackButton
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class RoleManagerView(discord.ui.View):

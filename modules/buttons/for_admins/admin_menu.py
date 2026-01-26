@@ -4,10 +4,11 @@ import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 
-from typing import TYPE_CHECKING
+from services.buttons.navigator_context import NavigationContext
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from modules.buttons.navigator import Navigator
+    from services.buttons.navigator import Navigator
 
 
 class AdminMenuButton(FirewallButton):
@@ -21,9 +22,18 @@ class AdminMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
-        print('ми на початку callback y Admin menu')
-        await self.navigator.go(
-            target='admin_menu',
-            interaction=interaction
+        context = NavigationContext()
+
+        params = {
+            'guild_id': interaction.guild_id
+        }
+
+        context.push(target='main_menu', params=params)
+
+        render = self.navigator.go(target='admin_menu', **params)
+
+        render.view.context = context
+
+        await interaction.response.edit_message(
+            view=render.view
         )
-        print('ми у кінці callback y Admin menu')
