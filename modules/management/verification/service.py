@@ -74,7 +74,7 @@ class AntiBotService:
         self.users_count.pop((interaction.user.id, interaction.guild_id), None)
 
         if interaction.response.is_done():
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 embed=success_embed,
             )
             return

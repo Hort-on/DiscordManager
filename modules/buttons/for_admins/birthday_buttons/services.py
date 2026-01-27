@@ -33,13 +33,13 @@ class AddBirthdayService:
         )
 
         if member is None:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='```❌ User not found. Please check username.```',
             )
             return
 
         if not AddBirthdayService._is_valid_date(birthday):
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='```❌ Invalid date format. Use DD.MM```',
             )
             return
@@ -78,7 +78,7 @@ class DeleteBirthdayService:
         )
 
         if member is None:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='❌ User not found. Check username.',
             )
             return
@@ -90,4 +90,4 @@ class DeleteBirthdayService:
             guild_id=interaction.guild.id
         )
 
-        await interaction.edit_original_response(content=response)
+        await interaction.response.edit_message(content=response)

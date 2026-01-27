@@ -34,14 +34,14 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
         result = await write_data_scenario.db_proceed()
 
         if result:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=DB_MSGS.get('channel_successful_msg')
             )
 
             await self._send_dm_to_user(interaction)
             return
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=SYSTEM_MSGS.get('failure_msg')
         )
 
@@ -82,12 +82,12 @@ class SaveChannelToDBScenario(ChannelScenario):
 
         result = await write_data_scenario.db_proceed()
         if result:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=DB_MSGS.get('channel_successful_msg')
             )
             return
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=SYSTEM_MSGS.get('failure_msg')
         )
 

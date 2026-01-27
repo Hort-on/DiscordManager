@@ -23,9 +23,9 @@ class DeleteMsgMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        context = NavigationContext()
+        context = getattr(self.view, 'context', NavigationContext())
 
-        context.back_view(target='admin_menu', params={'guild_id': interaction.guild_id})
+        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
 
         view = self.navigator.go(target='delete_msg_menu')
 

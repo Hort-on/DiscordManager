@@ -130,7 +130,7 @@ class AddSuperusersService(BaseSuperuserService):
             interaction: discord.Interaction,
             embed: discord.Embed
     ) -> None:
-        await interaction.edit_original_response(embed=embed)
+        await interaction.response.edit_message(embed=embed)
 
     @staticmethod
     def _build_embed(added_users: str, not_found_users: str, already_super: str) -> discord.Embed:  # TODO: Використовувати загальний шаблон
@@ -202,7 +202,7 @@ class DeleteSuperuserService(BaseSuperuserService):
             callback=self._delete_superuser_callback
         )
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content='',
             view=view
         )
@@ -299,7 +299,7 @@ class DeleteSuperuserService(BaseSuperuserService):
             )
 
         embeds_to_send = [embed for embed in [success_embed, info_embed] if embed is not None]
-        await interaction.edit_original_response(embeds=embeds_to_send)
+        await interaction.response.edit_message(embeds=embeds_to_send)
 
 
 class GetSuperusersList(BaseSuperuserService):

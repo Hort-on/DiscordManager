@@ -8,7 +8,6 @@ class Navigator:
     def go(self, target: str, **params):
         match target:
             case 'main_menu':
-                print('Ми у кейсі: main_menu')
                 return self._main_menu_view(**params)
 
             case 'admin_menu':
@@ -44,7 +43,6 @@ class Navigator:
 
     def _main_menu_view(self, *, guild: discord.Guild, user_id: int):
         from modules.buttons.main_button_view import MainMenuView
-        print('Створення MainMenuView')
         return MainMenuView(
                 navigator=self,
                 guild=guild,

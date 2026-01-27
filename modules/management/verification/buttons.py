@@ -8,7 +8,6 @@ from services.embed_constructor.embed_constructor import InfoEmbed
 
 class AgreeButton(FirewallButton):
     scope = 'user'
-    use_modal = True
 
     def __init__(self):
         super().__init__(

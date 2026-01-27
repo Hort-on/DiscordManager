@@ -80,7 +80,7 @@ class ChoiceHandler:
 
             case _:
                 print('Інший кейс')
-                await interaction.edit_original_response(
+                await interaction.response.edit_message(
                     content=SYSTEM_MSGS.get('failure_msg')
                 )
                 return
@@ -120,7 +120,7 @@ class SettingSelector(discord.ui.Select):
         option_type = SETTINGS_OPTIONS.get(config_key)
 
         if not option_type:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=''  # TODO: зробити embed
             )
             return

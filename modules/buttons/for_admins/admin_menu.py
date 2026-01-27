@@ -22,17 +22,18 @@ class AdminMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
-        context = NavigationContext()
+        context = getattr(self.view, 'context', NavigationContext())
 
-        params_main = {
-            'guild': interaction.guild,
-            'user_id': interaction.user.id
-        }
+        context.push(
+            target='main_menu',
+            params={
+                'guild': interaction.guild,
+                'user_id': interaction.user.id
+            }
+        )
 
-        context.back_view(target='main_menu', params=params_main)
-
-        view = self.navigator.go(target='admin_menu', params={'guild_id': interaction.guild_id})
+        view = self.navigator.go(target='admin_menu', guild_id=interaction.guild_id)
 
         view.context = context
 
-        await interaction.edit_original_response(view=view)
+        await interaction.response.edit_message(view=view)

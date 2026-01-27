@@ -46,7 +46,7 @@ class ConfirmationScenario(BaseScenario):
 
         result = await write_data_scenario.db_proceed()
         if not result:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=ECM.get('failure_edit_msg' if not result else 'success_edit_msg'),
                 view=SettingSelectorView(
                     navigator=self.nafigator,

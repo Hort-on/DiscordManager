@@ -15,7 +15,7 @@ class RandomNumService:
         result = random.randint(first_num, second_num)
 
         view = ReshuffleView(self.random_num_proceed, first_num, second_num)
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=f'The number is: {result}',
             view=view
         )
@@ -32,7 +32,7 @@ class RandomWordService:
 
         view = ReshuffleView(self.random_word_proceed, words)
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=f'The word is: {result}',
             view=view
         )
@@ -69,7 +69,7 @@ class RandomTeamByMsgService:
         members = [m.strip() for m in users_list.split(',')]
 
         if teams_quantity > len(members):
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='```❌ Teams count cannot be greater than users count```',
             )
             return
@@ -89,7 +89,7 @@ class RandomTeamByMsgService:
             await interaction.followup.send(embed=embed, view=view, ephemeral=False)
             return
 
-        await interaction.edit_original_response(embed=embed, view=view)
+        await interaction.response.edit_message(embed=embed, view=view)
 
 
 class RandomTeamByChannelService:
@@ -123,7 +123,7 @@ class RandomTeamByChannelService:
         members = [m for m in channel.members if not m.bot]
 
         if teams_quantity > len(members):
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='```❌ Teams count cannot be greater than users count```',
             )
             return
@@ -143,4 +143,4 @@ class RandomTeamByChannelService:
             await interaction.followup.send(embed=embed, view=view, ephemeral=False)
             return
 
-        await interaction.edit_original_response(embed=embed, view=view)
+        await interaction.response.edit_message(embed=embed, view=view)

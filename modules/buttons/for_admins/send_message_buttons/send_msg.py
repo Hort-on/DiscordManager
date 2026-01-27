@@ -35,6 +35,4 @@ class SendMessageButton(FirewallButton):
             embed = WarningEmbed(
                 description='Please open your Direct Message'
             )
-            await interaction.edit_original_response(
-                embed=embed
-            )
+            await interaction.response.edit_message(embed=embed)

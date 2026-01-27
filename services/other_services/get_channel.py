@@ -80,7 +80,7 @@ class ChannelSelectorManager:
                 ]
 
         if not channels:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content='No channels found',
                 view=None
             )

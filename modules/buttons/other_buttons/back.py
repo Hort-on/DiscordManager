@@ -19,7 +19,6 @@ class BackButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         context = getattr(self.view, 'context', None)
-
         if context is None:
             return
 
@@ -30,8 +29,6 @@ class BackButton(discord.ui.Button):
         target, params = prev
 
         view = self.navigator.go(target, **params)
-
-        if view is not None:
-            view.context = context
+        view.context = context
 
         await interaction.response.edit_message(view=view)

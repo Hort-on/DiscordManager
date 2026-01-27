@@ -13,28 +13,26 @@ if TYPE_CHECKING:
 
 class FirewallButton(discord.ui.Button):
     scope: str = 'user'
-    use_modal = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.container: BotContainer = AppContainer.get()
 
     async def callback(self, interaction: discord.Interaction):
-        button_permission = ButtonPermissionService(self.container.settings)
-        if not self.use_modal:
-            if not interaction.response.is_done():
-                await interaction.response.defer(ephemeral=True)
+        permission = ButtonPermissionService(self.container.settings)
 
-        if not button_permission.has_access(
-                interaction=interaction,
-                scope=self.scope
+        if not permission.has_access(
+            interaction=interaction,
+            scope=self.scope
         ):
-            await interaction.edit_original_response(
-                content='⛔ You do not have permission'
+            await interaction.response.edit_message(
+                content='⛔ You do not have permission',
+                view=None
             )
             return
 
         await self.on_click(interaction)
 
-    async def on_click(self, interaction):
+    async def on_click(self, interaction: discord.Interaction):
         raise NotImplementedError
+

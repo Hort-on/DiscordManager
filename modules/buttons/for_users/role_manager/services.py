@@ -30,7 +30,7 @@ async def _build_and_send_result(
             description='\n' + '-> '.join(role_names)
         )
 
-        await interaction.edit_original_response(embed=embed)
+        await interaction.response.edit_message(embed=embed)
 
 
 class AddRoleService:
@@ -73,7 +73,7 @@ class AddRoleService:
             max_values=25
         )
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content='Please choose the roles you want to add:',
             view=view
         )
@@ -141,7 +141,7 @@ class RemoveRoleService:
             max_values=25
         )
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content='Please choose the roles you want to remove:',
             view=view
         )

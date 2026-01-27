@@ -9,7 +9,6 @@ from services.other_services.get_channel import ChannelSelectorManager
 
 class RandomNumButton(FirewallButton):
     scope = 'user'
-    use_modal = True
 
     def __init__(self):
         super().__init__(
@@ -23,7 +22,6 @@ class RandomNumButton(FirewallButton):
 
 class RandomWordButton(FirewallButton):
     scope = 'user'
-    use_modal = True
 
     def __init__(self):
         super().__init__(
@@ -37,7 +35,6 @@ class RandomWordButton(FirewallButton):
 
 class RandomTeamByMsg(FirewallButton):
     scope = 'user'
-    use_modal = True
 
     def __init__(self):
         super().__init__(

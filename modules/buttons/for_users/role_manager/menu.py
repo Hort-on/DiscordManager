@@ -23,14 +23,14 @@ class RoleManagerMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        context = NavigationContext()
+        context = getattr(self.view, 'context', NavigationContext())
 
         params_main = {
             'guild': interaction.guild,
             'user_id': interaction.user.id
         }
 
-        context.back_view(target='main_menu', params=params_main)
+        context.push(target='main_menu', params=params_main)
 
         view = self.navigator.go(
             target='role_manager_menu',

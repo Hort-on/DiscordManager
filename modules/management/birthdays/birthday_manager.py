@@ -32,14 +32,14 @@ class BirthdayManager:
         try:
             datetime.strptime(user_birthday, '%d.%m')
         except ValueError:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=GENERAL_MSGS.get('invalid_date_msg')
             )
             return
 
         member = interaction.guild.get_member(user_id)
         if not member:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=GENERAL_MSGS.get('user_not_found_msg')
             )
             return
@@ -50,7 +50,7 @@ class BirthdayManager:
 
         )
         if await exists_scenario.db_proceed():
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=BIRTHDAY_MSGS.get('user_exists_msg').format(member=member.display_name)
             )
             return
@@ -62,7 +62,7 @@ class BirthdayManager:
         )
 
         if await add_scenario.db_proceed():
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=BIRTHDAY_MSGS.get('success_msg').format(
                     member=member.display_name,
                     user_birthday=user_birthday
@@ -70,7 +70,7 @@ class BirthdayManager:
             )
             return
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=SYSTEM_MSGS.get('failure_msg')
         )
 
@@ -87,7 +87,7 @@ class BirthdayManager:
         )
 
         if not await exists_scenario.db_proceed():
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=DB_MSGS.get('user_not_found_msg').format(user_id=user_id)
             )
             return
@@ -98,12 +98,12 @@ class BirthdayManager:
         )
 
         if await delete_scenario.db_proceed():
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=DB_MSGS.get('delete_user_msg').format(user_id=user_id)
             )
             return
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=SYSTEM_MSGS.get('failure_msg')
         )
 

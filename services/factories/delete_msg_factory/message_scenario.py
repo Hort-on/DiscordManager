@@ -31,14 +31,14 @@ class DeleteMessageService(DeleteMessageBaseService):
         deleted = await self.channel.purge(limit=self.amount)
 
         if not deleted:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=SM.get('no_msg_found').format(
                     channel=self.channel.name
                 )
             )
             return
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=SM.get('success_message_delete_msg').format(
                 deleted=len(deleted),
                 channel=self.channel.name
@@ -74,7 +74,7 @@ class DeleteMessageFromUserService(DeleteMessageBaseService):
         )
 
         if not deleted:
-            await interaction.edit_original_response(
+            await interaction.response.edit_message(
                 content=SM.get('no_msg_found').format(
                     channel=self.channel.name
                 )
@@ -120,6 +120,6 @@ class DeleteMessageFromUserService(DeleteMessageBaseService):
             final_msg += "\n\nNot found users:\n"
             final_msg += "\n".join(f"-> {member}" for member in self.not_found_users)
 
-        await interaction.edit_original_response(
+        await interaction.response.edit_message(
             content=f'```{final_msg}```'
         )

@@ -7,7 +7,6 @@ from modules.buttons.for_admins.superusers_buttons.services import DeleteSuperus
 
 class AddSuperuserButton(FirewallButton):
     scope = 'admin'
-    use_modal = True
 
     def __init__(self):
         super().__init__(
@@ -48,4 +47,4 @@ class SuperusersListButton(FirewallButton):
 
     async def on_click(self, interaction: discord.Interaction):
         result = self.get_superuser_name.get_display(guild=interaction.guild)
-        await interaction.edit_original_response(content=result)
+        await interaction.response.edit_message(content=result)

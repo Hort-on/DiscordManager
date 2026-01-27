@@ -3,7 +3,6 @@ import discord
 from discord.ui import View
 
 
-# TODO: оепепнахрх же бяе мют╡ц
 class YesNoView(View):
     def __init__(self, scenario):
         super().__init__(timeout=60)
@@ -14,7 +13,7 @@ class YesNoView(View):
         for item in self.children:
             item.disabled = True
 
-        await interaction.edit_original_response(view=self)
+        await interaction.response.edit_message(view=self)
         await self.scenario.yes_no_proceed(interaction=interaction, value=True)
 
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
@@ -22,5 +21,5 @@ class YesNoView(View):
         for item in self.children:
             item.disabled = True
 
-        await interaction.edit_original_response(view=self)
+        await interaction.response.edit_message(view=self)
         await self.scenario.yes_no_proceed(interaction=interaction, value=False)

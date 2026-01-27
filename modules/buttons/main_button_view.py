@@ -27,17 +27,13 @@ class MainMenuView(discord.ui.View):
 
         container: BotContainer = AppContainer.get()
 
-        print('отримання супер користувачів у: MainMenuView')
         superusers = container.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild.id
         )
 
-        print('Додаємо кнопку: RandomMenuButton')
         self.add_item(RandomMenuButton(navigator=navigator))
-        print('Додаємо кнопку: RoleManagerMenuButton')
         self.add_item(RoleManagerMenuButton(navigator=navigator))
 
         if user_id in superusers or user_id == guild.owner_id:
-            print('Додаємо кнопку: AdminMenuButton')
             self.add_item(AdminMenuButton(navigator=navigator))

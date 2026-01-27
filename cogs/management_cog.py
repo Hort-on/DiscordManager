@@ -22,17 +22,16 @@ class ManagementCog(commands.Cog):
         description='Opens management panel'
     )
     async def management(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        print('ми у ManagementCog')
         view = self.navigator.go(
             target='main_menu',
             guild=interaction.guild,
             user_id=interaction.user.id
         )
-        print('зробили view')
 
-        await interaction.edit_original_response(view=view)
-        print('Відправили повідомлення')
+        await interaction.response.send_message(
+            view=view,
+            ephemeral=True
+        )
 
 
 async def setup(bot):
