@@ -12,6 +12,7 @@ from modules.buttons.for_users.randomizer.buttons import (
 from modules.buttons.other_buttons.back import BackButton
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
@@ -24,8 +25,5 @@ class RandomModeView(discord.ui.View):
         self.add_item(RandomWordButton())
         self.add_item(RandomTeamByMsg())
         self.add_item(RandomTeamByChannel())
-        self.add_item(BackButton(
-            target='main_menu',
-            navigator=navigator
-        ))
+        self.add_item(BackButton(navigator=navigator))
 

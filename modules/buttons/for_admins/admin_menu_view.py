@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import discord
 
-from core.container import BotContainer, AppContainer
+from core.container import AppContainer
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.for_admins.birthday_buttons.menu import BirthdayMenuButton
@@ -17,16 +17,18 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
+    from core.container import BotContainer
 
 
 class AdminMenuView(discord.ui.View):
     def __init__(
         self,
         navigator: Navigator,
-        guild_id: int,
-        container: BotContainer = AppContainer.get()
+        guild_id: int
     ):
         super().__init__(timeout=60)
+
+        container: BotContainer = AppContainer.get()
 
         config = container.settings.dict_storage.for_dict_get_all(
             target=StorageTarget.SETTINGS,

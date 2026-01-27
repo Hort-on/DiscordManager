@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import discord
 
 from core.container import AppContainer
@@ -9,14 +11,14 @@ from services.other_services.get_member_by_name import get_member_by_name
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import BotContainer
 
 
 class AddBirthdayService:
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
+        container: BotContainer = AppContainer.get()
 
-        self.birthday_manager: BirthdayManager = controller.birthday_manager
+        self.birthday_manager: BirthdayManager = container.birthday_manager
 
     async def add_process(
             self,
@@ -61,9 +63,9 @@ class AddBirthdayService:
 
 class DeleteBirthdayService:
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
+        container: BotContainer = AppContainer.get()
 
-        self.birthday_manager = controller.birthday_manager
+        self.birthday_manager = container.birthday_manager
 
     async def delete_process(
             self,

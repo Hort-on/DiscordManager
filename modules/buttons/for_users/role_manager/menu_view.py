@@ -6,6 +6,7 @@ from modules.buttons.for_users.role_manager.buttons import AddRoleButton, Remove
 from modules.buttons.other_buttons.back import BackButton
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
@@ -17,8 +18,5 @@ class RoleManagerView(discord.ui.View):
         self.add_item(AddRoleButton())
         self.add_item(RemoveRoleButton())
 
-        self.add_item(BackButton(
-            target='main_menu',
-            navigator=navigator
-        ))
+        self.add_item(BackButton(navigator=navigator))
 

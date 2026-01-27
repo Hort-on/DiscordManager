@@ -13,7 +13,6 @@ class AddRoleButton(FirewallButton):
         self.add_role = AddRoleService()
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
         await self.add_role.prepare_roles(interaction=interaction)
 
 
@@ -26,5 +25,4 @@ class RemoveRoleButton(FirewallButton):
         self.remove_role = RemoveRoleService()
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.defer(ephemeral=True)
         await self.remove_role.prepare_roles(interaction=interaction)

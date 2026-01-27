@@ -5,7 +5,7 @@ class NavigationContext:
     def __init__(self):
         self.stack: list[tuple[str, dict]] = []
 
-    def push(self, target: str, params: dict[str, Any]) -> None:
+    def back_view(self, target: str, params: dict[str, Any]) -> None:
         self.stack.append((target, params))
 
     def pop(self) -> tuple[str, dict] | None:

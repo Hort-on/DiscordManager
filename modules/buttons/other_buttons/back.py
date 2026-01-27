@@ -29,16 +29,9 @@ class BackButton(discord.ui.Button):
 
         target, params = prev
 
-        render = self.navigator.go(target, **params)
+        view = self.navigator.go(target, **params)
 
-        if render.view is not None:
-            render.view.context = context
+        if view is not None:
+            view.context = context
 
-        await interaction.response.edit_message(
-            content=render.content,
-            embed=render.embed,
-            view=render.view
-        )
-
-
-
+        await interaction.response.edit_message(view=view)

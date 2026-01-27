@@ -15,18 +15,16 @@ from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.other_services.get_member_by_name import get_member_by_name
 
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import BotContainer
 
 
 # TODO: Подумати щодо оптимізації
 class BaseSuperuserService:
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
-        self.settings: SettingsStorage = controller.settings
-        self.db_factory: DBFactory = controller.db_factory
+        container: BotContainer = AppContainer.get()
+        self.settings: SettingsStorage = container.settings
+        self.db_factory: DBFactory = container.db_factory
 
 
 class AddSuperusersService(BaseSuperuserService):

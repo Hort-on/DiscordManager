@@ -6,6 +6,7 @@ from modules.buttons.for_admins.birthday_buttons.buttons import AddBirthdayButto
 from modules.buttons.other_buttons.back import BackButton
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
@@ -16,4 +17,4 @@ class BirthdayMenuView(discord.ui.View):
 
         self.add_item(AddBirthdayButton())
         self.add_item(DeleteBirthdayButton())
-        self.add_item(BackButton(target='birthday_menu', navigator=navigator))
+        self.add_item(BackButton(navigator=navigator))

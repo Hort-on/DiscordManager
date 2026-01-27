@@ -17,10 +17,10 @@ class FirewallButton(discord.ui.Button):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.container: BotContainer = AppContainer.get()
 
     async def callback(self, interaction: discord.Interaction):
-        controller: BotContainer = AppContainer.get()
-        button_permission = ButtonPermissionService(controller.settings)
+        button_permission = ButtonPermissionService(self.container.settings)
         if not self.use_modal:
             if not interaction.response.is_done():
                 await interaction.response.defer(ephemeral=True)

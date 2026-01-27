@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 class EditSettingsResultScenario:
     def __init__(self):
-        controller: BotContainer = AppContainer.get()
-        self.settings: SettingsStorage = controller.settings
+        container: BotContainer = AppContainer.get()
+        self.settings: SettingsStorage = container.settings
 
     async def build_result(self, interaction: discord.Interaction) -> discord.Embed:
         settings = self.settings.dict_storage.for_dict_get_all(

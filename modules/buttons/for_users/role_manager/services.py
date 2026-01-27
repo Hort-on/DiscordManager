@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import discord
 
 from core.container import AppContainer
@@ -11,7 +13,7 @@ from services.embed_constructor.embed_constructor import SuccessEmbed
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.controller import BotController
+    from core.container import BotContainer
 
 
 async def _build_and_send_result(
@@ -33,9 +35,9 @@ async def _build_and_send_result(
 
 class AddRoleService:
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
+        container: BotContainer = AppContainer.get()
 
-        self.settings: SettingsStorage = controller.settings
+        self.settings: SettingsStorage = container.settings
 
     async def prepare_roles(self, interaction: discord.Interaction):
         hidden_roles = self.settings.set_storage.for_set_get(
@@ -103,9 +105,9 @@ class AddRoleService:
 
 class RemoveRoleService:
     def __init__(self):
-        controller: 'BotController' = AppContainer.get()
+        container: BotContainer = AppContainer.get()
 
-        self.settings: SettingsStorage = controller.settings
+        self.settings: SettingsStorage = container.settings
 
     async def prepare_roles(self, interaction: discord.Interaction):
         hidden_roles = self.settings.set_storage.for_set_get(

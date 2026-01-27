@@ -6,6 +6,8 @@ from modules.buttons.button_protection.admin_buttons_protection import FirewallB
 
 from typing import TYPE_CHECKING
 
+from services.buttons.navigator_context import NavigationContext
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
@@ -21,7 +23,17 @@ class RandomMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await self.navigator.go(
-            target='random_menu',
-            interaction=interaction
-        )
+        context = NavigationContext()
+
+        params_main = {
+            'guild': interaction.guild,
+            'user_id': interaction.user.id
+        }
+
+        context.back_view(target='main_menu', params=params_main)
+
+        view = self.navigator.go(target='random_menu')
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)

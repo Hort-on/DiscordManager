@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import discord
 
-from core.container import AppContainer, BotContainer
+from core.container import AppContainer
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from services.yes_no_service.yes_no_factory import YesNoViewFactory
     from services.buttons.navigator import Navigator
+    from core.container import BotContainer
 
 
 class ChoiceHandler:
@@ -145,13 +146,13 @@ class SettingSelectorView(discord.ui.View):
             navigator=navigator,
             yes_no_factory=yes_no_factory
         ))
-        self.add_item(BackButton(target='admin_menu', navigator=navigator))
+        self.add_item(BackButton(navigator=navigator))
 
 
 class EditSettingsResultScenario:
     def __init__(self):
-        controller: BotContainer = AppContainer.get()
-        self.settings: SettingsStorage = controller.settings
+        container: BotContainer = AppContainer.get()
+        self.settings: SettingsStorage = container.settings
 
     async def build_result(self, interaction: discord.Interaction) -> discord.Embed:
         settings = self.settings.dict_storage.for_dict_get_all(

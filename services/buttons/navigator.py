@@ -1,116 +1,96 @@
 import discord
 
-from services.buttons.render import Render
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 class Navigator:
-    def go(self, target: str, **params) -> Render:
+    def go(self, target: str, **params):
         match target:
             case 'main_menu':
-                return self._render_main_menu(**params)
+                print('Ми у кейсі: main_menu')
+                return self._main_menu_view(**params)
 
             case 'admin_menu':
-                return self._render_admin_menu(**params)
+                print('Ми у кейсі: admin_menu')
+                return self._admin_menu_view(**params)
 
             case 'edit_settings':
-                return self._render_edit_settings(**params)
+                print('Ми у кейсі: edit_settings')
+                return self._edit_settings_view(**params)
 
             case 'birthday_menu':
-                return self._render_birthday_menu()
+                print('Ми у кейсі: birthday_menu')
+                return self._birthday_menu_view()
 
             case 'delete_msg_menu':
-                return self._render_delete_msg_menu()
+                print('Ми у кейсі: delete_msg_menu')
+                return self._delete_msg_menu_view()
 
             case 'superusers_menu':
-                return self._render_superusers_menu()
+                print('Ми у кейсі: superusers_menu')
+                return self._superusers_menu_view()
 
             case 'random_menu':
-                return self._render_random_menu()
+                print('Ми у кейсі: random_menu')
+                return self._random_menu_view()
 
             case 'role_manager_menu':
-                return self._render_role_manager_menu()
+                print('Ми у кейсі: role_manager_menu')
+                return self._role_manager_menu_view()
 
             case _:
                 raise ValueError('Unknow target')
 
-    def _render_main_menu(
-            self,
-            *,
-            guild: discord.Guild,
-            user_id: int,
-    ) -> Render:
+    def _main_menu_view(self, *, guild: discord.Guild, user_id: int):
         from modules.buttons.main_button_view import MainMenuView
-
-        return Render(
-            view=MainMenuView(
+        print('Створення MainMenuView')
+        return MainMenuView(
                 navigator=self,
                 guild=guild,
                 user_id=user_id
             )
-        )
 
-    def _render_admin_menu(self, *, guild_id: int) -> Render:
+    def _admin_menu_view(self, *, guild_id: int):
         from modules.buttons.for_admins.admin_menu_view import AdminMenuView
+        print('Створення AdminMenuView')
+        return AdminMenuView(navigator=self, guild_id=guild_id)
 
-        return Render(
-            view=AdminMenuView(navigator=self, guild_id=guild_id))
-
-    def _render_edit_settings(
+    def _edit_settings_view(
             self,
             *,
             db_factory: DBFactory,
             yes_no_factory: YesNoViewFactory
-    ) -> Render:
+    ):
         from modules.buttons.for_admins.edit_settings_buttons.services import SettingSelectorView
-
-        return Render(
-            view=SettingSelectorView(
+        print('Створення SettingSelectorView')
+        return SettingSelectorView(
                 navigator=self,
                 db_factory=db_factory,
                 yes_no_factory=yes_no_factory
             )
-        )
 
-    def _render_birthday_menu(self):
+    def _birthday_menu_view(self):
         from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView
+        print('Створення BirthdayMenuView')
+        return BirthdayMenuView(navigator=self)
 
-        return Render(view=BirthdayMenuView(navigator=self))
-
-    def _render_delete_msg_menu(self):
+    def _delete_msg_menu_view(self):
         from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
+        print('Створення DeleteMsgMenuView')
+        return DeleteMsgMenuView(navigator=self)
 
-        return Render(view=DeleteMsgMenuView(navigator=self))
-
-    def _render_superusers_menu(self):
+    def _superusers_menu_view(self):
         from modules.buttons.for_admins.superusers_buttons.menu_view import SuperusersMenuView
+        print('Створення SuperusersMenuView')
+        return SuperusersMenuView(navigator=self)
 
-        return Render(view=SuperusersMenuView(navigator=self))
-
-    def _render_random_menu(self):
+    def _random_menu_view(self):
         from modules.buttons.for_users.randomizer.menu_view import RandomModeView
+        print('Створення RandomModeView')
+        return RandomModeView(navigator=self)
 
-        return Render(view=RandomModeView(navigator=self))
-
-    def _render_role_manager_menu(self):
+    def _role_manager_menu_view(self):
         from modules.buttons.for_users.role_manager.menu_view import RoleManagerView
-
-        return Render(view=RoleManagerView(navigator=self))
-
-        #     case 'edit_settings':
-        #         from modules.buttons.for_admins.edit_settings_buttons.services import SettingSelectorView
-        #         formatter = SettingsFormatter()
-        #         embed = await formatter.format_settings(interaction)
-        #
-        #         view = SettingSelectorView(
-        #             navigator=self,
-        #             db_factory=self.container.db_factory,
-        #             yes_no_factory=self.container.yes_no_factory
-        #         )
-        #
-        #         await interaction.edit_original_response(
-        #             embed=embed,
-        #             view=view
-        #         )
-        #         return Render(view=SettingSelectorView(navigator=self))
+        print('Створення RoleManagerView')
+        return RoleManagerView(navigator=self)

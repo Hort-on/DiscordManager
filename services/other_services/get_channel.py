@@ -12,6 +12,7 @@ from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from core.container import BotContainer
 
@@ -25,9 +26,9 @@ class ChannelSelectorManager:
     ):
         super().__init__(timeout=60)
 
-        controller: BotContainer = AppContainer.get()
+        container: BotContainer = AppContainer.get()
 
-        self.settings: SettingsStorage = controller.settings
+        self.settings: SettingsStorage = container.settings
         self.scenario = scenario
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only

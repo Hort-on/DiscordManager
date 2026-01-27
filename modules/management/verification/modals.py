@@ -4,10 +4,12 @@ import discord
 
 from modules.management.verification.service import AntiBotService
 
+from core.container import AppContainer
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.container import AppContainer, BotContainer
+    from core.container import BotContainer
 
 
 class AgreeModal(discord.ui.Modal, title='Anti-bot check'):
