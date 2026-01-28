@@ -13,5 +13,5 @@ class ReshuffleView(discord.ui.View):
         style=discord.ButtonStyle.secondary,
         emoji='?'
     )
-    async def reshuffle(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def reshuffle(self, interaction: discord.Interaction, _):
         await self.callback(interaction, *self.args, **self.kwargs)

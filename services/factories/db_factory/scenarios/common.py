@@ -55,6 +55,7 @@ class WriteDataScenario(DataBaseScenario):
         self.data = data
 
     async def _execute(self) -> bool:
+        print('ми у execute WriteDataScenario')
         table = self._get_table(self.table_name)
 
         columns = ', '.join(['guild_id', *self.data.keys()])
@@ -64,9 +65,12 @@ class WriteDataScenario(DataBaseScenario):
         query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
                             ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
 
+        print('Підключення до бд')
         async with self.db_connect.connect() as cursor:
+            print('Виконання операції')
             await cursor.execute(query, (self.guild_id, *self.data.values()))
-            return cursor.rowcount > 0
+            print('Завершення виконання операції')
+            return cursor.total_changes > 0
 
 
 class WriteSuperuserScenario(DataBaseScenario):
@@ -103,7 +107,7 @@ class WriteSuperuserScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.executemany(query, values)
-            return cursor.rowcount
+            return cursor.total_changes > 0
 
 
 class DeleteSuperuserScenario(DataBaseScenario):
@@ -139,7 +143,7 @@ class DeleteSuperuserScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, params)
-            return cursor.rowcount > 0
+            return cursor.total_changes > 0
 
 
 class FetchAllDataScenario(DataBaseScenario):

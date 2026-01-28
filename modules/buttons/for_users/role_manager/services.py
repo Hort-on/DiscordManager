@@ -60,10 +60,13 @@ class AddRoleService:
 
         options = [
             discord.SelectOption(
-                label=value,
-                value=str(key)
+                label=name,
+                value=str(role_id)
             )
-            for key, value in available_roles.items()
+            for role_id, name in sorted(
+                available_roles.items(),
+                key=lambda item: item[1].lower()
+            )
         ]
 
         view = DropMenuView(

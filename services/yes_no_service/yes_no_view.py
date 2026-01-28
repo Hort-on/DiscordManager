@@ -9,17 +9,15 @@ class YesNoView(View):
         self.scenario = scenario
 
     @discord.ui.button(label='Yes', style=discord.ButtonStyle.green)
-    async def callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        for item in self.children:
-            item.disabled = True
-
-        await interaction.response.edit_message(view=self)
-        await self.scenario.yes_no_proceed(interaction=interaction, value=True)
+    async def yes_button(self, interaction, _):
+        await self.scenario.yes_no_proceed(
+            interaction=interaction,
+            value=True
+        )
 
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
-    async def callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        for item in self.children:
-            item.disabled = True
-
-        await interaction.response.edit_message(view=self)
-        await self.scenario.yes_no_proceed(interaction=interaction, value=False)
+    async def no_button(self, interaction, _):
+        await self.scenario.yes_no_proceed(
+            interaction=interaction,
+            value=False
+        )

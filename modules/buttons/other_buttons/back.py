@@ -31,4 +31,8 @@ class BackButton(discord.ui.Button):
         view = self.navigator.go(target, **params)
         view.context = context
 
-        await interaction.response.edit_message(view=view)
+        await interaction.response.edit_message(
+            content=None,
+            embeds=[],
+            view=view
+        )

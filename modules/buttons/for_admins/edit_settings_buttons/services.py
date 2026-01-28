@@ -55,11 +55,10 @@ class ChoiceHandler:
                 message = (EDIT_CONFIG_MSGS.get('editing_feature_msg')
                            .format(feature={config_key.replace('_', ' ').title()}))
 
-                return YesNoView(scenario=scenario)
+                view = YesNoView(scenario=scenario)
 
-                await interaction.edit_original_response(
-                    content=EDIT_CONFIG_MSGS.get('editing_feature_msg').format(
-                        feature={config_key.replace('_', ' ').title()}),
+                await interaction.response.edit_message(
+                    content=message,
                     view=view
                 )
                 print('Кінець кейсу boolean')

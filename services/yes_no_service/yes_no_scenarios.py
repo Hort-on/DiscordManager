@@ -38,21 +38,22 @@ class ConfirmationScenario(BaseScenario):
             interaction: discord.Interaction,
             value: bool
     ) -> None:
+        print('створення сценарію')
         write_data_scenario = self.db_factory.for_write_data(
-            guild_id=interaction.guild.id,
+            guild_id=interaction.guild_id,
             table_name='settings',
             data={self.config_key: value}
         )
 
         result = await write_data_scenario.db_proceed()
-        if not result:
-            await interaction.response.edit_message(
-                content=ECM.get('failure_edit_msg' if not result else 'success_edit_msg'),
-                view=SettingSelectorView(
-                    navigator=self.nafigator,
-                    db_factory=self.db_factory,
-                    yes_no_factory=self.yes_no_factory
-                ))
+        print('Отримали результат з бази даних')
+        await interaction.response.edit_message(
+            content=ECM.get('failure_edit_msg' if not result else 'success_edit_msg'),
+            view=SettingSelectorView(
+                navigator=self.nafigator,
+                db_factory=self.db_factory,
+                yes_no_factory=self.yes_no_factory
+            ))
 
 
 class ForBirthdayScenario(BaseScenario):

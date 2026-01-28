@@ -28,7 +28,7 @@ class AddBirthdayScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, (self.guild_id, self.user_id, self.birthday, None))
-            return cursor.rowcount > 0
+            return cursor.total_changes > 0
 
 
 class DeleteBirthdayScenario(DataBaseScenario):
@@ -53,7 +53,7 @@ class DeleteBirthdayScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, (self.guild_id, self.user_id))
-            return cursor.rowcount > 0
+            return cursor.total_changes > 0
 
 
 class ExistBirthdayCheckScenario(DataBaseScenario):
@@ -131,7 +131,7 @@ class UpdateLastCongratsScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, (self.date, self.user_id, self.guild_id))
-            return cursor.rowcount > 0
+            return cursor.total_changes > 0
 
 
 class ResetAllCongratsScenario(DataBaseScenario):
