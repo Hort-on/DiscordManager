@@ -26,7 +26,7 @@ class EditSettingsResultScenario:
 
         if not settings:
             return WarningEmbed(description='No settings found.')
-        lines: list[str] = ['Setting                  Status', '-----------------------  ----------']
+        lines: list[str] = [f'Setting {' ' * 18} Status', f'{'-' * 26}  {'-' * 15}']
         # ---- SETTINGS TABLE ----
 
         for key, value in settings.items():
@@ -39,35 +39,51 @@ class EditSettingsResultScenario:
         lines.append('')
         lines.append('Superusers:')
         users = self.settings.set_storage.for_set_get(
-            StorageTarget.SUPERUSERS,
-            interaction.guild_id
+            target=StorageTarget.SUPERUSERS,
+            guild_id=interaction.guild_id
         )
 
         if not users:
-            lines.append('❌ not assigned')
+            lines.append('❌ NOT ASSIGNED')
         else:
             for user_id in users:
                 member = interaction.guild.get_member(user_id)
                 name = member.display_name if member else f'Unknown ({user_id})'
                 lines.append(f'🔸 {name}')
 
-        # ---- CHANNELS ----
+        # ---- ASSIGNED CHANNELS ----
         lines.append('')
-        lines.append('Channels:')
+        lines.append('Assigned channels:')
 
-        current_selected_channels = self.settings.dict_storage.for_dict_get_all(
-            StorageTarget.SELECTED_CHANNELS,
-            interaction.guild_id
+        assigned_channels = self.settings.dict_storage.for_dict_get_all(
+            target=StorageTarget.SELECTED_CHANNELS,
+            guild_id=interaction.guild_id
         )
 
-        if not current_selected_channels:
+        if not assigned_channels:
             lines.append('❌ NOT ASSIGNED')
         else:
-            for key, value in current_selected_channels.items():
+            for key, value in assigned_channels.items():
                 channel = interaction.client.get_channel(value)
                 channel_name = channel.name if channel else '❌ Not assigned'
                 ch_label = key.replace('_channel_id', '')
                 lines.append(f'🔸 {ch_label}: {channel_name}')
+
+        # ---- HIDDEN CHANNELS ----
+        lines.append('')
+        lines.append('Hidden channels:')
+
+        hidden_channels = self.settings.set_storage.for_set_get_all(
+            target=StorageTarget.SELECTED_CHANNELS,
+            guild_id=interaction.guild_id
+        )
+        if not hidden_channels:
+            lines.append('❌ NOT ASSIGNED')
+        else:
+            for channel_id in hidden_channels:
+                channel = interaction.client.get_channel(channel_id)
+                channel_name = channel.name if channel else '❌ Not assigned'
+                lines.append(f'🔸 {channel_name}')
 
         description = '```text\n' + '\n'.join(lines) + '\n```'
 

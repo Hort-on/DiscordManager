@@ -55,7 +55,6 @@ class WriteDataScenario(DataBaseScenario):
         self.data = data
 
     async def _execute(self) -> bool:
-        print('ми у execute WriteDataScenario')
         table = self._get_table(self.table_name)
 
         columns = ', '.join(['guild_id', *self.data.keys()])
@@ -65,11 +64,8 @@ class WriteDataScenario(DataBaseScenario):
         query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
                             ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
 
-        print('Підключення до бд')
         async with self.db_connect.connect() as cursor:
-            print('Виконання операції')
             await cursor.execute(query, (self.guild_id, *self.data.values()))
-            print('Завершення виконання операції')
             return cursor.total_changes > 0
 
 

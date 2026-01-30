@@ -35,21 +35,14 @@ class AdminMenuView(discord.ui.View):
             guild_id=guild_id
         )
 
-        print('Додаємо кнопки')
         self.add_item(SuperusersMenuButton(navigator=navigator))
-        print('Додали SuperusersMenuButton')
         self.add_item(DeleteMsgMenuButton(navigator=navigator))
-        print('Додали DeleteMsgMenuButton')
         self.add_item(EditSettingsButton(navigator=navigator))
-        print('Додали EditSettingsButton')
 
         if config.get('birthday'):
             self.add_item(BirthdayMenuButton(navigator=navigator))
-            print('Додали BirthdayMenuButton')
 
         if config.get('send_messages'):
             self.add_item(SendMessageButton(navigator=navigator))
-            print('Додали SendMessageButton')
 
         self.add_item(BackButton(navigator=navigator))
-        print('Додали BackButton')

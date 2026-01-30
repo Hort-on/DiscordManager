@@ -23,6 +23,9 @@ class SetStorageManager:
     def for_set_get(self, target: StorageTarget, guild_id: int) -> set[int]:
         return self._map.get(target, {}).get(guild_id, set())
 
+    def for_set_get_all(self, target: StorageTarget, guild_id: int) -> set[int]:
+        return self._map.get(target, {}).get(guild_id, set())
+
     def for_set_remove(self, target: StorageTarget, guild_id: int, value) -> None:
         self._map[target].get(guild_id, set()).difference_update(value)
 

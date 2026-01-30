@@ -30,7 +30,7 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
         channel
     ) -> None:
 
-        write_data_scenario = self.db_factory.for_write_data(
+        write = self.db_factory.for_write_data(
             guild_id=interaction.guild.id,
             table_name='channels',
             data={
@@ -40,7 +40,7 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
             }
         )
 
-        result = await write_data_scenario.db_proceed()
+        result = await write.db_proceed()
 
         if result:
             await interaction.response.edit_message(
@@ -77,8 +77,9 @@ class SaveChannelToDBScenario(ChannelScenario):
             interaction: discord.Interaction,
             channel
     ) -> None:
+        print('SaveChannelToDBScenario - on_channel_selected: OK')
 
-        write_data_scenario = self.db_factory.for_write_data(
+        write = self.db_factory.for_write_data(
             guild_id=interaction.guild.id,
             table_name='settings',
             data={
@@ -86,7 +87,7 @@ class SaveChannelToDBScenario(ChannelScenario):
             }
         )
 
-        result = await write_data_scenario.db_proceed()
+        result = await write.db_proceed()
         if result:
             await interaction.response.edit_message(
                 content=DB_MSGS.get('channel_successful_msg')

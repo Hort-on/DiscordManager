@@ -21,7 +21,6 @@ class Navigator:
 
     def _main_menu_view(self, *, guild: discord.Guild, user_id: int):
         from modules.buttons.main_button_view import MainMenuView
-        print('Створення MainMenuView')
         return MainMenuView(
                 navigator=self,
                 guild=guild,
@@ -30,7 +29,6 @@ class Navigator:
 
     def _admin_menu_view(self, *, guild_id: int):
         from modules.buttons.for_admins.admin_menu_view import AdminMenuView
-        print('Створення AdminMenuView')
         return AdminMenuView(navigator=self, guild_id=guild_id)
 
     def _birthday_menu_view(self):

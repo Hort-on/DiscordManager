@@ -26,8 +26,6 @@ class ChannelSelectorManager:
             text_only=False,
             channels_with_users_only=False,
     ):
-        super().__init__(timeout=60)
-
         container: BotContainer = AppContainer.get()
 
         self.navigator = navigator
@@ -36,11 +34,12 @@ class ChannelSelectorManager:
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only
 
-    async def select_channel_type(self):
-        type_options = []
+    async def select_channel_type(self, interaction: discord.Interaction):
+        print('ChannelSelectorManager - select_channel_type: OK')
+        options = []
 
         if not self.channels_with_users_only:
-            type_options.append(
+            options.append(
                 discord.SelectOption(
                     label='Text channel',
                     value='text'
@@ -48,31 +47,32 @@ class ChannelSelectorManager:
             )
 
         if not self.text:
-            type_options.append(
+            options.append(
                 discord.SelectOption(
                     label='Voice channel',
                     value='voice'
                 )
             )
 
-        return DropMenuView(
+        print('ChannelSelectorManager - select_channel_type - options: OK')
+        view = DropMenuView(
             navigator=self.navigator,
-            options=type_options,
+            options=options,
             placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
             callback=self._select_channel
         )
 
-    async def _select_channel(
-            self,
-            interaction: discord.Interaction,
-            value: list[str]
-    ):
+        print('ChannelSelectorManager - select_channel_type - view: OK')
+
+        await interaction.response.edit_message(view=view)
+
+    async def _select_channel(self, interaction: discord.Interaction, value: list[str]):
         hidden_channels = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=interaction.guild_id
         )
 
-        if value == 'text':
+        if value[0] == 'text':
             channels = interaction.guild.text_channels
         else:
             channels = interaction.guild.voice_channels
