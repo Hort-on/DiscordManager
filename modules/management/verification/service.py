@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.yes_no_service.yes_no_factory import YesNoViewFactory
+
 import discord
 
 from database.settings_storage.settings import SettingsStorage
@@ -7,10 +12,6 @@ from database.settings_storage.settings_manager import StorageTarget
 
 from services.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 from services.yes_no_service.yes_no_view import YesNoView
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 class AntiBotService:

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.container import BotContainer
+
 import discord
 
 from core.container import AppContainer
 
 from modules.buttons.button_protection.protector import ButtonPermissionService
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from core.container import BotContainer
 
 
 class FirewallButton(discord.ui.Button):

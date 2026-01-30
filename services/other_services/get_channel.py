@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.container import BotContainer
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from core.container import AppContainer
@@ -11,15 +17,11 @@ from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.factories.channel_factory.channel_scenarios import ChannelScenario
 from services.utils.messages import GENERAL_MSGS
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from core.container import BotContainer
-
 
 class ChannelSelectorManager:
     def __init__(
             self,
+            navigator: Navigator,
             scenario: ChannelScenario,
             text_only=False,
             channels_with_users_only=False,
@@ -28,6 +30,7 @@ class ChannelSelectorManager:
 
         container: BotContainer = AppContainer.get()
 
+        self.navigator = navigator
         self.settings: SettingsStorage = container.settings
         self.scenario = scenario
         self.text = text_only
@@ -53,6 +56,7 @@ class ChannelSelectorManager:
             )
 
         return DropMenuView(
+            navigator=self.navigator,
             options=type_options,
             placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
             callback=self._select_channel
@@ -95,6 +99,7 @@ class ChannelSelectorManager:
         ]
 
         return DropMenuView(
+            navigator=self.navigator,
             options=channel_options,
             placeholder='',
             callback=self._save_channel

@@ -1,8 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.container import BotContainer
+    from services.factories.db_factory.db_scenario_factory import DBFactory
+
 import discord
 
+from core.container import AppContainer
 from modules.buttons.for_users.randomizer.modals import RandomTeamByChannelModal
 
-from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.utils.messages import DB_MSGS, SYSTEM_MSGS
 
 
@@ -12,8 +20,9 @@ class ChannelScenario:
 
 
 class SaveChannelToDBForMessageScenario(ChannelScenario):
-    def __init__(self, db_factory: DBFactory):
-        self.db_factory = db_factory
+    def __init__(self):
+        container: BotContainer = AppContainer.get()
+        self.db_factory: DBFactory = container.db_factory
 
     async def on_channel_selected(
         self,
@@ -57,13 +66,10 @@ class SaveChannelToDBForMessageScenario(ChannelScenario):
 
 
 class SaveChannelToDBScenario(ChannelScenario):
-    def __init__(
-            self,
-            db_factory: DBFactory,
-            config_key: str
-    ):
+    def __init__(self, config_key: str):
 
-        self.db_factory = db_factory
+        container: BotContainer = AppContainer.get()
+        self.db_factory: DBFactory = container.db_factory
         self.config_key = config_key
 
     async def on_channel_selected(

@@ -4,15 +4,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from core.container import BotContainer
+    from database.settings_storage.settings import SettingsStorage
 
 import discord
 
 from core.container import AppContainer
-
-from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
-
-from services.embed_constructor.embed_constructor import InfoEmbed, WarningEmbed
+from services.embed_constructor.embed_constructor import WarningEmbed, InfoEmbed
 
 
 class EditSettingsResultScenario:
@@ -74,3 +72,10 @@ class EditSettingsResultScenario:
         description = '```text\n' + '\n'.join(lines) + '\n```'
 
         return InfoEmbed(description=description)
+
+
+class SettingsFormatter:
+    @staticmethod
+    async def format_settings(interaction: discord.Interaction) -> discord.Embed:
+        embed = await EditSettingsResultScenario().build_result(interaction=interaction)
+        return embed

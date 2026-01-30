@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 
 from services.buttons.navigator_context import NavigationContext
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from services.buttons.navigator import Navigator
 
 
 class AdminMenuButton(FirewallButton):

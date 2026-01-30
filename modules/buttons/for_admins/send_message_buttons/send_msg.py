@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-import discord
-
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from services.embed_constructor.embed_constructor import WarningEmbed
-
-from services.other_services.get_channel import ChannelSelectorManager
-from services.factories.channel_factory.scenarios_factory import ChannelFactory
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
+
+import discord
+
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+
+from services.embed_constructor.embed_constructor import WarningEmbed
+
+from services.other_services.get_channel import ChannelSelectorManager
+from services.factories.channel_factory.scenarios_factory import ChannelFactory
 
 
 class SendMessageButton(FirewallButton):
@@ -22,15 +23,20 @@ class SendMessageButton(FirewallButton):
             label='Send message',
             style=discord.ButtonStyle.blurple
         )
+        self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
         scenario = ChannelFactory.for_db_message_save()
 
-        manager = ChannelSelectorManager(scenario=scenario, text_only=True)
+        manager = ChannelSelectorManager(
+            navigator=self.navigator,
+            scenario=scenario,
+            text_only=True
+        )
 
         try:
             await interaction.user.create_dm()
-            await manager.select_channel_type(interaction=interaction)
+            await manager.select_channel_type()
         except discord.Forbidden:
             embed = WarningEmbed(
                 description='Please open your Direct Message'

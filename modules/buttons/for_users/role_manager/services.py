@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.container import BotContainer
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from core.container import AppContainer
@@ -9,11 +15,6 @@ from database.settings_storage.settings_manager import StorageTarget
 
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import SuccessEmbed
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from core.container import BotContainer
 
 
 async def _build_and_send_result(
@@ -34,9 +35,10 @@ async def _build_and_send_result(
 
 
 class AddRoleService:
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         container: BotContainer = AppContainer.get()
 
+        self.navigator = navigator
         self.settings: SettingsStorage = container.settings
 
     async def prepare_roles(self, interaction: discord.Interaction):
@@ -70,6 +72,7 @@ class AddRoleService:
         ]
 
         view = DropMenuView(
+            navigator=self.navigator,
             options=options,
             placeholder='Here are roles I can add to you:',
             callback=self._add_role_to_user,
@@ -107,9 +110,10 @@ class AddRoleService:
 
 
 class RemoveRoleService:
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         container: BotContainer = AppContainer.get()
 
+        self.navigator = navigator
         self.settings: SettingsStorage = container.settings
 
     async def prepare_roles(self, interaction: discord.Interaction):
@@ -138,6 +142,7 @@ class RemoveRoleService:
         ]
 
         view = DropMenuView(
+            navigator=self.navigator,
             options=options,
             placeholder='Here are the roles I can remove from you:',
             callback=self._remove_role_from_user,

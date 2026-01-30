@@ -1,48 +1,27 @@
 import discord
 
-from services.factories.db_factory.db_scenario_factory import DBFactory
-from services.yes_no_service.yes_no_factory import YesNoViewFactory
-
 
 class Navigator:
+    def __init__(self):
+        self.routes = {
+            'main_menu': self._main_menu_view,
+            'admin_menu': self._admin_menu_view,
+            'birthday_menu': self._admin_menu_view,
+            'delete_msg_menu': self._delete_msg_menu_view,
+            'superusers_menu': self._delete_msg_menu_view,
+            'random_menu': self._random_menu_view,
+            'role_manager_menu': self._role_manager_menu_view
+        }
+
     def go(self, target: str, **params):
-        match target:
-            case 'main_menu':
-                return self._main_menu_view(**params)
-
-            case 'admin_menu':
-                print('Ми у кейсі: admin_menu')
-                return self._admin_menu_view(**params)
-
-            case 'edit_settings':
-                print('Ми у кейсі: edit_settings')
-                return self._edit_settings_view(**params)
-
-            case 'birthday_menu':
-                print('Ми у кейсі: birthday_menu')
-                return self._birthday_menu_view()
-
-            case 'delete_msg_menu':
-                print('Ми у кейсі: delete_msg_menu')
-                return self._delete_msg_menu_view()
-
-            case 'superusers_menu':
-                print('Ми у кейсі: superusers_menu')
-                return self._superusers_menu_view()
-
-            case 'random_menu':
-                print('Ми у кейсі: random_menu')
-                return self._random_menu_view()
-
-            case 'role_manager_menu':
-                print('Ми у кейсі: role_manager_menu')
-                return self._role_manager_menu_view()
-
-            case _:
-                raise ValueError('Unknow target')
+        try:
+            return self.routes[target](**params)
+        except KeyError:
+            raise ValueError(f'Unknown target: {target}')
 
     def _main_menu_view(self, *, guild: discord.Guild, user_id: int):
         from modules.buttons.main_button_view import MainMenuView
+        print('Створення MainMenuView')
         return MainMenuView(
                 navigator=self,
                 guild=guild,
@@ -53,20 +32,6 @@ class Navigator:
         from modules.buttons.for_admins.admin_menu_view import AdminMenuView
         print('Створення AdminMenuView')
         return AdminMenuView(navigator=self, guild_id=guild_id)
-
-    def _edit_settings_view(
-            self,
-            *,
-            db_factory: DBFactory,
-            yes_no_factory: YesNoViewFactory
-    ):
-        from modules.buttons.for_admins.edit_settings_buttons.services import SettingSelectorView
-        print('Створення SettingSelectorView')
-        return SettingSelectorView(
-                navigator=self,
-                db_factory=db_factory,
-                yes_no_factory=yes_no_factory
-            )
 
     def _birthday_menu_view(self):
         from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView

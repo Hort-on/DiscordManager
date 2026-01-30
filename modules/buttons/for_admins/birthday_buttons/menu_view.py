@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import discord
-
-from modules.buttons.for_admins.birthday_buttons.buttons import AddBirthdayButton, DeleteBirthdayButton
-from modules.buttons.other_buttons.back import BackButton
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
+
+import discord
+
+from modules.buttons.for_admins.birthday_buttons.buttons import AddBirthdayButton, DeleteBirthdayButton
+from modules.buttons.other_buttons.back import BackButton
 
 
 class BirthdayMenuView(discord.ui.View):

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.yes_no_service.yes_no_factory import YesNoViewFactory
+
 import discord
 
 from database.settings_storage.settings import SettingsStorage
@@ -10,9 +15,6 @@ from services.other_services.ask_user_birthday import UserBirthdayService
 # from services.utils.bad_words import invitation_pattern
 
 # from modules.management.verification.check_verification import CheckVerification
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from services.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 class BotController:

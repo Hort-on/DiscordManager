@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import discord
-
 from typing import TYPE_CHECKING
-
 
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
+
+import discord
 
 
 class BackButton(discord.ui.Button):

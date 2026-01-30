@@ -1,8 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.superusers_buttons.modals import AddSuperusersModal
-from modules.buttons.for_admins.superusers_buttons.services import DeleteSuperuserService, GetSuperusersList
+
+from modules.buttons.for_admins.superusers_buttons.services import (
+    DeleteSuperuserService,
+    GetSuperusersList
+)
 
 
 class AddSuperuserButton(FirewallButton):
@@ -24,12 +35,12 @@ class AddSuperuserButton(FirewallButton):
 class DeleteSuperusersButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         super().__init__(
             label='Delete superusers',
             style=discord.ButtonStyle.green,
         )
-        self.del_superuser = DeleteSuperuserService()
+        self.del_superuser = DeleteSuperuserService(navigator=navigator)
 
     async def on_click(self, interaction: discord.Interaction):
         await self.del_superuser.prepare_users(interaction=interaction)

@@ -1,7 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_users.randomizer.modals import RandomNumModal, RandomWordModal, RandomTeamByMsgModal
+
+from modules.buttons.for_users.randomizer.modals import (
+    RandomNumModal,
+    RandomWordModal,
+    RandomTeamByMsgModal
+)
 
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
 from services.other_services.get_channel import ChannelSelectorManager
@@ -49,18 +60,20 @@ class RandomTeamByMsg(FirewallButton):
 class RandomTeamByChannel(FirewallButton):
     scope = 'user'
 
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         super().__init__(
             label='Random team by channel',
             style=discord.ButtonStyle.secondary
         )
+        self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
         scenario = ChannelFactory.for_random_selection()
 
         manager = ChannelSelectorManager(
+            navigator=self.navigator,
             scenario=scenario,
             channels_with_users_only=True
         )
 
-        await manager.select_channel_type(interaction)
+        await manager.select_channel_type()

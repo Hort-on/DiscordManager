@@ -11,12 +11,12 @@ from core.controller import BotController
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
-from services.buttons.navigator import Navigator
 from modules.management.birthdays.birthday_manager import BirthdayManager
 from modules.management.events.member_left import MemberLeftNotification
 from modules.management.message_handler.bad_words_handler import BadWordsHandler
 from modules.management.verification.service import AntiBotService
 
+from services.buttons.navigator import Navigator
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.logger.logger import Logger
 from services.yes_no_service.yes_no_factory import YesNoViewFactory

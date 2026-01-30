@@ -1,16 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from core.container import BotContainer
+    from services.buttons.navigator import Navigator
+
 import discord
 
 from discord import app_commands
 from discord.ext import commands
 
 from core.container import AppContainer
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from core.container import BotContainer
-    from services.buttons.navigator import Navigator
 
 
 class ManagementCog(commands.Cog):

@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.buttons.navigator import Navigator
+
 import asyncio
 
 import discord
@@ -164,8 +171,9 @@ class AddSuperusersService(BaseSuperuserService):
 
 
 class DeleteSuperuserService(BaseSuperuserService):
-    def __init__(self):
+    def __init__(self, navigator: Navigator):
         super().__init__()
+        self.navigator = navigator
         self.not_found_users: set[int] = set()
 
     async def prepare_users(self, interaction: discord.Interaction):
@@ -197,6 +205,7 @@ class DeleteSuperuserService(BaseSuperuserService):
         ]
 
         view = DropMenuView(
+            navigator=self.navigator,
             options=options,
             placeholder='',
             callback=self._delete_superuser_callback

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import discord
-
-from core.container import AppContainer
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.edit_settings_buttons.services import SettingsFormatter
-
-from services.buttons.navigator_context import NavigationContext
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
-    from core.container import BotContainer
+
+import discord
+
+from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+from modules.buttons.for_admins.edit_settings_buttons.settings_formatter import SettingsFormatter
+from modules.buttons.for_admins.edit_settings_buttons.service import ToggleService
+
+from services.buttons.navigator_context import NavigationContext
+from services.drop_down_menu.drop_down_selector import DropMenuView
 
 
 class EditSettingsButton(FirewallButton):
@@ -23,7 +23,7 @@ class EditSettingsButton(FirewallButton):
             label='Edit settings',
             style=discord.ButtonStyle.green
         )
-        self.container: BotContainer = AppContainer.get()
+        self.service = ToggleService(navigator=navigator)
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
@@ -34,10 +34,13 @@ class EditSettingsButton(FirewallButton):
         formatter = SettingsFormatter()
         embed = await formatter.format_settings(interaction)
 
-        view = self.navigator.go(
-            target='edit_settings',
-            db_factory=self.container.db_factory,
-            yes_no_factory=self.container.yes_no_factory,
+        options = self.service.prepare_options()
+
+        view = DropMenuView(
+            navigator=self.navigator,
+            options=options,
+            placeholder='Please select the module you want to change',
+            callback=self.service.proceed
         )
 
         view.context = context

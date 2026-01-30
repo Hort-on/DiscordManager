@@ -1,3 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from services.buttons.navigator import Navigator
+
 import discord
 from discord import ui
 
@@ -5,14 +12,15 @@ from discord import ui
 class DropMenuView(ui.View):
     def __init__(
             self,
+            navigator: Navigator,
             options: list,
             placeholder: str,
             callback,
             min_values=1,
-            max_values=1,
-            timeout=60
+            max_values=1
     ):
-        super().__init__(timeout=timeout)
+        super().__init__(timeout=180)
+        self.navigator = navigator
         self._callback = callback
         self.options = options
         self.page = 0
