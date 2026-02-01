@@ -26,13 +26,9 @@ class DB:
                     birthday INTEGER NOT NULL DEFAULT 0,
                     
                     congrats INTEGER NOT NULL DEFAULT 0,
-                    congrats_channel_id INTEGER DEFAULT NULL,
                 
                     verification INTEGER NOT NULL DEFAULT 0,
-                    verification_channel_id INTEGER DEFAULT NULL,
                     verification_role_id INTEGER DEFAULT NULL,
-                    
-                    notification_channel_id INTEGER DEFAULT NULL,
                     
                     block_users INTEGER NOT NULL DEFAULT 0,
                     invitation_checking INTEGER NOT NULL DEFAULT 0,
@@ -47,13 +43,27 @@ class DB:
             ''')
 
             await temp_conn.execute('''
-                CREATE TABLE IF NOT EXISTS GuildSelectedChannels (
+                CREATE TABLE IF NOT EXISTS GuildSystemChannels (
                     guild_id INTEGER PRIMARY KEY,
                     
                     congrats_channel_id INTEGER DEFAULT NULL,
                     verification_channel_id INTEGER DEFAULT NULL,
                     notification_channel_id INTEGER DEFAULT NULL,
                     
+                    FOREIGN KEY (guild_id)
+                        REFERENCES GuildSettings(guild_id)
+                        ON DELETE CASCADE
+                );
+            ''')
+
+            await temp_conn.execute('''
+                CREATE TABLE IF NOT EXISTS GuildHiddenChannels (
+                    guild_id INTEGER PRIMARY KEY,
+
+                    congrats_channel_id INTEGER DEFAULT NULL,
+                    verification_channel_id INTEGER DEFAULT NULL,
+                    notification_channel_id INTEGER DEFAULT NULL,
+
                     FOREIGN KEY (guild_id)
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE

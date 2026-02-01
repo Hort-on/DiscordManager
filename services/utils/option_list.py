@@ -1,10 +1,7 @@
-SETTINGS_OPTIONS = {
+MAIN_SETTINGS_OPTIONS = {
             'birthday': "boolean",
             'congrats': "boolean",
-            'congrats_channel': "channel",
             'verification': "boolean",
-            'verification_channel': "channel",
-            'notification_channel': "channel",
             'block_user': "boolean",
             'invitation_check': "boolean",
             'spam_check': "boolean",
@@ -13,4 +10,10 @@ SETTINGS_OPTIONS = {
             'send_messages': "boolean",
             'write_audit_log': "boolean",
             'anti_bot': "boolean"
-        }
+}
+
+CHANNELS_SETTINGS_OPTIONS = {
+            'congrats_channel': "channel",
+            'verification_channel': "channel",
+            'notification_channel': "channel",
+}

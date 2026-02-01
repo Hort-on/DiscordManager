@@ -9,11 +9,11 @@ class SettingsStorage:
         self.bot = bot
 
         self._guild_settings: dict[int, dict[str, int]] = {}
-        self._guild_selected_channels: dict[int, dict[str, int]] = {}
-        self._guild_hidden_channels: dict[int, set[int]] = {}
+        self._guild_system_channels: dict[int, dict[str, int]] = {}
         self._guild_channels_to_send: dict[int, dict[int, int]] = {}
-        self._guild_superusers: dict[int, set[int]] = {}
+        self._guild_hidden_channels: dict[int, set[int]] = {}
         self._guild_hidden_roles: dict[int, set[int]] = {}
+        self._guild_superusers: dict[int, set[int]] = {}
 
         self.set_storage: SetStorageManager = SetStorageManager({
             StorageTarget.HIDDEN_CHANNELS: self._guild_hidden_channels,
@@ -23,7 +23,7 @@ class SettingsStorage:
 
         self.dict_storage: DictStorageManager = DictStorageManager({
             StorageTarget.SETTINGS: self._guild_settings,
-            StorageTarget.SELECTED_CHANNELS: self._guild_selected_channels,
+            StorageTarget.SYSTEM_CHANNELS: self._guild_system_channels,
             StorageTarget.CHANNELS_TO_SEND: self._guild_channels_to_send
         })
 
@@ -47,7 +47,7 @@ class SettingsStorage:
             channels = await channel_scenario.db_proceed()
 
             if channels:
-                self._guild_selected_channels[guild.id] = channels[0]
+                self._guild_system_channels[guild.id] = channels[0]
 
             # ---------------------------- load guild hidden channels ----------------------------- #
             channel_scenario = self.db_factory.for_fetch_all(

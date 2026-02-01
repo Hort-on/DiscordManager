@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 class StorageTarget(Enum):
     SETTINGS = auto()
-    SELECTED_CHANNELS = auto()
+    SYSTEM_CHANNELS = auto()
     HIDDEN_CHANNELS = auto()
     CHANNELS_TO_SEND = auto()
     SUPERUSERS = auto()

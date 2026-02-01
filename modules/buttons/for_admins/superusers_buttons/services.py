@@ -139,6 +139,7 @@ class AddSuperusersService(BaseSuperuserService):
     ) -> None:
         await interaction.response.edit_message(embed=embed)
 
+    # TODO: переробити через конструткор
     @staticmethod
     def _build_embed(added_users: str, not_found_users: str, already_super: str) -> discord.Embed:  # TODO: Використовувати загальний шаблон
         embed = discord.Embed(
@@ -364,3 +365,18 @@ class GetSuperusersList(BaseSuperuserService):
         )
 
         await cleanup_scenario.db_proceed()
+
+        lines.append('')
+                lines.append('Superusers:')
+                users = self.settings.set_storage.for_set_get(
+                    target=StorageTarget.SUPERUSERS,
+                    guild_id=interaction.guild_id
+                )
+
+                if not users:
+                    lines.append('❌ NOT ASSIGNED')
+                else:
+                    for user_id in users:
+                        member = interaction.guild.get_member(user_id)
+                        name = member.display_name if member else f'Unknown ({user_id})'
+                        lines.append(f'🔸 {name}')

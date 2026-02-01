@@ -63,7 +63,7 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
             db_connect: DB,
             logger: Logger,
             guild_id: int,
-            channel_id: int
+            channels_id: set[int]
     ):
         super().__init__(
             db_connect,
@@ -71,14 +71,25 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
             guild_id
         )
 
-        self.channel_id = channel_id
+        self.channel_ids = channels_id
 
     async def _execute(self) -> None:
+        if not self.channel_ids:
+            return
+
         table = self._get_table('channels')
-        query = f'DELETE FROM {table} WHERE guild_id = ? AND channel_id = ?'
+
+        placeholders = ','.join('?' for _ in self.channel_ids)
+        query = (
+            f'DELETE FROM {table} '
+            f'WHERE guild_id = ? '
+            f'AND channel_id IN ({placeholders})'
+        )
+
+        params = (self.guild_id, *self.channel_ids)
 
         async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.guild_id, self.channel_id))
+            await cursor.execute(query, params)
 
 
 class CleanupRemovedRoleScenario(DataBaseScenario):
@@ -87,7 +98,7 @@ class CleanupRemovedRoleScenario(DataBaseScenario):
             db_connect: DB,
             logger: Logger,
             guild_id: int,
-            role_id: int
+            role_ids: set[int]
     ):
         super().__init__(
             db_connect,
@@ -95,11 +106,22 @@ class CleanupRemovedRoleScenario(DataBaseScenario):
             guild_id
         )
 
-        self.role_id = role_id
+        self.role_ids = role_ids
 
     async def _execute(self) -> None:
+        if not self.role_ids:
+            return
+
         table = self._get_table('roles')
-        query = f'DELETE FROM {table} WHERE guild_id = ? AND role_id = ?'
+
+        placeholders = ','.join('?' for _ in self.role_ids)
+        query = (
+            f'DELETE FROM {table} '
+            f'WHERE guild_id = ? '
+            f'AND role_id IN ({placeholders})'
+        )
+
+        params = (self.guild_id, *self.role_ids)
 
         async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, (self.guild_id, self.role_id))
+            await cursor.execute(query, params)

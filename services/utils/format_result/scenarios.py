@@ -57,15 +57,15 @@ class EditSettingsResultScenario:
         lines.append('')
         lines.append('Channels:')
 
-        current_selected_channels = self.settings.dict_storage.for_dict_get_all(
-            StorageTarget.SELECTED_CHANNELS,
+        current_system_channels = self.settings.dict_storage.for_dict_get_all(
+            StorageTarget.SYSTEM_CHANNELS,
             interaction.guild_id
         )
 
-        if not current_selected_channels:
+        if not current_system_channels:
             lines.append('❌ NOT ASSIGNED')
         else:
-            for key, value in current_selected_channels.items():
+            for key, value in current_system_channels.items():
                 channel = interaction.client.get_channel(value)
                 channel_name = channel.name if channel else '❌ Not assigned'
                 ch_label = key.replace('_channel_id', '')

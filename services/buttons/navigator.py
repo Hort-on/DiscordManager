@@ -6,6 +6,7 @@ class Navigator:
         self.routes = {
             'main_menu': self._main_menu_view,
             'admin_menu': self._admin_menu_view,
+            'settings_menu': self._settings_menu_view,
             'birthday_menu': self._admin_menu_view,
             'delete_msg_menu': self._delete_msg_menu_view,
             'superusers_menu': self._delete_msg_menu_view,
@@ -30,6 +31,10 @@ class Navigator:
     def _admin_menu_view(self, *, guild_id: int):
         from modules.buttons.for_admins.admin_menu_view import AdminMenuView
         return AdminMenuView(navigator=self, guild_id=guild_id)
+
+    def _settings_menu_view(self):
+        from modules.buttons.for_admins.edit_settings_buttons.menu_view import SettingsMenuView
+        return SettingsMenuView(navigator=self)
 
     def _birthday_menu_view(self):
         from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView
