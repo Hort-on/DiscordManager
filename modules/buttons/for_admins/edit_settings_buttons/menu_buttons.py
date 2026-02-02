@@ -41,7 +41,7 @@ class MainSettingsButton(FirewallButton):
             navigator=self.navigator,
             options=options,
             placeholder='Please select the module you want to change',
-            callback=self.service.save_main_data
+            callback=self.service.save_data
         )
 
         view.context = context
@@ -70,7 +70,7 @@ class SysChannelsButton(FirewallButton):
 class HiddenChannelsButton(FirewallButton):
     def __init__(self, navigator: Navigator):
         super().__init__(
-            label='Hidden channels management',
+            label='Hidden role management',
             style=discord.ButtonStyle.green
         )
         self.service = SystemChannelsService(navigator=navigator)
@@ -80,6 +80,12 @@ class HiddenChannelsButton(FirewallButton):
         context = getattr(self.view, 'context', NavigationContext())
 
         context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
+
+        view = self.navigator.go(target='hidden_ch_menu')
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)
 
 
 class HiddenRolesButton(FirewallButton):
