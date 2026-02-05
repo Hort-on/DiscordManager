@@ -29,35 +29,47 @@ class SettingsStorage:
 
     async def load_all_settings(self) -> None:
         for guild in self.bot.guilds:
+
+            db_init = self.db_factory.for_init_guild(guild_id=guild.id)
+            await db_init.db_proceed()
             # --------------------------- load general guilds settings --------------------------- #
-            setting_scenario = self.db_factory.for_fetch_all(
+            settings_scenario = self.db_factory.for_fetch_all(
                 guild_id=guild.id,
                 table_name='settings'
             )
-            result = await setting_scenario.db_proceed()
+            result = await settings_scenario.db_proceed()
 
             if result:
                 self._guild_settings[guild.id] = result[0]
 
-            # ------------------------------- load guild channels -------------------------------- #
-            channel_scenario = self.db_factory.for_fetch_all(
+            # ------------------------------- load system channels -------------------------------- #
+            sys_channels = self.db_factory.for_fetch_all(
                 guild_id=guild.id,
-                table_name='guild_channels'
+                table_name='sys_channels'
             )
-            channels = await channel_scenario.db_proceed()
+            sys_ch = await sys_channels.db_proceed()
 
-            if channels:
-                self._guild_system_channels[guild.id] = channels[0]
+            if sys_ch:
+                row = sys_ch[0]
+
+                self._guild_system_channels[guild.id] = {
+                    k: v
+                    for k, v in row.items()
+                    if k != "guild_id"
+                }
 
             # ---------------------------- load guild hidden channels ----------------------------- #
-            channel_scenario = self.db_factory.for_fetch_all(
+            hidden_channels = self.db_factory.for_fetch_all(
                 guild_id=guild.id,
                 table_name='hidden_channels'
             )
-            channels = await channel_scenario.db_proceed()
 
-            if channels:
-                self._guild_hidden_channels[guild.id] = channels[0]
+            hidden_ch = await hidden_channels.db_proceed()
+
+            if hidden_ch:
+                self._guild_hidden_channels[guild.id] = {
+                    row['channel_id'] for row in hidden_ch
+                }
 
             # --------------------------- load guild channels to send ----------------------------- #
             channel_to_send_scenario = self.db_factory.for_fetch_all(

@@ -7,20 +7,19 @@ from services.utils.messages import DB_MSGS as DM
 class DataBaseScenario:
     table_map = {
         'settings': "GuildSettings",
-        'guild_channels': "GuildSelectedChannels",
+        'sys_channels': "SystemChannels",
         'hidden_channels': "HiddenChannels",
         'channels_to_send': "ChannelsToSend",
         'super_users': "SuperUsers",
         'birthdays': "Birthdays",
-        'spam_info': "SpamInfo",
-        'roles': "HiddenRoles"
+        'roles': "HiddenRoles",
+        'temp_channels': "TempChannels"
     }
 
     USER_TABLES = [
         'super_users',
-        'channels',
-        'birthdays',
-        'spam_info'
+        'channels_to_send',
+        'birthdays'
     ]
 
     def __init__(
@@ -37,9 +36,7 @@ class DataBaseScenario:
         try:
             return await self._execute()
         except Exception as e:
-            await self.logger.error(
-                await self.logger.error(DM.get('failure_read_msg'), exc=e)
-            )
+            await self.logger.error(DM.get('failure_read_msg'), exc=e)
             return None
 
     async def _execute(self):

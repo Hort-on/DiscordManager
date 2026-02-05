@@ -63,7 +63,7 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
             db_connect: DB,
             logger: Logger,
             guild_id: int,
-            channels_id: set[int]
+            channel_ids: set[int]
     ):
         super().__init__(
             db_connect,
@@ -71,7 +71,7 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
             guild_id
         )
 
-        self.channel_ids = channels_id
+        self.channel_ids = channel_ids
 
     async def _execute(self) -> None:
         if not self.channel_ids:

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+from modules.buttons.for_admins.superusers_buttons.format_users_list import SuperusersFormatter
 
 from services.buttons.navigator_context import NavigationContext
 
@@ -17,8 +18,8 @@ class SuperusersMenuButton(FirewallButton):
 
     def __init__(self, navigator: Navigator):
         super().__init__(
-            label='Superusers management',
-            style=discord.ButtonStyle.green
+            label='👮Superusers management',
+            style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
 
@@ -31,4 +32,7 @@ class SuperusersMenuButton(FirewallButton):
 
         view.context = context
 
-        await interaction.response.edit_message(view=view)
+        formatter = SuperusersFormatter()
+        embed = formatter.build_embed(interaction=interaction)
+
+        await interaction.response.edit_message(view=view, embed=embed)

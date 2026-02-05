@@ -30,17 +30,17 @@ class MainSettingsButton(FirewallButton):
     async def on_click(self, interaction: discord.Interaction) -> None:
         context = getattr(self.view, 'context', NavigationContext())
 
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
+        context.push(target='settings_menu')
 
         formatter = SettingsFormatter()
         embed = await formatter.format_current_main_settings(interaction)
 
         options = self.service.build_options(guild_id=interaction.guild_id)
-
+        print(embed, options)
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the module you want to change',
+            placeholder='Please select the module you want to change.',
             callback=self.service.save_data
         )
 
@@ -70,7 +70,7 @@ class SysChannelsButton(FirewallButton):
 class HiddenChannelsButton(FirewallButton):
     def __init__(self, navigator: Navigator):
         super().__init__(
-            label='Hidden role management',
+            label='Hidden channels management',
             style=discord.ButtonStyle.green
         )
         self.service = SystemChannelsService(navigator=navigator)

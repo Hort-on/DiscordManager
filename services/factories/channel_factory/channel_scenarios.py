@@ -77,7 +77,6 @@ class SaveChannelToDBScenario(ChannelScenario):
             interaction: discord.Interaction,
             channel
     ) -> None:
-        print('SaveChannelToDBScenario - on_channel_selected: OK')
 
         write = self.db_factory.for_write_data(
             guild_id=interaction.guild.id,

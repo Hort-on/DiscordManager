@@ -18,16 +18,21 @@ class BackButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         context = getattr(self.view, 'context', None)
-        if context is None:
+        if not context:
             return
 
         prev = context.pop()
-        if prev is None:
+        if not prev:
             return
 
         target, params = prev
 
-        view = self.navigator.go(target, **params)
+        view = (
+            self.navigator.go(target, **params)
+            if params
+            else self.navigator.go(target)
+        )
+
         view.context = context
 
         await interaction.response.edit_message(

@@ -18,7 +18,7 @@ class DeleteMsgMenuButton(FirewallButton):
     def __init__(self, navigator: Navigator):
         super().__init__(
             label='Delete message',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
 

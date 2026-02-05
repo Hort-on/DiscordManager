@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from modules.buttons.other_buttons.back import BackButton
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
 import discord
+
 from discord import ui
 
 
@@ -29,6 +32,8 @@ class DropMenuView(ui.View):
         self.max_values = max_values
 
         self.update_view()
+
+        self.add_item(BackButton(navigator=self.navigator))
 
     def update_view(self):
         self.clear_items()

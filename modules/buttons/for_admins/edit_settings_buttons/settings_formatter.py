@@ -115,23 +115,23 @@ class CurrentSettings:
     async def current_hidden_roles(self, interaction: discord.Interaction) -> discord.Embed:
         not_found_roles: set[int] = set()
 
-        lines: list[str] = [f'Hidden roles: {' ' * 18} Status', f'{'-' * 26}  {'-' * 15}', '']
+        lines: list[str] = [f'Hidden roles:', f'{'-' * 13}', '']
 
         hidden_roles = self.settings.set_storage.for_set_get_all(
-            target=StorageTarget.HIDDEN_CHANNELS,
+            target=StorageTarget.HIDDEN_ROLES,
             guild_id=interaction.guild_id
         )
         if not hidden_roles:
             lines.append('❌ HIDDEN ROLES NOT FOUND')
         else:
-            for channel_id in hidden_roles:
-                channel = interaction.client.get_channel(channel_id)
+            for role_id in hidden_roles:
+                role = interaction.guild.get_role(role_id)
 
-                if not channel:
-                    not_found_roles.add(channel_id)
+                if not role:
+                    not_found_roles.add(role_id)
                     continue
 
-                channel_name = channel.name if channel else '❌ Not assigned'
+                channel_name = role.name if role else '❌ Not assigned'
                 lines.append(f'🔸 {channel_name}')
 
         # if not_found_roles:

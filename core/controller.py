@@ -30,12 +30,12 @@ class BotController:
         self.db_factory = db_factory
         self.yes_no_factory = yes_no_factory
 
-        bot.add_listener(self.on_ready, name='on_ready')
-        bot.add_listener(self.on_message, name='on_message')
-        bot.add_listener(self.on_member_join, name='on_member_join')
-        bot.add_listener(self.on_member_remove, name='on_member_remove')
-        bot.add_listener(self.on_guild_remove, name='on_guild_remove')
-        bot.add_listener(self.on_guild_join, name='on_guild_join')
+        bot.add_listener(self.on_ready)
+        bot.add_listener(self.on_message)
+        bot.add_listener(self.on_member_join)
+        bot.add_listener(self.on_member_remove)
+        bot.add_listener(self.on_guild_remove)
+        bot.add_listener(self.on_guild_join)
 
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:

@@ -22,6 +22,8 @@ class DB:
             await temp_conn.execute('''
                 CREATE TABLE IF NOT EXISTS GuildSettings (
                     guild_id INTEGER PRIMARY KEY,
+                    
+                    language TEXT NOT NULL DEFAULT 'en',
                 
                     birthday INTEGER NOT NULL DEFAULT 0,
                     
@@ -43,27 +45,13 @@ class DB:
             ''')
 
             await temp_conn.execute('''
-                CREATE TABLE IF NOT EXISTS GuildSystemChannels (
+                CREATE TABLE IF NOT EXISTS SystemChannels (
                     guild_id INTEGER PRIMARY KEY,
                     
                     congrats_channel_id INTEGER DEFAULT NULL,
                     verification_channel_id INTEGER DEFAULT NULL,
                     notification_channel_id INTEGER DEFAULT NULL,
                     
-                    FOREIGN KEY (guild_id)
-                        REFERENCES GuildSettings(guild_id)
-                        ON DELETE CASCADE
-                );
-            ''')
-
-            await temp_conn.execute('''
-                CREATE TABLE IF NOT EXISTS GuildHiddenChannels (
-                    guild_id INTEGER PRIMARY KEY,
-
-                    congrats_channel_id INTEGER DEFAULT NULL,
-                    verification_channel_id INTEGER DEFAULT NULL,
-                    notification_channel_id INTEGER DEFAULT NULL,
-
                     FOREIGN KEY (guild_id)
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
@@ -127,6 +115,19 @@ class DB:
 
             await temp_conn.execute('''
                 CREATE TABLE IF NOT EXISTS HiddenChannels (
+                    guild_id INTEGER NOT NULL,
+                    channel_id INTEGER NOT NULL,
+
+                    PRIMARY KEY (guild_id, channel_id),
+
+                    FOREIGN KEY (guild_id)
+                        REFERENCES GuildSettings(guild_id)
+                        ON DELETE CASCADE
+                );
+            ''')
+
+            await temp_conn.execute('''
+                CREATE TABLE IF NOT EXISTS TempChannels (
                     guild_id INTEGER NOT NULL,
                     channel_id INTEGER NOT NULL,
 

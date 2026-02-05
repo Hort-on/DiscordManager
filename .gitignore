@@ -1,1 +1,16 @@
 .env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+.venv/
+
+# IDE
+.idea/
+
+# Runtime
+core/logs/
+database/DATA/

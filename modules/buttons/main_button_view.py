@@ -32,8 +32,16 @@ class MainMenuView(discord.ui.View):
             guild_id=guild.id
         )
 
+        role_manager = container.settings.dict_storage.for_dict_get(
+            'role_manager',
+            target=StorageTarget.SETTINGS,
+            guild_id=guild.id
+        )
+
         self.add_item(RandomMenuButton(navigator=navigator))
-        self.add_item(RoleManagerMenuButton(navigator=navigator))
+
+        if role_manager.get('role_manager'):
+            self.add_item(RoleManagerMenuButton(navigator=navigator))
 
         if user_id in superusers or user_id == guild.owner_id:
             self.add_item(AdminMenuButton(navigator=navigator))

@@ -17,7 +17,7 @@ class AdminMenuButton(FirewallButton):
 
     def __init__(self, navigator: Navigator):
         super().__init__(
-            label='Admin menu',
+            label='🛠️Admin menu',
             style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator

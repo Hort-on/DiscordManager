@@ -29,6 +29,8 @@ class SettingsMenuButton(FirewallButton):
 
         view = self.navigator.go(target='settings_menu')
 
+        view.context = context
+
         await interaction.response.edit_message(
             content='⚙️ Settings management',
             view=view

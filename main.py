@@ -2,6 +2,7 @@ from pathlib import Path
 
 import os
 import asyncio
+import logging
 from dotenv import load_dotenv
 
 from core.bot_config import bot
@@ -20,6 +21,10 @@ from services.buttons.navigator import Navigator
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.logger.logger import Logger
 from services.yes_no_service.yes_no_factory import YesNoViewFactory
+
+# Show Discord API errors in console
+logging.basicConfig(level=logging.WARNING)
+logging.getLogger('discord.http').setLevel(logging.DEBUG)
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')

@@ -4,7 +4,7 @@ from services.factories.db_factory.scenarios.base import DataBaseScenario
 from services.logger.logger import Logger
 
 
-class GetDataScenario(DataBaseScenario):
+class GetData(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -24,6 +24,7 @@ class GetDataScenario(DataBaseScenario):
 
     async def _execute(self) -> dict:
         table = self._get_table(self.table_name)
+
         columns_sql = ', '.join(self.columns) if self.columns else '*'
         query = f'SELECT {columns_sql} FROM {table} WHERE guild_id = ?'
 
@@ -36,14 +37,14 @@ class GetDataScenario(DataBaseScenario):
                 return dict(zip(col_names, row)) if row else None
 
 
-class WriteDataScenario(DataBaseScenario):
+class WriteData(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
             logger: Logger,
             guild_id: int,
             table_name: str,
-            data: dict
+            data: dict[str, int]
     ):
         super().__init__(
             db_connect=db_connect,
@@ -69,7 +70,76 @@ class WriteDataScenario(DataBaseScenario):
             return cursor.total_changes > 0
 
 
-class WriteSuperuserScenario(DataBaseScenario):
+class WriteSet(DataBaseScenario):
+    def __init__(
+        self,
+        db_connect: DB,
+        logger: Logger,
+        guild_id: int,
+        values: set[int],
+        table_name: str,
+        key: str
+    ):
+        super().__init__(
+            db_connect=db_connect,
+            logger=logger,
+            guild_id=guild_id
+        )
+        self.values = values
+        self.table_name = table_name
+        self.key = key
+
+    async def _execute(self) -> bool:
+        table = self._get_table(self.table_name)
+        query = f'''
+            INSERT OR IGNORE INTO {table} (guild_id, {self.key})
+            VALUES (?, ?)
+        '''
+
+        value = [(self.guild_id, ch_id) for ch_id in self.values]
+
+        async with self.db_connect.connect() as cursor:
+            await cursor.executemany(query, value)
+            return cursor.total_changes > 0
+
+
+class DeleteSet(DataBaseScenario):
+    def __init__(
+        self,
+        db_connect: DB,
+        logger: Logger,
+        guild_id: int,
+        values: set[int],
+        table_name: str,
+        key: str
+    ):
+        super().__init__(
+            db_connect=db_connect,
+            logger=logger,
+            guild_id=guild_id
+        )
+        self.values = values
+        self.table_name = table_name
+        self.key = key
+
+    async def _execute(self) -> bool:
+        table = self._get_table(table_name=self.table_name)
+
+        placeholders = ', '.join('?' for _ in self.values)
+        query = f'''
+            DELETE FROM {table}
+            WHERE guild_id = ?
+              AND {self.key} IN ({placeholders})
+        '''
+
+        params = (self.guild_id, *self.values)
+
+        async with self.db_connect.connect() as cursor:
+            await cursor.execute(query, params)
+            return cursor.total_changes > 0
+
+
+class WriteSuperuser(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -88,9 +158,6 @@ class WriteSuperuserScenario(DataBaseScenario):
         self.user_ids = user_ids
 
     async def _execute(self) -> int:
-        if not self.user_ids:
-            return 0
-
         table = self._get_table('super_users')
 
         query = f"""
@@ -106,7 +173,7 @@ class WriteSuperuserScenario(DataBaseScenario):
             return cursor.total_changes > 0
 
 
-class DeleteSuperuserScenario(DataBaseScenario):
+class DeleteSuperuser(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -122,9 +189,6 @@ class DeleteSuperuserScenario(DataBaseScenario):
         self.user_ids = user_ids
 
     async def _execute(self) -> bool:
-        if not self.user_ids:
-            return False
-
         table = self._get_table('super_users')
 
         placeholders = ', '.join(['?'] * len(self.user_ids))
@@ -142,7 +206,7 @@ class DeleteSuperuserScenario(DataBaseScenario):
             return cursor.total_changes > 0
 
 
-class FetchAllDataScenario(DataBaseScenario):
+class FetchAllData(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -173,7 +237,7 @@ class FetchAllDataScenario(DataBaseScenario):
                 return [dict(zip(columns, row)) for row in rows]
 
 
-class InitGuildScenario(DataBaseScenario):
+class InitGuild(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -187,9 +251,13 @@ class InitGuildScenario(DataBaseScenario):
         )
 
     async def _execute(self):
-        query = '''
-        INSERT OR IGNORE INTO GuildSettings (guild_id)
-        VALUES (?)
-        '''
         async with self.db_connect.connect() as db:
-            await db.execute(query, (self.guild_id,))
+            await db.execute(
+                "INSERT OR IGNORE INTO GuildSettings (guild_id) VALUES (?)",
+                (self.guild_id,)
+            )
+
+            await db.execute(
+                "INSERT OR IGNORE INTO SystemChannels (guild_id) VALUES (?)",
+                (self.guild_id,)
+            )

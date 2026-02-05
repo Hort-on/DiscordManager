@@ -32,9 +32,8 @@ class RoleManagerMenuButton(FirewallButton):
 
         context.push(target='main_menu', params=params_main)
 
-        view = self.navigator.go(
-            target='role_manager_menu',
-            interaction=interaction
-        )
+        view = self.navigator.go(target='role_manager_menu')
+
+        view.context = context
 
         await interaction.response.edit_message(view=view)

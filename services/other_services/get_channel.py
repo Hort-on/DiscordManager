@@ -35,7 +35,6 @@ class ChannelSelectorManager:
         self.channels_with_users_only = channels_with_users_only
 
     async def select_channel_type(self, interaction: discord.Interaction):
-        print('ChannelSelectorManager - select_channel_type: OK')
         options = []
 
         if not self.channels_with_users_only:
@@ -54,15 +53,12 @@ class ChannelSelectorManager:
                 )
             )
 
-        print('ChannelSelectorManager - select_channel_type - options: OK')
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
             placeholder=GENERAL_MSGS.get('ask_channel_type_msg'),
             callback=self._select_channel
         )
-
-        print('ChannelSelectorManager - select_channel_type - view: OK')
 
         await interaction.response.edit_message(view=view)
 

@@ -13,7 +13,6 @@ from core.container import AppContainer
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
-from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import SuccessEmbed
 
 
@@ -22,16 +21,17 @@ async def _build_and_send_result(
         role_ids: set[int],
         text: str
 ) -> None:
+    embed = None
     role_names: list[str] = [text]
     for role_id in role_ids:
         role = interaction.guild.get_role(role_id)
-        role_names.append(role.name)
+        role_names.append(f'🔸{role.name}')
 
         embed = SuccessEmbed(
-            description='\n' + '-> '.join(role_names)
+            description='\n'.join(role_names)
         )
 
-        await interaction.response.edit_message(embed=embed)
+    await interaction.response.edit_message(embed=embed)
 
 
 class AddRoleService:
@@ -60,7 +60,7 @@ class AddRoleService:
             )
         }
 
-        options = [
+        return [
             discord.SelectOption(
                 label=name,
                 value=str(role_id)
@@ -71,21 +71,8 @@ class AddRoleService:
             )
         ]
 
-        view = DropMenuView(
-            navigator=self.navigator,
-            options=options,
-            placeholder='Here are roles I can add to you:',
-            callback=self._add_role_to_user,
-            max_values=25
-        )
-
-        await interaction.response.edit_message(
-            content='Please choose the roles you want to add:',
-            view=view
-        )
-
     @staticmethod
-    async def _add_role_to_user(
+    async def add_role_to_user(
             interaction: discord.Interaction,
             roles: list[str]
     ):
@@ -133,7 +120,7 @@ class RemoveRoleService:
             )
         }
 
-        options = [
+        return [
             discord.SelectOption(
                 label=value,
                 value=str(key)
@@ -141,21 +128,8 @@ class RemoveRoleService:
             for key, value in roles_to_remove.items()
         ]
 
-        view = DropMenuView(
-            navigator=self.navigator,
-            options=options,
-            placeholder='Here are the roles I can remove from you:',
-            callback=self._remove_role_from_user,
-            max_values=25
-        )
-
-        await interaction.response.edit_message(
-            content='Please choose the roles you want to remove:',
-            view=view
-        )
-
     @staticmethod
-    async def _remove_role_from_user(
+    async def remove_role_from_user(
             interaction: discord.Interaction,
             roles: list[str]
     ):

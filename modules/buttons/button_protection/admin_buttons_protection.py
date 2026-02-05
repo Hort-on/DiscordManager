@@ -11,6 +11,8 @@ from core.container import AppContainer
 
 from modules.buttons.button_protection.protector import ButtonPermissionService
 
+from services.embed_constructor.embed_constructor import ErrorEmbed
+
 
 class FirewallButton(discord.ui.Button):
     scope: str = 'user'
@@ -26,14 +28,13 @@ class FirewallButton(discord.ui.Button):
             interaction=interaction,
             scope=self.scope
         ):
-            await interaction.response.edit_message(
-                content='⛔ You do not have permission',
-                view=None
+            error_embed = ErrorEmbed(
+                description='⛔ You do not have permission.'
             )
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         await self.on_click(interaction)
 
     async def on_click(self, interaction: discord.Interaction):
         raise NotImplementedError
-

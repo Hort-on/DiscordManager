@@ -32,7 +32,7 @@ class EditMainService:
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )
-
+        print(settings)
         return [
             discord.SelectOption(
                 label=k.replace('_', ' ').title(),
@@ -41,7 +41,7 @@ class EditMainService:
             for k, v in sorted(settings.items(), key=lambda item: item[0])
         ]
 
-    async def save_main_data(self, interaction: discord.Interaction, config_key: str):
+    async def save_data(self, interaction: discord.Interaction, config_key: str):
         current_value = self.settings.dict_storage.for_dict_get(
             config_key[0],
             target=StorageTarget.SETTINGS,
