@@ -10,16 +10,15 @@ import discord
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.edit_settings_buttons.services.hidden_service import HiddenService
-from modules.buttons.for_admins.edit_settings_buttons.settings_formatter import SettingsFormatter
-from modules.buttons.other_buttons.back import BackButton
+from modules.buttons.for_admins.edit_settings_buttons.services.hidden_roles_service import HiddenRolesService
+from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
 
 from services.buttons.navigator_context import NavigationContext
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import ErrorEmbed
 
 
-class HiddenRolesManagement(FirewallButton):
+class HiddenRolesMenuButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -34,14 +33,14 @@ class HiddenRolesManagement(FirewallButton):
 
         context.push(target='settings_menu')
 
-        view = HiddenRolesMenuView(navigator=self.navigator)
+        view = self.navigator.go(target='hidden_roles_menu')
 
         view.context = context
 
         await interaction.response.edit_message(view=view)
 
 
-class AddHiddenRole(FirewallButton):
+class AddHiddenRoleButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -49,7 +48,7 @@ class AddHiddenRole(FirewallButton):
             label='📥Add hidden roles',
             style=discord.ButtonStyle.green
         )
-        self.service = HiddenService(navigator=navigator)
+        self.service = HiddenRolesService(navigator=navigator)
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
@@ -58,12 +57,10 @@ class AddHiddenRole(FirewallButton):
         context.push(target='hidden_roles_menu')
 
         formatter = SettingsFormatter()
-        embed = await formatter.format_current_hidden_roles(interaction)
+        embeds = formatter.format_current_hidden_roles(interaction)
 
-        options = self.service.for_add_build_options(
-            guild_id=interaction.guild_id,
-            target=StorageTarget.HIDDEN_ROLES,
-            storage=interaction.guild.roles
+        options = self.service.for_add_roles_options(
+            guild=interaction.guild
         )
 
         if not options:
@@ -85,11 +82,11 @@ class AddHiddenRole(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embed=embed
+            embeds=embeds
         )
 
 
-class DeleteHiddenRole(FirewallButton):
+class DeleteHiddenRoleButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -97,7 +94,7 @@ class DeleteHiddenRole(FirewallButton):
             label='🗑️Delete hidden roles',
             style=discord.ButtonStyle.red,
         )
-        self.service = HiddenService(navigator=navigator)
+        self.service = HiddenRolesService(navigator=navigator)
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
@@ -106,9 +103,9 @@ class DeleteHiddenRole(FirewallButton):
         context.push(target='hidden_roles_menu')
 
         formatter = SettingsFormatter()
-        embed = await formatter.format_current_hidden_roles(interaction)
+        embeds = formatter.format_current_hidden_roles(interaction)
 
-        options = self.service.for_delete_build_options(
+        options = self.service.for_remove_roles_options(
             guild=interaction.guild,
             target=StorageTarget.HIDDEN_ROLES
         )
@@ -132,14 +129,5 @@ class DeleteHiddenRole(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embed=embed
+            embeds=embeds
         )
-
-
-class HiddenRolesMenuView(discord.ui.View):
-    def __init__(self, navigator: Navigator):
-        super().__init__(timeout=60)
-
-        self.add_item(AddHiddenRole(navigator=navigator))
-        self.add_item(DeleteHiddenRole(navigator=navigator))
-        self.add_item(BackButton(navigator=navigator))

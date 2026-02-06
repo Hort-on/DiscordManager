@@ -23,10 +23,11 @@ from services.factories.db_factory.scenarios.birthday import (
 )
 
 from services.factories.db_factory.scenarios.cleanup import (
-    CleanupRemovedGuildScenario,
-    CleanupRemovedUserScenario,
-    CleanupRemovedChannelScenario,
-    CleanupRemovedRoleScenario
+    CleanupGuild,
+    CleanupUser,
+    CleanupHiddenChannels,
+    CleanupSystemChannels,
+    CleanupHiddenRoles
 )
 
 from services.logger.logger import Logger
@@ -153,31 +154,43 @@ class DBFactory:
             logger=self.logger,
         )
 
-    def for_remove_guild(self, guild_id: int) -> CleanupRemovedGuildScenario:
-        return CleanupRemovedGuildScenario(
+    def for_cleanup_guild(self, guild_id: int) -> CleanupGuild:
+        return CleanupGuild(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
         )
 
-    def for_remove_user(self, guild_id: int, user_ids: set[int]) -> CleanupRemovedUserScenario:
-        return CleanupRemovedUserScenario(
+    def for_cleanup_user(self, guild_id: int, user_ids: set[int]) -> CleanupUser:
+        return CleanupUser(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
             user_ids=user_ids
         )
 
-    def for_remove_channel(self, guild_id: int, channel_ids: set[int]) -> CleanupRemovedChannelScenario:
-        return CleanupRemovedChannelScenario(
+    def for_cleanup_hidden_channel(self, guild_id: int, channel_ids: set[int]) -> CleanupHiddenChannels:
+        return CleanupHiddenChannels(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
             channel_ids=channel_ids
         )
 
-    def for_remove_role(self, guild_id: int, role_ids: set[int]) -> CleanupRemovedRoleScenario:
-        return CleanupRemovedRoleScenario(
+    def for_cleanup_system_channel(
+            self,
+            guild_id: int,
+            channels: dict[str, int]
+    ) -> CleanupSystemChannels:
+        return CleanupSystemChannels(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id,
+            channels=channels,
+        )
+
+    def for_cleanup_hidden_roles(self, guild_id: int, role_ids: set[int]) -> CleanupHiddenRoles:
+        return CleanupHiddenRoles(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,

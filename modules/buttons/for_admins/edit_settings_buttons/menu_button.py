@@ -12,7 +12,7 @@ from modules.buttons.button_protection.admin_buttons_protection import FirewallB
 from services.buttons.navigator_context import NavigationContext
 
 
-class SettingsMenuButton(FirewallButton):
+class EditSettingsMenuButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):

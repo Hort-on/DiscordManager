@@ -4,7 +4,7 @@ from services.factories.db_factory.scenarios.base import DataBaseScenario
 from services.logger.logger import Logger
 
 
-class CleanupRemovedGuildScenario(DataBaseScenario):
+class CleanupGuild(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -17,13 +17,14 @@ class CleanupRemovedGuildScenario(DataBaseScenario):
             guild_id
         )
 
-    async def _execute(self) -> None:
+    async def _execute(self) -> bool:
         async with self.db_connect.connect() as cursor:
             query = f'DELETE FROM GuildSettings WHERE guild_id = ?'
             await cursor.execute(query, (self.guild_id,))
+            return cursor.total_changes > 0
 
 
-class CleanupRemovedUserScenario(DataBaseScenario):
+class CleanupUser(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -39,10 +40,7 @@ class CleanupRemovedUserScenario(DataBaseScenario):
 
         self.user_ids = user_ids
 
-    async def _execute(self) -> None:
-        if not self.user_ids:
-            return
-
+    async def _execute(self) -> bool:
         placeholders = ','.join('?' for _ in self.user_ids)
 
         async with self.db_connect.connect() as cursor:
@@ -55,9 +53,10 @@ class CleanupRemovedUserScenario(DataBaseScenario):
 
                 params = (self.guild_id, *self.user_ids)
                 await cursor.execute(query, params)
+            return cursor.total_changes > 0
 
 
-class CleanupRemovedChannelScenario(DataBaseScenario):
+class CleanupHiddenChannels(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
@@ -73,11 +72,8 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
 
         self.channel_ids = channel_ids
 
-    async def _execute(self) -> None:
-        if not self.channel_ids:
-            return
-
-        table = self._get_table('channels')
+    async def _execute(self) -> bool:
+        table = self._get_table('hidden_channels')
 
         placeholders = ','.join('?' for _ in self.channel_ids)
         query = (
@@ -90,9 +86,37 @@ class CleanupRemovedChannelScenario(DataBaseScenario):
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, params)
+            return cursor.total_changes > 0
 
 
-class CleanupRemovedRoleScenario(DataBaseScenario):
+class CleanupSystemChannels(DataBaseScenario):
+    def __init__(
+        self,
+        db_connect: DB,
+        logger: Logger,
+        guild_id: int,
+        channels: dict[str, int]
+    ):
+        super().__init__(db_connect, logger, guild_id)
+        self.channels = channels
+
+    async def _execute(self) -> bool:
+        table = self._get_table('sys_channels')
+
+        async with self.db_connect.connect() as cursor:
+            for key, channel_id in self.channels.items():
+                query = (
+                    f'UPDATE {table} '
+                    f'SET {key} = NULL '
+                    f'WHERE guild_id = ? '
+                    f'AND {key} = ?'
+                )
+                await cursor.execute(query, (self.guild_id, channel_id))
+
+            return cursor.total_changes > 0
+
+
+class CleanupHiddenRoles(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,

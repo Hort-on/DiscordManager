@@ -13,8 +13,11 @@ class Navigator:
             'random_menu': self._random_menu,
             'role_manager_menu': self._role_manager_menu,
 
-            'Hidden_ch_menu': self._hidden_ch_menu,
-            'hidden_roles_menu': self._hidden_roles_menu
+            'hidden_channels_menu': self._hidden_channels_menu,
+            'hidden_roles_menu': self._hidden_roles_menu,
+            'system_channels_menu': self._system_channels_menu,
+
+
         }
 
     def go(self, target: str, **params):
@@ -60,10 +63,14 @@ class Navigator:
         from modules.buttons.for_users.role_manager.menu_view import RoleManagerView
         return RoleManagerView(navigator=self)
 
-    def _hidden_ch_menu(self):
-        from modules.buttons.for_admins.edit_settings_buttons.buttons.hidden_ch import HiddenChMenuView
-        return HiddenChMenuView(navigator=self)
+    def _hidden_channels_menu(self):
+        from modules.buttons.for_admins.edit_settings_buttons.views import HiddenChannelsMenuView
+        return HiddenChannelsMenuView(navigator=self)
 
     def _hidden_roles_menu(self):
-        from modules.buttons.for_admins.edit_settings_buttons.buttons.hidden_roles import HiddenRolesMenuView
+        from modules.buttons.for_admins.edit_settings_buttons.views import HiddenRolesMenuView
         return HiddenRolesMenuView(navigator=self)
+
+    def _system_channels_menu(self):
+        from modules.buttons.for_admins.edit_settings_buttons.views import SystemChannelsMenuView
+        return SystemChannelsMenuView(navigator=self)

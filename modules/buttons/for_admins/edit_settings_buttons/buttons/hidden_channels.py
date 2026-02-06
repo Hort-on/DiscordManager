@@ -2,25 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
 import discord
 
-from database.settings_storage.settings_manager import StorageTarget
-
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.edit_settings_buttons.settings_formatter import SettingsFormatter
-from modules.buttons.other_buttons.back import BackButton
-from modules.buttons.for_admins.edit_settings_buttons.services.hidden_service import HiddenService
+from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
+from modules.buttons.for_admins.edit_settings_buttons.services.hidden_channels_service import HiddenChannelsService
 
 from services.buttons.navigator_context import NavigationContext
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import ErrorEmbed
 
 
-class HiddenChannelsManagement(FirewallButton):
+class HiddenChannelsMenuButtons(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -35,14 +31,14 @@ class HiddenChannelsManagement(FirewallButton):
 
         context.push(target='settings_menu')
 
-        view = HiddenChMenuView(navigator=self.navigator)
+        view = self.navigator.go(target='hidden_channels_menu')
 
         view.context = context
 
         await interaction.response.edit_message(view=view)
 
 
-class AddHiddenChannel(FirewallButton):
+class AddHiddenChannelButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -50,21 +46,19 @@ class AddHiddenChannel(FirewallButton):
             label='📥Add hidden channels',
             style=discord.ButtonStyle.green
         )
-        self.service = HiddenService(navigator=navigator)
+        self.service = HiddenChannelsService(navigator=navigator)
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         context = getattr(self.view, 'context', NavigationContext())
 
-        context.push(target='Hidden_ch_menu')
+        context.push(target='hidden_channels_menu')
 
         formatter = SettingsFormatter()
-        embed = await formatter.format_current_hidden_channels(interaction)
+        embeds = formatter.format_current_hidden_channels(interaction)
 
-        options = self.service.for_add_build_options(
-            guild_id=interaction.guild_id,
-            target=StorageTarget.HIDDEN_CHANNELS,
-            storage=interaction.guild.channels
+        options = self.service.for_add_channel_options(
+            guild=interaction.guild
         )
 
         if not options:
@@ -78,7 +72,7 @@ class AddHiddenChannel(FirewallButton):
             navigator=self.navigator,
             options=options,
             placeholder='Please select the module you want to change',
-            callback=self.service.for_add_ch_save,
+            callback=self.service.for_add_channel_save,
             max_values=min(25, len(options))
         )
 
@@ -86,11 +80,11 @@ class AddHiddenChannel(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embed=embed
+            embeds=embeds
         )
 
 
-class DeleteHiddenChannel(FirewallButton):
+class DeleteHiddenChannelButton(FirewallButton):
     scope = 'admin'
 
     def __init__(self, navigator: Navigator):
@@ -98,20 +92,19 @@ class DeleteHiddenChannel(FirewallButton):
             label='🗑️Delete hidden channels',
             style=discord.ButtonStyle.red
         )
-        self.service = HiddenService(navigator=navigator)
+        self.service = HiddenChannelsService(navigator=navigator)
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         context = getattr(self.view, 'context', NavigationContext())
 
-        context.push(target='Hidden_ch_menu')
+        context.push(target='hidden_channels_menu')
 
         formatter = SettingsFormatter()
-        embed = await formatter.format_current_hidden_channels(interaction)
+        embeds = formatter.format_current_hidden_channels(interaction)
 
-        options = self.service.for_delete_build_options(
+        options = self.service.for_remove_channel_options(
             guild=interaction.guild,
-            target=StorageTarget.HIDDEN_CHANNELS
         )
 
         if not options:
@@ -125,7 +118,7 @@ class DeleteHiddenChannel(FirewallButton):
             navigator=self.navigator,
             options=options,
             placeholder='Please select the channel you want to delete',
-            callback=self.service.for_remove_ch_data,
+            callback=self.service.for_remove_channel_data,
             max_values=min(25, len(options))
         )
 
@@ -133,14 +126,5 @@ class DeleteHiddenChannel(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embed=embed
+            embeds=embeds
         )
-
-
-class HiddenChMenuView(discord.ui.View):
-    def __init__(self, navigator: Navigator):
-        super().__init__(timeout=60)
-
-        self.add_item(AddHiddenChannel(navigator=navigator))
-        self.add_item(DeleteHiddenChannel(navigator=navigator))
-        self.add_item(BackButton(navigator=navigator))

@@ -271,7 +271,7 @@ class DeleteSuperuserService(BaseSuperuserService):
         await interaction.response.edit_message(embeds=embeds_to_send)
 
     async def _cleanup_none_exists(self, guild_id: int, not_found_users: set[int]):
-        scenario = self.db_factory.for_remove_user(
+        scenario = self.db_factory.for_cleanup_user(
             guild_id=guild_id,
             user_ids=not_found_users
         )

@@ -44,5 +44,18 @@ class DictStorageManager:
     def for_dict_get_all(self, target: StorageTarget, guild_id: int) -> dict:
         return self._map.get(target, {}).get(guild_id, {})
 
-    def for_dict_remove(self, target: StorageTarget, guild_id: int, key) -> None:
-        self._map[target].get(guild_id, {}).pop(key, None)
+    def for_dict_remove(
+            self,
+            target: StorageTarget,
+            guild_id: int,
+            keys,
+    ) -> None:
+        guild_data = self._map[target].get(guild_id)
+        if target == StorageTarget.SYSTEM_CHANNELS:
+            for key in keys:
+                if key in guild_data:
+                    guild_data[key] = None
+            return
+
+        for key in keys:
+            guild_data.pop(key, None)

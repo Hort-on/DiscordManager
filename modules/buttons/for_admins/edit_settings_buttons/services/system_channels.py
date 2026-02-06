@@ -14,12 +14,14 @@ from core.container import AppContainer
 
 from database.settings_storage.settings_manager import StorageTarget
 
+from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
+
 from services.drop_down_menu.drop_down_selector import DropMenuView
 from services.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbed, InfoEmbed
 from services.buttons.navigator_context import NavigationContext
 
 
-class SystemChannelsService:
+class AddSystemChannelsService:
     def __init__(self, navigator: Navigator):
         container: BotContainer = AppContainer.get()
 
@@ -29,28 +31,11 @@ class SystemChannelsService:
 
         self.ch_key = None
 
-    def channel_list(self, guild_id: int) -> discord.Embed:
-        channels = self.settings.dict_storage.for_dict_get_all(
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id
-        )
-
-        lines: list[str] = ['Current system channels:', f'{'-' * 26}']
-
-        for k, v in sorted(channels.items(), key=lambda item: item[0]):
-            lines.append(f'{k}: {v if v else '❗ not assigned.'}')
-
-        return InfoEmbed(
-            description='\n'.join(lines)
-        )
-
     def build_options(self, guild_id: int):
         sys_channels = self.settings.dict_storage.for_dict_get_all(
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=guild_id
         )
-
-        print(sys_channels)
 
         return [
             discord.SelectOption(
@@ -119,6 +104,31 @@ class SystemChannelsService:
         success_embed = SuccessEmbed(
             description=f'For {self.ch_key} successfully assigned the channel {channel.name}'
         )
-        current_channels = self.channel_list(interaction.guild_id)
+        formatter = SettingsFormatter()
+        current_channels = formatter.format_current_system_channels(guild=interaction.guild)
 
-        await interaction.response.edit_message(embeds=[success_embed, current_channels])
+        await interaction.response.edit_message(embeds=[success_embed, current_channels[0], current_channels[1]])
+
+
+class DeleteSystemChannelsService:
+    def __init__(self, navigator: Navigator):
+        container: BotContainer = AppContainer.get()
+
+        self.db_factory: DBFactory = container.db_factory
+        self.settings: SettingsStorage = container.settings
+        self.navigator = navigator
+
+    def channel_list(self, guild_id: int) -> discord.Embed:
+        channels = self.settings.dict_storage.for_dict_get_all(
+            target=StorageTarget.SYSTEM_CHANNELS,
+            guild_id=guild_id
+        )
+
+        lines: list[str] = ['Current system channels:', f'{'-' * 26}']
+
+        for k, v in sorted(channels.items(), key=lambda item: item[0]):
+            lines.append(f'{k}: {v if v else '❗ not assigned.'}')
+
+        return InfoEmbed(
+            description='\n'.join(lines)
+        )
