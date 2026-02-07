@@ -29,6 +29,7 @@ class HiddenRolesService:
         self.db_factory: DBFactory = container.db_factory
         self.settings: SettingsStorage = container.settings
         self.navigator = navigator
+        self.formatter = SettingsFormatter()
 
     def for_add_roles_options(self, guild: discord.Guild):
         hidden_roles = self.settings.set_storage.for_set_get_all(
@@ -99,11 +100,10 @@ class HiddenRolesService:
             description='Something went wrong, please try again later.'
         )
 
-        formatter = SettingsFormatter()
-        settings_embeds = formatter.format_current_hidden_roles(interaction)
+        settings_embed = await self.formatter.format_current_hidden_roles(interaction)
 
         await interaction.response.edit_message(
-            embeds=[settings_embeds[0], settings_embeds[1], success_embed if db_result else error_embed]
+            embeds=[settings_embed, success_embed if db_result else error_embed]
         )
 
     async def for_remove_role_data(self, interaction: discord.Interaction, value: list[str]):
@@ -139,9 +139,8 @@ class HiddenRolesService:
             description='Something went wrong, please try again later.'
         )
 
-        formatter = SettingsFormatter()
-        settings_embeds = formatter.format_current_hidden_roles(interaction)
+        settings_embed = await self.formatter.format_current_hidden_roles(interaction)
 
         await interaction.response.edit_message(
-            embeds=[settings_embeds[0], settings_embeds[1], success_embed if db_result else error_embed]
+            embeds=[settings_embed, success_embed if db_result else error_embed]
         )

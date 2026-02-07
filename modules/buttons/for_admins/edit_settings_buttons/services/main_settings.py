@@ -28,6 +28,7 @@ class EditMainSettingsService:
         self.db_factory: DBFactory = container.db_factory
         self.settings: SettingsStorage = container.settings
         self.navigator = navigator
+        self.formatter = SettingsFormatter()
         self.role_key = None
 
     def build_options(self, guild_id: int):
@@ -93,8 +94,7 @@ class EditMainSettingsService:
             description=f'verification role is successfully assigned to: {role.name}'
         )
 
-        formatter = SettingsFormatter()
-        settings_embed = formatter.format_current_main_settings(interaction)
+        settings_embed = self.formatter.format_current_main_settings(interaction)
 
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]
@@ -135,8 +135,7 @@ class EditMainSettingsService:
             description=f'{config_key} is successfully {'enabled' if new_value else 'disabled'}'
         )
 
-        formatter = SettingsFormatter()
-        settings_embed = formatter.format_current_main_settings(interaction)
+        settings_embed = self.formatter.format_current_main_settings(interaction)
 
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]

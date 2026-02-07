@@ -55,7 +55,7 @@ class AddHiddenChannelButton(FirewallButton):
         context.push(target='hidden_channels_menu')
 
         formatter = SettingsFormatter()
-        embeds = formatter.format_current_hidden_channels(interaction)
+        embed = await formatter.format_current_hidden_channels(interaction)
 
         options = self.service.for_add_channel_options(
             guild=interaction.guild
@@ -80,7 +80,7 @@ class AddHiddenChannelButton(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embeds=embeds
+            embed=embed
         )
 
 
@@ -101,7 +101,7 @@ class DeleteHiddenChannelButton(FirewallButton):
         context.push(target='hidden_channels_menu')
 
         formatter = SettingsFormatter()
-        embeds = formatter.format_current_hidden_channels(interaction)
+        embed = await formatter.format_current_hidden_channels(interaction)
 
         options = self.service.for_remove_channel_options(
             guild=interaction.guild,
@@ -126,5 +126,5 @@ class DeleteHiddenChannelButton(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embeds=embeds
+            embed=embed
         )

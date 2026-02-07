@@ -12,7 +12,8 @@ from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatte
 
 from modules.buttons.for_admins.edit_settings_buttons.services.system_channels import (
     AddSystemChannelsService,
-    DeleteSystemChannelsService
+    DeleteSystemChannelsService,
+    build_options
 )
 
 from services.buttons.navigator_context import NavigationContext
@@ -39,10 +40,7 @@ class SystemChannelsMenuButton(FirewallButton):
 
         view.context = context
 
-        formatter = SettingsFormatter()
-        embeds = formatter.format_current_system_channels(guild=interaction.guild)
-
-        await interaction.response.edit_message(embeds=embeds, view=view)
+        await interaction.response.edit_message(view=view)
 
 
 class AddSystemChannelsButton(FirewallButton):
@@ -61,7 +59,7 @@ class AddSystemChannelsButton(FirewallButton):
 
         context.push(target='system_channels_menu')
 
-        options = self.service.build_options(guild_id=interaction.guild_id)
+        options = build_options(guild_id=interaction.guild_id)
 
         if not options:
             embed = ErrorEmbed(
@@ -80,9 +78,9 @@ class AddSystemChannelsButton(FirewallButton):
         view.context = context
 
         formatter = SettingsFormatter()
-        embeds = formatter.format_current_system_channels(guild=interaction.guild)
+        embed = await formatter.format_current_system_channels(guild=interaction.guild)
 
-        await interaction.response.edit_message(embeds=embeds, view=view)
+        await interaction.response.edit_message(embed=embed, view=view)
 
 
 class DeleteSystemChannelsButton(FirewallButton):
@@ -101,7 +99,7 @@ class DeleteSystemChannelsButton(FirewallButton):
 
         context.push(target='system_channels_menu')
 
-        options = self.service.build_options(guild_id=interaction.guild_id)
+        options = build_options(guild_id=interaction.guild_id)
 
         if not options:
             embed = ErrorEmbed(
@@ -113,13 +111,14 @@ class DeleteSystemChannelsButton(FirewallButton):
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the channel you want to change',
-            callback=self.service.choosing_the_channel,
+            placeholder='Please select the channel you want to delete',
+            callback=self.service.delete_channel,
             max_values=min(25, len(options))
         )
 
         view.context = context
 
-        embed = self.service.channel_list(guild_id=interaction.guild_id)
+        formatter = SettingsFormatter()
+        embed = await formatter.format_current_system_channels(guild=interaction.guild)
 
         await interaction.response.edit_message(embed=embed, view=view)

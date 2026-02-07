@@ -29,6 +29,7 @@ class HiddenChannelsService:
         self.db_factory: DBFactory = container.db_factory
         self.settings: SettingsStorage = container.settings
         self.navigator = navigator
+        self.formatter = SettingsFormatter()
 
     def for_add_channel_options(self, guild: discord.Guild):
         result = self.settings.set_storage.for_set_get_all(
@@ -99,11 +100,10 @@ class HiddenChannelsService:
             description='Something went wrong, please try again later.'
         )
 
-        formatter = SettingsFormatter()
-        settings_embeds = formatter.format_current_hidden_channels(interaction)
+        settings_embed = await self.formatter.format_current_hidden_channels(interaction)
 
         await interaction.response.edit_message(
-            embeds=[settings_embeds[0], settings_embeds[1], success_embed if db_result else error_embed]
+            embeds=[settings_embed, success_embed if db_result else error_embed]
         )
 
     async def for_remove_channel_data(self, interaction: discord.Interaction, value: list[str]):
@@ -139,9 +139,8 @@ class HiddenChannelsService:
             description='Something went wrong, please try again later.'
         )
 
-        formatter = SettingsFormatter()
-        settings_embeds = formatter.format_current_hidden_channels(interaction)
+        settings_embed = await self.formatter.format_current_hidden_channels(interaction)
 
         await interaction.response.edit_message(
-            embeds=[settings_embeds[0], settings_embeds[1], success_embed if db_result else error_embed]
+            embeds=[settings_embed, success_embed if db_result else error_embed]
         )

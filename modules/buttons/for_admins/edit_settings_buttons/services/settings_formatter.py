@@ -8,14 +8,11 @@ if TYPE_CHECKING:
 
 import discord
 
-import asyncio
-
 from core.container import AppContainer
 
 from database.settings_storage.settings_manager import StorageTarget
 
 from services.embed_constructor.embed_constructor import WarningEmbed, InfoEmbed
-
 from services.factories.db_factory.db_scenario_factory import DBFactory
 from services.other_services.cleanup_service import CleanUpService
 
@@ -52,7 +49,7 @@ class CurrentSettings:
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
 
-    def current_system_channels(self, guild: discord.Guild) -> list[discord.Embed]:
+    async def current_system_channels(self, guild: discord.Guild) -> discord.Embed:
         not_found_ch: dict[str, int] = {}
 
         channels = self.settings.dict_storage.for_dict_get_all(
@@ -60,26 +57,29 @@ class CurrentSettings:
             guild_id=guild.id
         )
 
-        lines: list[str] = [f'Current system channels{' ' * 3}channel names', f'{'-' * 23}{' ' * 3}{'-' * 15}']
+        lines: list[str] = [f'System channels{' ' * 8}channel names',
+                            f'{'-' * 21}{' ' * 2}{'-' * 14}']
 
         for k, v in sorted(channels.items(), key=lambda item: item[0]):
             ch = guild.get_channel(v)
-            lines.append(f'{k:<23}: {ch.name if ch else '❗ not assigned'}')
+            config_name = k.removesuffix('_id').replace('_', ' ')
+            lines.append(f'{config_name:<20}: {ch.name if ch else '❗ not assigned'}')
 
-        info_cleanup = None
         if not_found_ch:
-            info_cleanup = asyncio.create_task(self.service.clean_up_system_channels(
+            msg = await self.service.clean_up_system_channels(
                 guild_id=guild.id,
                 channels=channels
-            ))
+            )
+            lines.append(f'\n\n{msg}')
 
         info_embed = InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
-        return [info_embed, info_cleanup if info_cleanup else None]
 
-    def current_hidden_channels(self, interaction: discord.Interaction) -> list[discord.Embed]:
+        return info_embed
+
+    async def current_hidden_channels(self, interaction: discord.Interaction) -> discord.Embed:
         not_found_ch: set[int] = set()
 
-        lines: list[str] = [f'Hidden channels: {' ' * 18} Status', f'{'-' * 26}  {'-' * 15}', '']
+        lines: list[str] = [f'Hidden channels:', f'{'-' * 16}']
 
         hidden_channels = self.settings.set_storage.for_set_get_all(
             target=StorageTarget.HIDDEN_CHANNELS,
@@ -98,23 +98,23 @@ class CurrentSettings:
                 channel_name = channel.name if channel else '❌ Not assigned'
                 lines.append(f'🔸 {channel_name}')
 
-        info_cleanup = None
         if not_found_ch:
-            info_cleanup = asyncio.create_task(self.service.clean_up_hidden_channels(
+            msg = await self.service.clean_up_hidden_channels(
                 guild_id=interaction.guild_id,
                 values=not_found_ch
-            ))
+            )
+            lines.append(f'\n\n{msg}')
 
         description = '```text\n' + '\n'.join(lines) + '\n```'
 
         info_embed = InfoEmbed(description=description)
 
-        return [info_embed, info_cleanup if info_cleanup else None]
+        return info_embed
 
-    def current_hidden_roles(self, interaction: discord.Interaction) -> list[discord.Embed]:
+    async def current_hidden_roles(self, interaction: discord.Interaction) -> discord.Embed:
         not_found_roles: set[int] = set()
 
-        lines: list[str] = [f'Hidden roles:', f'{'-' * 13}', '']
+        lines: list[str] = [f'Hidden roles:', f'{'-' * 13}']
 
         hidden_roles = self.settings.set_storage.for_set_get_all(
             target=StorageTarget.HIDDEN_ROLES,
@@ -133,18 +133,18 @@ class CurrentSettings:
                 channel_name = role.name if role else '❌ Not assigned'
                 lines.append(f'🔸 {channel_name}')
 
-        info_cleanup = None
         if not_found_roles:
-            info_cleanup = asyncio.create_task(self.service.clean_up_hidden_roles(
+            msg = await self.service.clean_up_hidden_roles(
                 guild_id=interaction.guild_id,
                 role_ids=not_found_roles
-            ))
+            )
+            lines.append(f'\n\n{msg}')
 
         description = '```text\n' + '\n'.join(lines) + '\n```'
 
         info_embed = InfoEmbed(description=description)
 
-        return [info_embed, info_cleanup if info_cleanup else None]
+        return info_embed
 
 
 class SettingsFormatter:
@@ -154,16 +154,16 @@ class SettingsFormatter:
         return embed
 
     @staticmethod
-    def format_current_system_channels(guild: discord.Guild) -> list[discord.Embed]:
-        embeds = CurrentSettings().current_system_channels(guild=guild)
-        return embeds
+    async def format_current_system_channels(guild: discord.Guild) -> discord.Embed:
+        embed = await CurrentSettings().current_system_channels(guild=guild)
+        return embed
 
     @staticmethod
-    def format_current_hidden_channels(interaction: discord.Interaction) -> list[discord.Embed]:
-        embeds = CurrentSettings().current_hidden_channels(interaction=interaction)
-        return embeds
+    async def format_current_hidden_channels(interaction: discord.Interaction) -> discord.Embed:
+        embed = await CurrentSettings().current_hidden_channels(interaction=interaction)
+        return embed
 
     @staticmethod
-    def format_current_hidden_roles(interaction: discord.Interaction) -> list[discord.Embed]:
-        embeds = CurrentSettings().current_hidden_roles(interaction=interaction)
-        return embeds
+    async def format_current_hidden_roles(interaction: discord.Interaction) -> discord.Embed:
+        embed = await CurrentSettings().current_hidden_roles(interaction=interaction)
+        return embed

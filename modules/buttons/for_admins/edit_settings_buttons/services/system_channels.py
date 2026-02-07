@@ -21,6 +21,23 @@ from services.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbe
 from services.buttons.navigator_context import NavigationContext
 
 
+def build_options(guild_id: int) -> list[discord.SelectOption]:
+    container: BotContainer = AppContainer.get()
+
+    sys_channels = container.settings.dict_storage.for_dict_get_all(
+        target=StorageTarget.SYSTEM_CHANNELS,
+        guild_id=guild_id
+    )
+
+    return [
+        discord.SelectOption(
+            label=key.removesuffix('_id').replace('_', ' '),
+            value=key
+        )
+        for key in sorted(sys_channels.keys(), key=lambda item: item[0])
+    ]
+
+
 class AddSystemChannelsService:
     def __init__(self, navigator: Navigator):
         container: BotContainer = AppContainer.get()
@@ -30,20 +47,6 @@ class AddSystemChannelsService:
         self.navigator = navigator
 
         self.ch_key = None
-
-    def build_options(self, guild_id: int):
-        sys_channels = self.settings.dict_storage.for_dict_get_all(
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id
-        )
-
-        return [
-            discord.SelectOption(
-                label=k.replace('_', ' ').title(),
-                value=k
-            )
-            for k, v in sorted(sys_channels.items(), key=lambda item: item[0])
-        ]
 
     async def choosing_the_channel(self, interaction: discord.Interaction, ch_key: str):
         self.ch_key = ch_key[0]
@@ -62,7 +65,7 @@ class AddSystemChannelsService:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please choose the channel',
+            placeholder='Please select the channel',
             callback=self._save_result
         )
 
@@ -72,9 +75,14 @@ class AddSystemChannelsService:
 
         view.context = context
 
-        await interaction.response.edit_message(view=view)
+        info_embed = InfoEmbed(
+            description=f'Please select the channel you want to assign to'
+                        f' {ch_key[0].removesuffix('_id').replace('_', ' ')}'
+        )
 
-    async def _save_result(self, interaction: discord.Interaction, config: str):
+        await interaction.response.edit_message(embed=info_embed, view=view)
+
+    async def _save_result(self, interaction: discord.Interaction, config: str) -> None:
         ch_id = int(config[0])
 
         write = self.db_factory.for_write_data(
@@ -104,10 +112,11 @@ class AddSystemChannelsService:
         success_embed = SuccessEmbed(
             description=f'For {self.ch_key} successfully assigned the channel {channel.name}'
         )
-        formatter = SettingsFormatter()
-        current_channels = formatter.format_current_system_channels(guild=interaction.guild)
 
-        await interaction.response.edit_message(embeds=[success_embed, current_channels[0], current_channels[1]])
+        formatter = SettingsFormatter()
+        current_channels = await formatter.format_current_system_channels(guild=interaction.guild)
+
+        await interaction.response.edit_message(embeds=[success_embed, current_channels])
 
 
 class DeleteSystemChannelsService:
@@ -118,17 +127,40 @@ class DeleteSystemChannelsService:
         self.settings: SettingsStorage = container.settings
         self.navigator = navigator
 
-    def channel_list(self, guild_id: int) -> discord.Embed:
-        channels = self.settings.dict_storage.for_dict_get_all(
+    async def delete_channel(self, interaction: discord.Interaction, values: list[str]) -> None:
+        delete = self.db_factory.for_cleanup_system_channel(
+            guild_id=interaction.guild_id,
+            channels=values
+        )
+
+        result = await delete.db_proceed()
+        if not result:
+            error_embed = ErrorEmbed(
+                description='Something went wrong, please try again later.'
+            )
+            await interaction.response.edit_message(embed=error_embed)
+            return
+
+        self.settings.dict_storage.for_dict_remove(
             target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id
+            guild_id=interaction.guild_id,
+            keys=values
         )
 
-        lines: list[str] = ['Current system channels:', f'{'-' * 26}']
+        if len(values) <= 1:
+            word_1 = 'Channel'
+            word_2 = 'has'
+        else:
+            word_1 = 'Channels'
+            word_2 = 'have'
 
-        for k, v in sorted(channels.items(), key=lambda item: item[0]):
-            lines.append(f'{k}: {v if v else '❗ not assigned.'}')
+        msg = f'{word_1} {word_2} been successfully deleted.'
 
-        return InfoEmbed(
-            description='\n'.join(lines)
+        success_embed = SuccessEmbed(
+            description=msg
         )
+
+        formatter = SettingsFormatter()
+        current_channels = await formatter.format_current_system_channels(guild=interaction.guild)
+
+        await interaction.response.edit_message(embeds=[success_embed, current_channels])

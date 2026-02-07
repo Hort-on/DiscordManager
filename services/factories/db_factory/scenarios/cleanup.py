@@ -95,7 +95,7 @@ class CleanupSystemChannels(DataBaseScenario):
         db_connect: DB,
         logger: Logger,
         guild_id: int,
-        channels: dict[str, int]
+        channels: list[str]
     ):
         super().__init__(db_connect, logger, guild_id)
         self.channels = channels
@@ -104,14 +104,13 @@ class CleanupSystemChannels(DataBaseScenario):
         table = self._get_table('sys_channels')
 
         async with self.db_connect.connect() as cursor:
-            for key, channel_id in self.channels.items():
+            for key in self.channels:
                 query = (
                     f'UPDATE {table} '
                     f'SET {key} = NULL '
                     f'WHERE guild_id = ? '
-                    f'AND {key} = ?'
                 )
-                await cursor.execute(query, (self.guild_id, channel_id))
+                await cursor.execute(query, (self.guild_id,))
 
             return cursor.total_changes > 0
 

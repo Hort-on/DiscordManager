@@ -180,7 +180,7 @@ class DBFactory:
     def for_cleanup_system_channel(
             self,
             guild_id: int,
-            channels: dict[str, int]
+            channels: list[str]
     ) -> CleanupSystemChannels:
         return CleanupSystemChannels(
             db_connect=self.db_connect,

@@ -57,7 +57,7 @@ class AddHiddenRoleButton(FirewallButton):
         context.push(target='hidden_roles_menu')
 
         formatter = SettingsFormatter()
-        embeds = formatter.format_current_hidden_roles(interaction)
+        embed = await formatter.format_current_hidden_roles(interaction)
 
         options = self.service.for_add_roles_options(
             guild=interaction.guild
@@ -82,7 +82,7 @@ class AddHiddenRoleButton(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embeds=embeds
+            embed=embed
         )
 
 
@@ -103,7 +103,7 @@ class DeleteHiddenRoleButton(FirewallButton):
         context.push(target='hidden_roles_menu')
 
         formatter = SettingsFormatter()
-        embeds = formatter.format_current_hidden_roles(interaction)
+        embed = await formatter.format_current_hidden_roles(interaction)
 
         options = self.service.for_remove_roles_options(
             guild=interaction.guild,
@@ -129,5 +129,5 @@ class DeleteHiddenRoleButton(FirewallButton):
 
         await interaction.response.edit_message(
             view=view,
-            embeds=embeds
+            embed=embed
         )
