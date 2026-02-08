@@ -131,3 +131,21 @@ class DeleteHiddenRoleButton(FirewallButton):
             view=view,
             embed=embed
         )
+
+
+class HiddenRolesListButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='📄Hidden roles list',
+            style=discord.ButtonStyle.blurple,
+        )
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        formatter = SettingsFormatter()
+        embed = await formatter.format_current_hidden_roles(interaction)
+
+        await interaction.response.edit_message(
+            embed=embed
+        )

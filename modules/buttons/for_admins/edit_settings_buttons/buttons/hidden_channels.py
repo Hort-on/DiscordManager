@@ -128,3 +128,19 @@ class DeleteHiddenChannelButton(FirewallButton):
             view=view,
             embed=embed
         )
+
+
+class HiddenChannelsListButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='📄Hidden channels list',
+            style=discord.ButtonStyle.blurple
+        )
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        formatter = SettingsFormatter()
+        embed = await formatter.format_current_hidden_channels(interaction)
+
+        await interaction.response.edit_message(embed=embed)

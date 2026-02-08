@@ -147,12 +147,10 @@ class DeleteSystemChannelsService:
             keys=values
         )
 
-        if len(values) <= 1:
-            word_1 = 'Channel'
-            word_2 = 'has'
-        else:
-            word_1 = 'Channels'
-            word_2 = 'have'
+        is_plural = len(values) != 1
+
+        word_1 = 'Channels' if is_plural else 'Channel'
+        word_2 = 'have' if is_plural else 'has'
 
         msg = f'{word_1} {word_2} been successfully deleted.'
 

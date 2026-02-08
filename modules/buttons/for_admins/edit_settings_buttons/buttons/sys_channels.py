@@ -122,3 +122,19 @@ class DeleteSystemChannelsButton(FirewallButton):
         embed = await formatter.format_current_system_channels(guild=interaction.guild)
 
         await interaction.response.edit_message(embed=embed, view=view)
+
+
+class SystemChannelsListButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(self):
+        super().__init__(
+            label='📄System channels list',
+            style=discord.ButtonStyle.blurple
+        )
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        formatter = SettingsFormatter()
+        embed = await formatter.format_current_system_channels(guild=interaction.guild)
+
+        await interaction.response.edit_message(embed=embed)
