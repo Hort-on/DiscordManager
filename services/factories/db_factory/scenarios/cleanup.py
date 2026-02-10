@@ -104,11 +104,11 @@ class CleanUpVerificationRole(DataBaseScenario):
         )
 
     async def _execute(self) -> None:
-        query = (
-            f'UPDATE GuildSettings'
-            f'SET verification_role_id = NULL '
-            f'WHERE guild_id = ? '
-        )
+        query = """
+            UPDATE GuildSettings
+            SET verification_role_id = NULL
+            WHERE guild_id = ?
+        """
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, (self.guild_id,))

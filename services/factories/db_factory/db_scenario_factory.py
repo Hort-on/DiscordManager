@@ -166,7 +166,7 @@ class DBFactory:
             guild_id=guild_id,
         )
 
-    def for_cleanup_role_delite(self, guild_id: int) -> CleanUpVerificationRole:
+    def for_cleanup_role_delete(self, guild_id: int) -> CleanUpVerificationRole:
         return CleanUpVerificationRole(
             db_connect=self.db_connect,
             logger=self.logger,

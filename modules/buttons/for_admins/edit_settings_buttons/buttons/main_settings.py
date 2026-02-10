@@ -10,7 +10,6 @@ import discord
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
 from modules.buttons.for_admins.edit_settings_buttons.services.main_settings import EditMainSettingsService
-from modules.buttons.for_admins.edit_settings_buttons.services.system_channels import AddSystemChannelsService
 
 from services.buttons.navigator_context import NavigationContext
 from services.drop_down_menu.drop_down_selector import DropMenuView
@@ -50,52 +49,3 @@ class MainSettingsButton(FirewallButton):
             view=view,
             embed=embed
         )
-
-
-class SysChannelsMenuButton(FirewallButton):
-    def __init__(self, navigator: Navigator):
-        super().__init__(
-            label='System channels management',
-            style=discord.ButtonStyle.green
-        )
-        self.service = AddSystemChannelsService(navigator=navigator)
-        self.navigator = navigator
-
-    async def on_click(self, interaction: discord.Interaction) -> None:
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-
-class HiddenChannelsMenuButton(FirewallButton):
-    def __init__(self, navigator: Navigator):
-        super().__init__(
-            label='Hidden channels management',
-            style=discord.ButtonStyle.green
-        )
-        self.navigator = navigator
-
-    async def on_click(self, interaction: discord.Interaction) -> None:
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-        view = self.navigator.go(target='hidden_ch_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
-
-
-class HiddenRolesMenuButton(FirewallButton):
-    def __init__(self, navigator: Navigator):
-        super().__init__(
-            label='Hidden role management',
-            style=discord.ButtonStyle.green
-        )
-        self.navigator = navigator
-
-    async def on_click(self, interaction: discord.Interaction) -> None:
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})

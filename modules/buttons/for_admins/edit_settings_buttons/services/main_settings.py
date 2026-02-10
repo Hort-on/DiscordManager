@@ -18,6 +18,7 @@ from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatte
 
 from services.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbed
 from services.drop_down_menu.drop_down_selector import DropMenuView
+from services.buttons.navigator_context import NavigationContext
 
 
 class EditMainSettingsService:
@@ -48,7 +49,7 @@ class EditMainSettingsService:
         match config_key[0]:
             case 'verification':
                 current_value = self.settings.dict_storage.for_dict_get(
-                    config_key,
+                    config_key[0],
                     target=StorageTarget.SETTINGS,
                     guild_id=interaction.guild_id,
                 )
@@ -57,7 +58,11 @@ class EditMainSettingsService:
                 new_value = not current
 
                 if not new_value:
-                    ...
+                    await self._clean_up_verification(
+                        guild_id=interaction.guild_id
+                    )
+
+                await self._save_data(interaction=interaction, config_key=config_key[0])
 
             case 'verification_role_id':
                 options = [
@@ -74,6 +79,12 @@ class EditMainSettingsService:
                     placeholder='Please select the role:',
                     callback=self._save_verify_role
                 )
+
+                context = getattr(view, 'context', NavigationContext())
+
+                context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
+
+                view.context = context
 
                 await interaction.response.edit_message(view=view)
 
@@ -167,7 +178,7 @@ class EditMainSettingsService:
             data={'verification_channel_id': None}
         )
 
-        delete_role = self.db_factory.for_cleanup_role_delite(
+        delete_role = self.db_factory.for_cleanup_role_delete(
             guild_id=guild_id
         )
 
