@@ -70,36 +70,41 @@ class WriteData(DataBaseScenario):
             return cursor.total_changes > 0
 
 
-class WriteSet(DataBaseScenario):
+class InsertSet(DataBaseScenario):
     def __init__(
         self,
         db_connect: DB,
         logger: Logger,
         guild_id: int,
-        values: set[int],
         table_name: str,
-        key: str
+        key: str,
+        values: set[int]
     ):
         super().__init__(
             db_connect=db_connect,
             logger=logger,
             guild_id=guild_id
         )
-        self.values = values
+
         self.table_name = table_name
         self.key = key
+        self.values = values
 
     async def _execute(self) -> bool:
+        if not self.values:
+            return False
+
         table = self._get_table(self.table_name)
+
         query = f'''
             INSERT OR IGNORE INTO {table} (guild_id, {self.key})
             VALUES (?, ?)
         '''
 
-        value = [(self.guild_id, ch_id) for ch_id in self.values]
+        params = [(self.guild_id, v) for v in self.values]
 
         async with self.db_connect.connect() as cursor:
-            await cursor.executemany(query, value)
+            await cursor.executemany(query, params)
             return cursor.total_changes > 0
 
 
@@ -109,23 +114,27 @@ class DeleteSet(DataBaseScenario):
         db_connect: DB,
         logger: Logger,
         guild_id: int,
-        values: set[int],
         table_name: str,
-        key: str
+        key: str,
+        values: set[int]
     ):
         super().__init__(
             db_connect=db_connect,
             logger=logger,
             guild_id=guild_id
         )
-        self.values = values
+
         self.table_name = table_name
         self.key = key
+        self.values = values
 
     async def _execute(self) -> bool:
-        table = self._get_table(table_name=self.table_name)
+        if not self.values:
+            return False
 
+        table = self._get_table(self.table_name)
         placeholders = ', '.join('?' for _ in self.values)
+
         query = f'''
             DELETE FROM {table}
             WHERE guild_id = ?
@@ -133,73 +142,6 @@ class DeleteSet(DataBaseScenario):
         '''
 
         params = (self.guild_id, *self.values)
-
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, params)
-            return cursor.total_changes > 0
-
-
-class WriteSuperuser(DataBaseScenario):
-    def __init__(
-            self,
-            db_connect: DB,
-            logger: Logger,
-            guild_id: int,
-            table_name: str,
-            user_ids: set[int]
-    ):
-        super().__init__(
-            db_connect=db_connect,
-            logger=logger,
-            guild_id=guild_id
-        )
-
-        self.table_name = table_name
-        self.user_ids = user_ids
-
-    async def _execute(self) -> int:
-        table = self._get_table('super_users')
-
-        query = f"""
-            INSERT INTO {table} (guild_id, user_id)
-            VALUES (?, ?)
-            ON CONFLICT(guild_id, user_id) DO NOTHING
-        """
-
-        values = [(self.guild_id, uid) for uid in self.user_ids]
-
-        async with self.db_connect.connect() as cursor:
-            await cursor.executemany(query, values)
-            return cursor.total_changes > 0
-
-
-class DeleteSuperuser(DataBaseScenario):
-    def __init__(
-            self,
-            db_connect: DB,
-            logger: Logger,
-            guild_id: int,
-            user_ids: set[int]
-    ):
-        super().__init__(
-            db_connect=db_connect,
-            logger=logger,
-            guild_id=guild_id
-        )
-        self.user_ids = user_ids
-
-    async def _execute(self) -> bool:
-        table = self._get_table('super_users')
-
-        placeholders = ', '.join(['?'] * len(self.user_ids))
-
-        query = f"""
-               DELETE FROM {table}
-               WHERE guild_id = ?
-               AND user_id IN ({placeholders})
-           """
-
-        params = [self.guild_id, *self.user_ids]
 
         async with self.db_connect.connect() as cursor:
             await cursor.execute(query, params)
@@ -239,10 +181,10 @@ class FetchAllData(DataBaseScenario):
 
 class InitGuild(DataBaseScenario):
     def __init__(
-            self,
-            db_connect: DB,
-            logger: Logger,
-            guild_id: int
+        self,
+        db_connect: DB,
+        logger: Logger,
+        guild_id: int
     ):
         super().__init__(
             db_connect=db_connect,

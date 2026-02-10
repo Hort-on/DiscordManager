@@ -63,6 +63,7 @@ class ChannelSelectorManager:
         await interaction.response.edit_message(view=view)
 
     async def _select_channel(self, interaction: discord.Interaction, value: list[str]):
+        print('_select_channel: OK')
         hidden_channels = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=interaction.guild_id
@@ -84,7 +85,7 @@ class ChannelSelectorManager:
                 content='No channels found',
                 view=None
             )
-            return ''
+            return
 
         channel_options = [
             discord.SelectOption(
@@ -94,12 +95,14 @@ class ChannelSelectorManager:
             for channel in channels if channel.id not in hidden_channels
         ]
 
-        return DropMenuView(
+        view = DropMenuView(
             navigator=self.navigator,
             options=channel_options,
             placeholder='',
             callback=self._save_channel
         )
+
+        await interaction.response.edit_message(view=view)
 
     async def _save_channel(
             self,

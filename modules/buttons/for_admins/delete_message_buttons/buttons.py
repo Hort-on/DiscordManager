@@ -32,7 +32,7 @@ class DeleteAnyMessageButton(FirewallButton):
             scenario=scenario,
             text_only=True
         )
-        await manager.select_channel_type()
+        await manager.select_channel_type(interaction=interaction)
 
 
 class DeleteUserMessageButton(FirewallButton):
@@ -54,4 +54,4 @@ class DeleteUserMessageButton(FirewallButton):
             text_only=True
         )
 
-        await manager.select_channel_type()
+        await manager.select_channel_type(interaction=interaction)

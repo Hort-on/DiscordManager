@@ -32,7 +32,7 @@ class HiddenChannelsService:
         self.formatter = SettingsFormatter()
 
     def for_add_channel_options(self, guild: discord.Guild):
-        result = self.settings.set_storage.for_set_get_all(
+        result = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=guild.id
         )
@@ -46,7 +46,7 @@ class HiddenChannelsService:
         ]
 
     def for_remove_channel_options(self, guild: discord.Guild):
-        hidden_channels = self.settings.set_storage.for_set_get_all(
+        hidden_channels = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=guild.id
         )
@@ -75,7 +75,7 @@ class HiddenChannelsService:
             value=values
         )
 
-        write = self.db_factory.for_write_set(
+        write = self.db_factory.for_insert_set(
             guild_id=interaction.guild_id,
             values=values,
             table_name='hidden_channels',

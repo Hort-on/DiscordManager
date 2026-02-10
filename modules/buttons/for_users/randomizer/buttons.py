@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from services.buttons.navigator import Navigator
 
@@ -76,4 +77,4 @@ class RandomTeamByChannel(FirewallButton):
             channels_with_users_only=True
         )
 
-        await manager.select_channel_type()
+        await manager.select_channel_type(interaction=interaction)

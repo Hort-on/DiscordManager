@@ -25,13 +25,14 @@ class CurrentSettings:
         self.service = CleanUpService()
 
     def current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
-        settings = self.settings.dict_storage.for_dict_get_all(
+        settings = self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id
         )
 
         if not settings:
             return WarningEmbed(description='No settings found.')
+
         lines: list[str] = [f'Setting{' ' * 14}Status', f'{'-' * 23}  {'-' * 12}']
 
         for key, value in sorted(settings.items(), key=lambda item: item[0]):
@@ -50,9 +51,9 @@ class CurrentSettings:
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
 
     async def current_system_channels(self, guild: discord.Guild) -> discord.Embed:
-        not_found_ch: dict[str, int] = {}
+        not_found_ch: list[str] = []
 
-        channels = self.settings.dict_storage.for_dict_get_all(
+        channels = self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=guild.id
         )
@@ -60,15 +61,19 @@ class CurrentSettings:
         lines: list[str] = [f'System channels{' ' * 8}channel names',
                             f'{'-' * 21}{' ' * 2}{'-' * 14}']
 
-        for k, v in sorted(channels.items(), key=lambda item: item[0]):
-            ch = guild.get_channel(v)
-            config_name = k.removesuffix('_id').replace('_', ' ')
-            lines.append(f'{config_name:<20}: {ch.name if ch else '❗ not assigned'}')
+        for key, value in sorted(channels.items(), key=lambda item: item[0]):
+            channel = guild.get_channel(value)
+
+            if not channel and value is not None:
+                not_found_ch.append(key)
+
+            config_name = key.removesuffix('_id').replace('_', ' ')
+            lines.append(f'{config_name:<20}: {channel.name if channel else '❗ not assigned'}')
 
         if not_found_ch:
             msg = await self.service.clean_up_system_channels(
                 guild_id=guild.id,
-                channels=channels
+                channels=not_found_ch
             )
             lines.append(f'\n\n{msg}')
 
@@ -81,7 +86,7 @@ class CurrentSettings:
 
         lines: list[str] = [f'Hidden channels:', f'{'-' * 16}']
 
-        hidden_channels = self.settings.set_storage.for_set_get_all(
+        hidden_channels = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=interaction.guild_id
         )
@@ -116,7 +121,7 @@ class CurrentSettings:
 
         lines: list[str] = [f'Hidden roles:', f'{'-' * 13}']
 
-        hidden_roles = self.settings.set_storage.for_set_get_all(
+        hidden_roles = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_ROLES,
             guild_id=interaction.guild_id
         )

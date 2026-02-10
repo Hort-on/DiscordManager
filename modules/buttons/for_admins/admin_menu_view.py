@@ -30,7 +30,7 @@ class AdminMenuView(discord.ui.View):
 
         container: BotContainer = AppContainer.get()
 
-        config = container.settings.dict_storage.for_dict_get_all(
+        config = container.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )

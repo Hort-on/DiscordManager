@@ -36,7 +36,7 @@ class SendMessageButton(FirewallButton):
 
         try:
             await interaction.user.create_dm()
-            await manager.select_channel_type()
+            await manager.select_channel_type(interaction=interaction)
         except discord.Forbidden:
             embed = WarningEmbed(
                 description='Please open your Direct Message'

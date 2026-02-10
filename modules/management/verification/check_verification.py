@@ -1,6 +1,5 @@
 import discord
 
-from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 from modules.management.verification.view import VerificationView

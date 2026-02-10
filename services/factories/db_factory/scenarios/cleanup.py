@@ -12,9 +12,9 @@ class CleanupGuild(DataBaseScenario):
             guild_id: int,
     ):
         super().__init__(
-            db_connect,
-            logger,
-            guild_id
+            db_connect=db_connect,
+            logger=logger,
+            guild_id=guild_id
         )
 
     async def _execute(self) -> bool:
@@ -33,59 +33,34 @@ class CleanupUser(DataBaseScenario):
             user_ids: set[int]
     ):
         super().__init__(
-            db_connect,
-            logger,
-            guild_id
+            db_connect=db_connect,
+            logger=logger,
+            guild_id=guild_id
         )
 
         self.user_ids = user_ids
 
     async def _execute(self) -> bool:
-        placeholders = ','.join('?' for _ in self.user_ids)
+        if not self.user_ids:
+            return False
+
+        placeholders = ', '.join('?' for _ in self.user_ids)
 
         async with self.db_connect.connect() as cursor:
-            for table in self.USER_TABLES:
+            for table_key in self.USER_TABLES:
+                table = self._get_table(table_key)
+
                 query = f'''
                     DELETE FROM {table}
                     WHERE guild_id = ?
-                    AND user_id IN ({placeholders})
+                      AND user_id IN ({placeholders})
                 '''
 
-                params = (self.guild_id, *self.user_ids)
-                await cursor.execute(query, params)
-            return cursor.total_changes > 0
+                await cursor.execute(
+                    query,
+                    (self.guild_id, *self.user_ids)
+                )
 
-
-class CleanupHiddenChannels(DataBaseScenario):
-    def __init__(
-            self,
-            db_connect: DB,
-            logger: Logger,
-            guild_id: int,
-            channel_ids: set[int]
-    ):
-        super().__init__(
-            db_connect,
-            logger,
-            guild_id
-        )
-
-        self.channel_ids = channel_ids
-
-    async def _execute(self) -> bool:
-        table = self._get_table('hidden_channels')
-
-        placeholders = ','.join('?' for _ in self.channel_ids)
-        query = (
-            f'DELETE FROM {table} '
-            f'WHERE guild_id = ? '
-            f'AND channel_id IN ({placeholders})'
-        )
-
-        params = (self.guild_id, *self.channel_ids)
-
-        async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, params)
             return cursor.total_changes > 0
 
 
@@ -115,13 +90,12 @@ class CleanupSystemChannels(DataBaseScenario):
             return cursor.total_changes > 0
 
 
-class CleanupHiddenRoles(DataBaseScenario):
+class CleanUpVerificationRole(DataBaseScenario):
     def __init__(
             self,
             db_connect: DB,
             logger: Logger,
             guild_id: int,
-            role_ids: set[int]
     ):
         super().__init__(
             db_connect,
@@ -129,22 +103,12 @@ class CleanupHiddenRoles(DataBaseScenario):
             guild_id
         )
 
-        self.role_ids = role_ids
-
     async def _execute(self) -> None:
-        if not self.role_ids:
-            return
-
-        table = self._get_table('roles')
-
-        placeholders = ','.join('?' for _ in self.role_ids)
         query = (
-            f'DELETE FROM {table} '
+            f'UPDATE GuildSettings'
+            f'SET verification_role_id = NULL '
             f'WHERE guild_id = ? '
-            f'AND role_id IN ({placeholders})'
         )
 
-        params = (self.guild_id, *self.role_ids)
-
         async with self.db_connect.connect() as cursor:
-            await cursor.execute(query, params)
+            await cursor.execute(query, (self.guild_id,))

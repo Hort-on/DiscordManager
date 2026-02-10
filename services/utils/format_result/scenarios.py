@@ -21,7 +21,7 @@ class EditSettingsResultScenario:
         self.settings: SettingsStorage = container.settings
 
     async def build_result(self, interaction: discord.Interaction) -> discord.Embed:
-        settings = self.settings.dict_storage.for_dict_get_all(
+        settings = self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id
         )
@@ -57,9 +57,9 @@ class EditSettingsResultScenario:
         lines.append('')
         lines.append('Channels:')
 
-        current_system_channels = self.settings.dict_storage.for_dict_get_all(
-            StorageTarget.SYSTEM_CHANNELS,
-            interaction.guild_id
+        current_system_channels = self.settings.dict_storage.for_dict_get(
+            target=StorageTarget.SYSTEM_CHANNELS,
+            guild_id=interaction.guild_id
         )
 
         if not current_system_channels:

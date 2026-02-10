@@ -32,7 +32,7 @@ class HiddenRolesService:
         self.formatter = SettingsFormatter()
 
     def for_add_roles_options(self, guild: discord.Guild):
-        hidden_roles = self.settings.set_storage.for_set_get_all(
+        hidden_roles = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_ROLES,
             guild_id=guild.id
         )
@@ -46,7 +46,7 @@ class HiddenRolesService:
         ]
 
     def for_remove_roles_options(self, guild: discord.Guild, target: StorageTarget):
-        hidden_roles = self.settings.set_storage.for_set_get_all(
+        hidden_roles = self.settings.set_storage.for_set_get(
             target=target,
             guild_id=guild.id
         )
@@ -75,7 +75,7 @@ class HiddenRolesService:
             value=values
         )
 
-        write = self.db_factory.for_write_set(
+        write = self.db_factory.for_insert_set(
             guild_id=interaction.guild_id,
             values=values,
             table_name='roles',

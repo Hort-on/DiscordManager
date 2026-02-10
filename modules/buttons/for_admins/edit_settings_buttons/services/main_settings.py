@@ -2,15 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import discord
-
-from services.drop_down_menu.drop_down_selector import DropMenuView
-
 if TYPE_CHECKING:
     from core.container import BotContainer
     from services.factories.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from services.buttons.navigator import Navigator
+
+import discord
 
 from core.container import AppContainer
 
@@ -19,6 +17,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
 
 from services.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbed
+from services.drop_down_menu.drop_down_selector import DropMenuView
 
 
 class EditMainSettingsService:
@@ -32,7 +31,7 @@ class EditMainSettingsService:
         self.role_key = None
 
     def build_options(self, guild_id: int):
-        settings = self.settings.dict_storage.for_dict_get_all(
+        settings = self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )
@@ -46,25 +45,40 @@ class EditMainSettingsService:
         ]
 
     async def proceed_result(self, interaction: discord.Interaction, config_key: list[str]):
-        if config_key[0] == 'verification_role_id':
-            options = [
-                discord.SelectOption(
-                    label=role.name,
-                    value=str(role.id)
+        match config_key[0]:
+            case 'verification':
+                current_value = self.settings.dict_storage.for_dict_get(
+                    config_key,
+                    target=StorageTarget.SETTINGS,
+                    guild_id=interaction.guild_id,
                 )
-                for role in interaction.guild.roles
-            ]
 
-            view = DropMenuView(
-                navigator=self.navigator,
-                options=options,
-                placeholder='Please select the role:',
-                callback=self._save_verify_role
-            )
+                current = current_value.get(config_key[0], False)
+                new_value = not current
 
-            await interaction.response.edit_message(view=view)
-        else:
-            await self._save_data(interaction=interaction, config_key=config_key[0])
+                if not new_value:
+                    ...
+
+            case 'verification_role_id':
+                options = [
+                    discord.SelectOption(
+                        label=role.name,
+                        value=str(role.id)
+                    )
+                    for role in interaction.guild.roles
+                ]
+
+                view = DropMenuView(
+                    navigator=self.navigator,
+                    options=options,
+                    placeholder='Please select the role:',
+                    callback=self._save_verify_role
+                )
+
+                await interaction.response.edit_message(view=view)
+
+            case _:
+                await self._save_data(interaction=interaction, config_key=config_key[0])
 
     async def _save_verify_role(self, interaction: discord.Interaction, config_key: list[str]):
         write = self.db_factory.for_write_data(
@@ -81,11 +95,10 @@ class EditMainSettingsService:
             await interaction.response.edit_message(embed=embed)
             return
 
-        self.settings.dict_storage.for_dict_set(
+        self.settings.dict_storage.for_dict_update(
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id,
-            key='verification_role_id',
-            value=int(config_key[0])
+            data={'verification_role_id': int(config_key[0])}
         )
 
         role = interaction.guild.get_role(int(config_key[0]))
@@ -124,11 +137,10 @@ class EditMainSettingsService:
             await interaction.response.edit_message(embed=embed)
             return
 
-        self.settings.dict_storage.for_dict_set(
+        self.settings.dict_storage.for_dict_update(
                 target=StorageTarget.SETTINGS,
                 guild_id=interaction.guild_id,
-                key=config_key,
-                value=new_value
+                data={config_key: new_value}
         )
 
         success_embed = SuccessEmbed(
@@ -140,3 +152,30 @@ class EditMainSettingsService:
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]
         )
+
+    async def _clean_up_verification(self, guild_id: int):
+        delete_channel = self.db_factory.for_cleanup_system_channel(
+            guild_id=guild_id,
+            channels=['verification_channel_id']
+        )
+
+        await delete_channel.db_proceed()
+
+        self.settings.dict_storage.for_dict_update(
+            target=StorageTarget.SYSTEM_CHANNELS,
+            guild_id=guild_id,
+            data={'verification_channel_id': None}
+        )
+
+        delete_role = self.db_factory.for_cleanup_role_delite(
+            guild_id=guild_id
+        )
+
+        await delete_role.db_proceed()
+
+        self.settings.dict_storage.for_dict_update(
+            target=StorageTarget.SETTINGS,
+            guild_id=guild_id,
+            data={'verification_role_id': None}
+        )
+    

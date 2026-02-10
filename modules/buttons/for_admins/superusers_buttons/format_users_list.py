@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from database.settings_storage.settings_manager import StorageTarget
-from services.embed_constructor.embed_constructor import InfoEmbed, ErrorEmbed
+from services.embed_constructor.embed_constructor import InfoEmbed
 
 if TYPE_CHECKING:
     from core.container import BotContainer

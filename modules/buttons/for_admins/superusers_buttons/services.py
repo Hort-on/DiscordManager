@@ -129,10 +129,11 @@ class AddSuperusersService(BaseSuperuserService):
                 value=user_ids
             )
 
-            scenario = self.db_factory.for_write_superuser(
+            scenario = self.db_factory.for_insert_set(
                 guild_id=interaction.guild_id,
+                values=user_ids,
                 table_name='super_users',
-                user_ids=user_ids
+                key='user_id'
             )
 
             save_to_db_result = await scenario.db_proceed()
@@ -196,9 +197,11 @@ class DeleteSuperuserService(BaseSuperuserService):
     ):
         user_ids_int = {int(user_id) for user_id in user_ids_str}
 
-        scenario = self.db_factory.for_delete_superuser(
-            interaction=interaction,
-            user_ids=user_ids_int
+        scenario = self.db_factory.for_delete_set(
+            guild_id=interaction.guild_id,
+            values=user_ids_int,
+            table_name='super_users',
+            key='user_id'
         )
 
         deleted = await scenario.db_proceed()
@@ -278,9 +281,8 @@ class DeleteSuperuserService(BaseSuperuserService):
 
         await scenario.db_proceed()
 
-        for user in not_found_users:
-            self.settings.dict_storage.for_dict_remove(
-                target=StorageTarget.CHANNELS_TO_SEND,
-                guild_id=guild_id,
-                key=user
-            )
+        self.settings.dict_storage.for_dict_delete(
+            target=StorageTarget.CHANNELS_TO_SEND,
+            guild_id=guild_id,
+            data=not_found_users
+        )

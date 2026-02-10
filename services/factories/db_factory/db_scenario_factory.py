@@ -1,13 +1,9 @@
-import discord
-
 from database.data_base_model import DB
 
 from services.factories.db_factory.scenarios.common import (
     GetData,
     WriteData,
-    WriteSuperuser,
-    DeleteSuperuser,
-    WriteSet,
+    InsertSet,
     DeleteSet,
     FetchAllData,
     InitGuild
@@ -25,9 +21,8 @@ from services.factories.db_factory.scenarios.birthday import (
 from services.factories.db_factory.scenarios.cleanup import (
     CleanupGuild,
     CleanupUser,
-    CleanupHiddenChannels,
     CleanupSystemChannels,
-    CleanupHiddenRoles
+    CleanUpVerificationRole
 )
 
 from services.logger.logger import Logger
@@ -61,8 +56,8 @@ class DBFactory:
             data=data
         )
 
-    def for_write_set(self, guild_id: int, values: set[int], table_name: str, key: str) -> WriteSet:
-        return WriteSet(
+    def for_insert_set(self, guild_id: int, values: set[int], table_name: str, key: str) -> InsertSet:
+        return InsertSet(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
@@ -79,23 +74,6 @@ class DBFactory:
             values=values,
             table_name=table_name,
             key=key
-        )
-
-    def for_write_superuser(self, guild_id: int, table_name: str, user_ids: set[int]) -> WriteSuperuser:
-        return WriteSuperuser(
-            db_connect=self.db_connect,
-            logger=self.logger,
-            guild_id=guild_id,
-            table_name=table_name,
-            user_ids=user_ids
-        )
-
-    def for_delete_superuser(self, interaction: discord.Interaction, user_ids: set[int]) -> DeleteSuperuser:
-        return DeleteSuperuser(
-            db_connect=self.db_connect,
-            logger=self.logger,
-            guild_id=interaction.guild_id,
-            user_ids=user_ids
         )
 
     def for_fetch_all(self, guild_id: int, table_name: str) -> FetchAllData:
@@ -169,14 +147,6 @@ class DBFactory:
             user_ids=user_ids
         )
 
-    def for_cleanup_hidden_channel(self, guild_id: int, channel_ids: set[int]) -> CleanupHiddenChannels:
-        return CleanupHiddenChannels(
-            db_connect=self.db_connect,
-            logger=self.logger,
-            guild_id=guild_id,
-            channel_ids=channel_ids
-        )
-
     def for_cleanup_system_channel(
             self,
             guild_id: int,
@@ -189,17 +159,16 @@ class DBFactory:
             channels=channels,
         )
 
-    def for_cleanup_hidden_roles(self, guild_id: int, role_ids: set[int]) -> CleanupHiddenRoles:
-        return CleanupHiddenRoles(
-            db_connect=self.db_connect,
-            logger=self.logger,
-            guild_id=guild_id,
-            role_ids=role_ids
-        )
-
     def for_init_guild(self, guild_id: int) -> InitGuild:
         return InitGuild(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
+        )
+
+    def for_cleanup_role_delite(self, guild_id: int) -> CleanUpVerificationRole:
+        return CleanUpVerificationRole(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id
         )

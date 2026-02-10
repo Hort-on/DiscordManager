@@ -24,7 +24,7 @@ from services.buttons.navigator_context import NavigationContext
 def build_options(guild_id: int) -> list[discord.SelectOption]:
     container: BotContainer = AppContainer.get()
 
-    sys_channels = container.settings.dict_storage.for_dict_get_all(
+    sys_channels = container.settings.dict_storage.for_dict_get(
         target=StorageTarget.SYSTEM_CHANNELS,
         guild_id=guild_id
     )
@@ -100,11 +100,10 @@ class AddSystemChannelsService:
             await interaction.response.edit_message(embed=error_embed)
             return
 
-        self.settings.dict_storage.for_dict_set(
+        self.settings.dict_storage.for_dict_update(
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=interaction.guild_id,
-            key=self.ch_key,
-            value=ch_id
+            data={self.ch_key: ch_id}
         )
 
         channel = interaction.guild.get_channel(ch_id)
@@ -141,10 +140,12 @@ class DeleteSystemChannelsService:
             await interaction.response.edit_message(embed=error_embed)
             return
 
-        self.settings.dict_storage.for_dict_remove(
+        channel_keys = [ch for ch in values]
+
+        self.settings.dict_storage.for_dict_update(
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=interaction.guild_id,
-            keys=values
+            data={key: None for key in channel_keys}
         )
 
         is_plural = len(values) != 1
