@@ -29,7 +29,7 @@ class RandomNumButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.send_modal(RandomNumModal())
+        await interaction.response.send_modal(RandomNumModal())
 
 
 class RandomWordButton(FirewallButton):
@@ -42,7 +42,7 @@ class RandomWordButton(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.send_modal(RandomWordModal())
+        await interaction.response.send_modal(RandomWordModal())
 
 
 class RandomTeamByMsg(FirewallButton):
@@ -55,7 +55,7 @@ class RandomTeamByMsg(FirewallButton):
         )
 
     async def on_click(self, interaction: discord.Interaction):
-        await interaction.send_modal(RandomTeamByMsgModal())
+        await interaction.response.send_modal(RandomTeamByMsgModal())
 
 
 class RandomTeamByChannel(FirewallButton):
@@ -77,4 +77,4 @@ class RandomTeamByChannel(FirewallButton):
             channels_with_users_only=True
         )
 
-        await manager.select_channel_type(interaction=interaction)
+        await manager.select_channel(interaction=interaction)

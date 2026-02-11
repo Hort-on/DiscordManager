@@ -15,9 +15,10 @@ class RandomNumService:
         result = random.randint(first_num, second_num)
 
         view = ReshuffleView(self.random_num_proceed, first_num, second_num)
-        await interaction.response.edit_message(
+        await interaction.response.send_message(
             content=f'The number is: {result}',
-            view=view
+            view=view,
+            ephemeral=True
         )
 
 
@@ -32,9 +33,10 @@ class RandomWordService:
 
         view = ReshuffleView(self.random_word_proceed, words)
 
-        await interaction.response.edit_message(
+        await interaction.response.send_message(
             content=f'The word is: {result}',
-            view=view
+            view=view,
+            ephemeral=True
         )
 
 
@@ -69,7 +71,7 @@ class RandomTeamByMsgService:
         members = [m.strip() for m in users_list.split(',')]
 
         if teams_quantity > len(members):
-            await interaction.response.edit_message(
+            await interaction.response.send_message(
                 content='```❌ Teams count cannot be greater than users count```',
             )
             return
@@ -89,7 +91,7 @@ class RandomTeamByMsgService:
             await interaction.followup.send(embed=embed, view=view, ephemeral=False)
             return
 
-        await interaction.response.edit_message(embed=embed, view=view)
+        await interaction.response.send_message(embed=embed, view=view)
 
 
 class RandomTeamByChannelService:

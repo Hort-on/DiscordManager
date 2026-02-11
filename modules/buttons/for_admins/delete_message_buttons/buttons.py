@@ -8,10 +8,17 @@ if TYPE_CHECKING:
 import discord
 
 from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.delete_message_buttons.modals import DeleteMessagesModal, DeleteUserMessagesModal
+
+from modules.buttons.for_admins.delete_message_buttons.modals import (
+    DeleteMessagesModal,
+    DeleteUserMessagesModal
+)
 
 from services.factories.channel_factory.scenarios_factory import ChannelFactory
 from services.other_services.get_channel import ChannelSelectorManager
+from services.buttons.navigator_context import NavigationContext
+from services.drop_down_menu.drop_down_selector import DropMenuView
+from services.embed_constructor.embed_constructor import ErrorEmbed
 
 
 class DeleteAnyMessageButton(FirewallButton):
@@ -20,19 +27,42 @@ class DeleteAnyMessageButton(FirewallButton):
     def __init__(self, navigator: Navigator):
         super().__init__(
             label='Delete message',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         scenario = ChannelFactory.for_message_deletion(modal=DeleteMessagesModal)
 
-        manager = ChannelSelectorManager(
+        service = ChannelSelectorManager(
             navigator=self.navigator,
             scenario=scenario,
             text_only=True
         )
-        await manager.select_channel_type(interaction=interaction)
+
+        options = await service.build_options(interaction=interaction)
+
+        if not options:
+            embed = ErrorEmbed(
+                description=f'The guild does not have text channels.'
+            )
+            await interaction.response.edit_message(embed=embed)
+            return
+
+        view = DropMenuView(
+            navigator=self.navigator,
+            options=options,
+            placeholder='Please select the channel:',
+            callback=service.proceed_channel
+        )
+
+        context = getattr(view, 'context', NavigationContext())
+
+        context.push(target='delete_msg_menu', params={'guild_id': interaction.guild_id})
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)
 
 
 class DeleteUserMessageButton(FirewallButton):
@@ -41,17 +71,39 @@ class DeleteUserMessageButton(FirewallButton):
     def __init__(self, navigator: Navigator):
         super().__init__(
             label='Delete message from users',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         scenario = ChannelFactory.for_message_deletion(modal=DeleteUserMessagesModal)
 
-        manager = ChannelSelectorManager(
+        service = ChannelSelectorManager(
             navigator=self.navigator,
             scenario=scenario,
             text_only=True
         )
 
-        await manager.select_channel_type(interaction=interaction)
+        options = await service.build_options(interaction=interaction)
+
+        if not options:
+            embed = ErrorEmbed(
+                description=f'The guild does not have text channels.'
+            )
+            await interaction.response.edit_message(embed=embed)
+            return
+
+        view = DropMenuView(
+            navigator=self.navigator,
+            options=options,
+            placeholder='Please select the channel:',
+            callback=service.proceed_channel
+        )
+
+        context = getattr(view, 'context', NavigationContext())
+
+        context.push(target='delete_msg_menu', params={'guild_id': interaction.guild_id})
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)
