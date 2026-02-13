@@ -3,16 +3,20 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from services.yes_no_service.yes_no_factory import YesNoViewFactory
+    from ui.yes_no_service.yes_no_factory import YesNoViewFactory
 
 import discord
 
+from features.moderation.verification import CheckVerification
+
 from database.settings_storage.settings import SettingsStorage
-from modules.management.events.member_left import MemberLeftNotification
-from services.factories.db_factory.db_scenario_factory import DBFactory
+
+from events.member_left import MemberLeftNotification
+
+from database.db_factory.db_scenario_factory import DBFactory
 # from discord.ext import tasks
-from services.other_services.ask_user_birthday import UserBirthdayService
-# from services.utils.bad_words import invitation_pattern
+from general_services.other_services.ask_user_birthday import UserJoinBirthdayService
+# from general_services.utils.bad_words import invitation_pattern
 
 # from modules.management.verification.check_verification import CheckVerification
 
@@ -45,6 +49,12 @@ class BotController:
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()
         await self.settings.load_all_settings()
+
+        verify_service = CheckVerification(
+            settings=self.settings,
+            bot=self.bot
+        )
+        await verify_service.prepare()
 
     async def on_message(self, message) -> None:
         # TODO: потрібно зробити перевірку суперюзерів з бд
@@ -81,17 +91,16 @@ class BotController:
         #     await handle_spam(message)
         #
         # await self.handle_message(message)
-        await self.bot.process_commands(message)
 
     async def on_member_join(self, member) -> None:
-        await UserBirthdayService(self).check(member=member)
+        await UserJoinBirthdayService(self).check_if_birthday(member=member)  # TODO: правильно назвати імя функції
 
     async def on_member_remove(self, member) -> None:
         await MemberLeftNotification(bot=self.bot, settings=self.settings).check_if_notification(member)
 
     async def on_guild_remove(self, guild: discord.Guild) -> None:
         print(f'Бот від\'єднався від {guild.name}')
-        delete_guild_scenario = self.db_factory.for_remove_guild(guild.id)
+        delete_guild_scenario = self.db_factory.for_cleanup_guild(guild.id)
         await delete_guild_scenario.db_proceed()
 
     async def on_guild_join(self, guild: discord.Guild) -> None:

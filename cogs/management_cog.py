@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from core.container import BotContainer
-    from services.buttons.navigator import Navigator
+    from core.navigator import Navigator
 
 import discord
 
@@ -36,7 +36,6 @@ class ManagementCog(commands.Cog):
 
 
 async def setup(bot):
-    container: BotContainer = AppContainer.get()
     await bot.add_cog(
         ManagementCog(navigator=container.navigator)
     )

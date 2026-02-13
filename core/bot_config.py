@@ -23,7 +23,7 @@ def create_bot():
     intents.moderation = True
     intents.typing = False
 
-    return Bot(intents=intents, command_prefix=None)
+    return Bot(intents=intents, command_prefix='!')
 
 
 bot = create_bot()

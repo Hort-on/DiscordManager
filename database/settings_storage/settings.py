@@ -1,6 +1,6 @@
 from database.settings_storage.settings_manager import SetStorageManager, StorageTarget, DictStorageManager
 
-from services.factories.db_factory.db_scenario_factory import DBFactory
+from database.db_factory.db_scenario_factory import DBFactory
 
 
 class SettingsStorage:

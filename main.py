@@ -12,15 +12,14 @@ from core.controller import BotController
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 
-from modules.management.birthdays.birthday_manager import BirthdayManager
-from modules.management.events.member_left import MemberLeftNotification
-from modules.management.message_handler.bad_words_handler import BadWordsHandler
-from modules.management.verification.service import AntiBotService
+from features.birthdays import BirthdayManager
+from features.moderation.message_handler import BadWordsHandler
+from modules.verification.service import AntiBotService
 
-from services.buttons.navigator import Navigator
-from services.factories.db_factory.db_scenario_factory import DBFactory
-from services.logger.logger import Logger
-from services.yes_no_service.yes_no_factory import YesNoViewFactory
+from core.navigator import Navigator
+from database.db_factory.db_scenario_factory import DBFactory
+from general_services.logger.logger import Logger
+from ui.yes_no_service import YesNoViewFactory
 
 # Show Discord API errors in console
 logging.basicConfig(level=logging.WARNING)
@@ -46,8 +45,6 @@ async def main():
 
     bad_words_handler = BadWordsHandler()
 
-    member_left_notify = MemberLeftNotification(bot=bot, settings=settings)
-
     navigator = Navigator()
 
     yes_no_factory = YesNoViewFactory()
@@ -62,7 +59,6 @@ async def main():
         settings=settings,
         birthday_manager=birthday_manager,
         bad_words_handler=bad_words_handler,
-        member_left_notify=member_left_notify,
         anti_bot_service=anti_bot_service,
         navigator=navigator,
         yes_no_factory=yes_no_factory

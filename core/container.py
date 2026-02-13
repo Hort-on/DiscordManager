@@ -7,16 +7,15 @@ if TYPE_CHECKING:
 
     from database.data_base_model import DB
     from database.settings_storage.settings import SettingsStorage
-    from services.buttons.navigator import Navigator
+    from core.navigator import Navigator
 
-    from modules.management.birthdays.birthday_manager import BirthdayManager
-    from modules.management.events.member_left import MemberLeftNotification
-    from modules.management.message_handler.bad_words_handler import BadWordsHandler
-    from modules.management.verification.service import AntiBotService
+    from features.birthdays import BirthdayManager
+    from features.moderation.message_handler import BadWordsHandler
+    from modules.verification.service import AntiBotService
 
-    from services.factories.db_factory.db_scenario_factory import DBFactory
-    from services.logger.logger import Logger
-    from services.yes_no_service.yes_no_factory import YesNoViewFactory
+    from database.db_factory.db_scenario_factory import DBFactory
+    from general_services.logger.logger import Logger
+    from ui.yes_no_service import YesNoViewFactory
 
 
 class BotContainer:
@@ -29,7 +28,6 @@ class BotContainer:
             settings: SettingsStorage,
             birthday_manager: BirthdayManager,
             bad_words_handler: BadWordsHandler,
-            member_left_notify: MemberLeftNotification,
             anti_bot_service: AntiBotService,
             navigator: Navigator,
             yes_no_factory: YesNoViewFactory
@@ -41,7 +39,6 @@ class BotContainer:
         self.settings = settings
         self.birthday_manager = birthday_manager
         self.bad_words = bad_words_handler
-        self.member_left_notify = member_left_notify
         self.anti_bot_service = anti_bot_service
         self.navigator = navigator
         self.yes_no_factory = yes_no_factory

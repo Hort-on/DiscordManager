@@ -5,8 +5,8 @@ import aiosqlite
 
 from contextlib import asynccontextmanager
 
-from services.logger.logger import Logger
-from services.utils.messages import DB_MSGS as DM
+from general_services.logger.logger import Logger
+from general_services.utils.messages import DB_MSGS as DM
 
 
 class DB:
@@ -135,6 +135,34 @@ class DB:
 
                     FOREIGN KEY (guild_id)
                         REFERENCES GuildSettings(guild_id)
+                        ON DELETE CASCADE
+                );
+            ''')
+
+            await temp_conn.execute('''
+                CREATE TABLE IF NOT EXISTS Groups (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    guild_id INTEGER NOT NULL,
+                    owner_id INTEGER NOT NULL,
+                    name TEXT NOT NULL,
+                    
+                    UNIQUE(guild_id, owner_id),
+                    
+                    FOREIGN KEY (guild_id)
+                        REFERENCES GuildSettings(guild_id)
+                        ON DELETE CASCADE
+                );
+            ''')
+
+            await temp_conn.execute('''
+                CREATE TABLE IF NOT EXISTS GroupMembers (
+                    group_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                
+                    PRIMARY KEY (group_id, user_id),
+                
+                    FOREIGN KEY (group_id)
+                        REFERENCES Groups(id)
                         ON DELETE CASCADE
                 );
             ''')
