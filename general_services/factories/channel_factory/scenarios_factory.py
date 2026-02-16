@@ -1,6 +1,5 @@
 from general_services.factories.channel_factory.channel_scenarios import (
     SaveChannelToDBScenario,
-    DeleteMessagesScenario,
     SaveChannelToDBForMessageScenario,
     RandomSelection
 )
@@ -15,10 +14,6 @@ class ChannelFactory:
     @staticmethod
     def for_db_message_save() -> SaveChannelToDBForMessageScenario:
         return SaveChannelToDBForMessageScenario()
-
-    @staticmethod
-    def for_message_deletion(modal) -> DeleteMessagesScenario:
-        return DeleteMessagesScenario(modal)
 
     @staticmethod
     def for_random_selection() -> RandomSelection:

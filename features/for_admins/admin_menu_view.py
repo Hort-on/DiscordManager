@@ -2,20 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-    from database.settings_storage.settings import SettingsStorage
-
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
 
-from modules.buttons.for_admins.birthday_buttons.menu import BirthdayMenuButton
-from modules.buttons.for_admins.delete_message_buttons.menu import DeleteMsgMenuButton
-from modules.buttons.for_admins.superusers_buttons.menu import SuperusersMenuButton
-from modules.buttons.for_admins.edit_settings_buttons.menu_button import EditSettingsMenuButton
-from modules.buttons.for_admins.send_message_buttons.send_msg import SendMessageButton
-from modules.buttons.other_buttons.back import BackButton
+from features.for_admins.delete_message.buttons import DeleteMessageButton
+from features.for_admins.edit_settings.menu_button import EditSettingsMenuButton
+from features.for_admins.send_anon_messages.send_msg import SendMessageButton
+from features.for_admins.superusers.menu import SuperusersMenuButton
+from features.for_everyone.birthdays.menu import BirthdayMenuButton
+
+from ui.buttons.back_button import BackButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from database.settings_storage.settings import SettingsStorage
 
 
 class AdminMenuView(discord.ui.View):
@@ -33,7 +34,7 @@ class AdminMenuView(discord.ui.View):
         )
 
         self.add_item(SuperusersMenuButton(navigator=navigator))
-        self.add_item(DeleteMsgMenuButton(navigator=navigator))
+        self.add_item(DeleteMessageButton(navigator=navigator))
         self.add_item(EditSettingsMenuButton(navigator=navigator))
 
         if config.get('birthday'):

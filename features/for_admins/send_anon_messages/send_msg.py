@@ -2,43 +2,38 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+from features.for_admins.send_anon_messages.flow import SendAnonMsg
 
-from ui.embed_constructor.embed_constructor import WarningEmbed
+from ui.button_protection.admin_buttons_protection import FirewallButton
 
-from general_services.other_services.get_channel import ChannelSelectorManager
-from general_services.factories.channel_factory.scenarios_factory import ChannelFactory
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from features.for_admins.send_anon_messages.service import SendAnonMessageService
 
 
 class SendMessageButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(
+            self,
+            navigator: Navigator,
+            service: SendAnonMessageService
+    ):
         super().__init__(
             label='Send message',
             style=discord.ButtonStyle.blurple
         )
         self.navigator = navigator
+        self.service = service
 
     async def on_click(self, interaction: discord.Interaction):
-        scenario = ChannelFactory.for_db_message_save()
-
-        manager = ChannelSelectorManager(
-            navigator=self.navigator,
-            scenario=scenario,
-            text_only=True
+        flow = SendAnonMsg(
+            service=self.service,
+            navigator=self.navigator
         )
 
-        try:
-            await interaction.user.create_dm()
-            await manager.select_channel(interaction=interaction)
-        except discord.Forbidden:
-            embed = WarningEmbed(
-                description='Please open your Direct Message'
-            )
-            await interaction.response.edit_message(embed=embed)
+        await flow.start_for_send(
+            interaction=interaction
+        )

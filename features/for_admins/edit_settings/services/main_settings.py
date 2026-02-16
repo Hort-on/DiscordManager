@@ -1,183 +1,109 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from core.container import BotContainer
-    from database.db_factory.db_scenario_factory import DBFactory
-    from database.settings_storage.settings import SettingsStorage
-    from core.navigator import Navigator
-    from core.bot_config import Bot
-
-import discord
-
-from core.container import AppContainer
+from typing import TYPE_CHECKING, Any
 
 from database.settings_storage.settings_manager import StorageTarget
 
-from modules.buttons.for_admins.edit_settings_buttons.services.settings_formatter import SettingsFormatter
-from modules.verification.check_verification import CheckVerification
+if TYPE_CHECKING:
+    from core.bot_config import Bot
 
-from ui.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbed
-from ui.drop_down_menu.drop_down_selector import DropMenuView
-from core.navigator_context import NavigationContext
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
+
+    from features.moderation.verification.check_verification import CheckVerification
 
 
-class EditMainSettingsService:
+class MainSettingsService:
     def __init__(
             self,
             bot: Bot,
-            navigator: Navigator,
             db_factory: DBFactory,
-            settings: SettingsStorage
+            settings: SettingsStorage,
+            verification_service: CheckVerification
     ):
 
+        self.bot = bot
         self.db_factory = db_factory
         self.settings = settings
-        self.bot = bot
-        self.navigator = navigator
-        self.formatter = SettingsFormatter()
-        self.role_key = None
+        self.service = verification_service
 
-    def build_options(self, guild_id: int):
-        settings = self.settings.dict_storage.for_dict_get(
+    def get_main_settings(self, guild_id: int) -> dict[str, Any]:
+        return self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )
-        print(settings)
-        return [
-            discord.SelectOption(
-                label=k.replace('_', ' ').title(),
-                value=k
-            )
-            for k, v in sorted(settings.items(), key=lambda item: item[0])
-        ]
 
-    async def proceed_result(self, interaction: discord.Interaction, config_key: list[str]):
-        match config_key[0]:
-            case 'verification':
-                current_value = self.settings.dict_storage.for_dict_get(
-                    config_key[0],
-                    target=StorageTarget.SETTINGS,
-                    guild_id=interaction.guild_id,
-                )
+    def is_setting_enabled(self, guild_id: int, config_key: str) -> bool:
+        result = self.settings.dict_storage.for_dict_get(
+            config_key,
+            target=StorageTarget.SETTINGS,
+            guild_id=guild_id,
+        )
 
-                current = current_value.get(config_key[0], False)
-                new_value = not current
+        return bool(result.get(config_key))
 
-                if not new_value:
-                    await self._clean_up_verification(
-                        guild_id=interaction.guild_id
-                    )
+    async def handle_setting_update(self, guild_id: int, config_key: str) -> bool:
+        if config_key == 'verification':
 
-                await self._save_data(interaction=interaction, config_key=config_key[0])
+            if not self.is_setting_enabled(
+                    guild_id=guild_id,
+                    config_key=config_key
+            ):
+                await self._clean_up_verification(guild_id=guild_id)
 
-                verification_service = CheckVerification(
-                    settings=self.settings,
-                    bot=self.bot
-                )
+            await self.service.prepare()
 
-                await verification_service.prepare()
+        return await self._save_new_value(
+            guild_id=guild_id,
+            config_key=config_key
+        )
 
-            case 'verification_role_id':
-                options = [
-                    discord.SelectOption(
-                        label=role.name,
-                        value=str(role.id)
-                    )
-                    for role in interaction.guild.roles
-                ]
-
-                view = DropMenuView(
-                    navigator=self.navigator,
-                    options=options,
-                    placeholder='Please select the role:',
-                    callback=self._save_verify_role
-                )
-
-                context = getattr(view, 'context', NavigationContext())
-
-                context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-                view.context = context
-
-                await interaction.response.edit_message(view=view)
-
-            case _:
-                await self._save_data(interaction=interaction, config_key=config_key[0])
-
-    async def _save_verify_role(self, interaction: discord.Interaction, config_key: list[str]):
+    async def save_new_role(self, guild_id: int, role_id: int) -> bool:
         write = self.db_factory.for_write_data(
-            guild_id=interaction.guild_id,
+            guild_id=guild_id,
             table_name='settings',
-            data={'verification_role_id': int(config_key[0])}
+            data={'verification_role_id': role_id}
         )
 
         result = await write.db_proceed()
         if not result:
-            embed = ErrorEmbed(
-                description='Somethings went wrong, please try again later'
-            )
-            await interaction.response.edit_message(embed=embed)
-            return
+            return False
 
         self.settings.dict_storage.for_dict_update(
             target=StorageTarget.SETTINGS,
-            guild_id=interaction.guild_id,
-            data={'verification_role_id': int(config_key[0])}
+            guild_id=guild_id,
+            data={'verification_role_id': role_id}
         )
 
-        role = interaction.guild.get_role(int(config_key[0]))
+        return True
 
-        success_embed = SuccessEmbed(
-            description=f'verification role is successfully assigned to: {role.name}'
-        )
-
-        settings_embed = self.formatter.format_current_main_settings(interaction)
-
-        await interaction.response.edit_message(
-            embeds=[settings_embed, success_embed]
-        )
-
-    async def _save_data(self, interaction: discord.Interaction, config_key: str):
+    async def _save_new_value(self, guild_id: int, config_key: str) -> bool:
         current_value = self.settings.dict_storage.for_dict_get(
             config_key,
             target=StorageTarget.SETTINGS,
-            guild_id=interaction.guild_id,
+            guild_id=guild_id,
         )
 
         current = current_value.get(config_key, False)
         new_value = not current
 
         write = self.db_factory.for_write_data(
-            guild_id=interaction.guild_id,
+            guild_id=guild_id,
             table_name='settings',
             data={config_key: new_value}
         )
 
-        db_result = await write.db_proceed()
-        if not db_result:
-            embed = ErrorEmbed(
-                description='Somethings went wrong, please try again later'
-            )
-            await interaction.response.edit_message(embed=embed)
-            return
+        result = await write.db_proceed()
+        if not result:
+            return False
 
         self.settings.dict_storage.for_dict_update(
                 target=StorageTarget.SETTINGS,
-                guild_id=interaction.guild_id,
+                guild_id=guild_id,
                 data={config_key: new_value}
         )
 
-        success_embed = SuccessEmbed(
-            description=f'{config_key} is successfully {'enabled' if new_value else 'disabled'}'
-        )
-
-        settings_embed = self.formatter.format_current_main_settings(interaction)
-
-        await interaction.response.edit_message(
-            embeds=[settings_embed, success_embed]
-        )
+        return True
 
     async def _clean_up_verification(self, guild_id: int):
         delete_channel = self.db_factory.for_cleanup_system_channel(

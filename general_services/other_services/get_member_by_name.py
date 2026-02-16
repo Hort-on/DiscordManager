@@ -1,11 +1,11 @@
 import discord
 
 
-def get_member_by_name(interaction: discord.Interaction, username: str) -> discord.Member:
+def get_member_by_name(guild: discord.Guild, username: str) -> discord.Member:
     member = discord.utils.find(
         lambda m: m.name.lower() == username.lower()
         or m.display_name.lower() == username.lower(),
-        interaction.guild.members
+        guild.members
     )
 
     return member

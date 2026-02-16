@@ -1,0 +1,79 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import discord
+
+from ui.drop_down_menu.drop_down_selector import DropMenuView
+from ui.embed_constructor.embed_constructor import WarningEmbed, ErrorEmbed, SuccessEmbed
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from features.for_admins.send_anon_messages.service import SendAnonMessageService
+
+
+class SendAnonMsg:
+    def __init__(
+            self,
+            service: SendAnonMessageService,
+            navigator: Navigator
+    ):
+        self.service = service
+        self.navigator = navigator
+
+    async def start_for_send(self, interaction: discord.Interaction):
+        options = self.service.get_channels(
+            guild=interaction.guild
+        )
+
+        if not options:
+            embed = ErrorEmbed(
+                description='No available roles to be add.'
+            )
+            await interaction.response.edit_message(embed=embed)
+            return
+
+        view = DropMenuView(
+            navigator=self.navigator,
+            options=options,
+            placeholder='Please select the channel you want to send messages:',
+            callback=self._handle_channel,
+        )
+
+        try:
+            await interaction.user.send("To send messages just send the to he bot in DM")
+        except discord.Forbidden:
+            embed = WarningEmbed(
+                description='Please open your Direct Messages.'
+            )
+            await interaction.response.edit_message(embed=embed)
+            return
+
+        await interaction.response.edit_message(
+            view=view
+        )
+
+    async def _handle_channel(self, interaction: discord.Interaction, value: list[str]):
+        channel = interaction.guild.get_channel(int(value[0]))
+
+        result = await self.service.save_channel(
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id,
+            channel_id=channel.id
+        )
+
+        if not result:
+            error_embed = ErrorEmbed(
+                description='Something went wrong, please try again later.'
+            )
+            await interaction.response.edit_message(
+                embed=error_embed
+            )
+            return
+        success_embed = SuccessEmbed(
+            description=f'Successful, now all you can send anon messages. Selected channel: {channel.name}'
+        )
+
+        await interaction.response.edit_message(
+            embed=success_embed
+        )

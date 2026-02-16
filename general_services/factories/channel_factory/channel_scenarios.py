@@ -17,51 +17,6 @@ class ChannelScenario:
         raise NotImplementedError
 
 
-class SaveChannelToDBForMessageScenario(ChannelScenario):
-    def __init__(self, db_factory: DBFactory):
-        self.db_factory = db_factory
-
-    async def on_selected_channel(
-        self,
-        interaction: discord.Interaction,
-        channel
-    ) -> None:
-
-        write = self.db_factory.for_write_data(
-            guild_id=interaction.guild.id,
-            table_name='channels',
-            data={
-                'guild_id': interaction.guild.id,
-                'user_id': interaction.user.id,
-                'channel_id': channel.id
-            }
-        )
-
-        result = await write.db_proceed()
-
-        if result:
-            await interaction.response.edit_message(
-                content=DB_MSGS.get('channel_successful_msg')
-            )
-
-            await self._send_dm_to_user(interaction)
-            return
-
-        await interaction.response.edit_message(
-            content=SYSTEM_MSGS.get('failure_msg')
-        )
-
-    @staticmethod
-    async def _send_dm_to_user(interaction: discord.Interaction):
-        try:
-            dm = await interaction.user.create_dm()
-            await dm.send(
-                content=''
-            )
-        except discord.Forbidden:
-            pass
-
-
 class SaveChannelToDBScenario(ChannelScenario):
     def __init__(
             self,

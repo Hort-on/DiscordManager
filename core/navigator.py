@@ -8,7 +8,6 @@ class Navigator:
             'admin_menu': self._admin_menu,
             'settings_menu': self._settings_menu,
             'birthday_menu': self._admin_menu,
-            'delete_msg_menu': self._delete_msg_menu,
             'superusers_menu': self._superusers_menu,
             'random_menu': self._random_menu,
             'role_manager_menu': self._role_manager_menu,
@@ -44,10 +43,6 @@ class Navigator:
     def _birthday_menu(self):
         from modules.buttons.for_admins.birthday_buttons.menu_view import BirthdayMenuView
         return BirthdayMenuView(navigator=self)
-
-    def _delete_msg_menu(self):
-        from modules.buttons.for_admins.delete_message_buttons.menu_view import DeleteMsgMenuView
-        return DeleteMsgMenuView(navigator=self)
 
     def _superusers_menu(self):
         from modules.buttons.for_admins.superusers_buttons.menu_view import SuperusersMenuView

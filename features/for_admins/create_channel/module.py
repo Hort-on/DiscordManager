@@ -1,7 +1,7 @@
 from .create_channel_service import CreateChannelService
 
 
-def build(settings, db) -> CreateChannelService:
+def build() -> CreateChannelService:
     create_channel_service = CreateChannelService()
 
     return CreateChannelService()

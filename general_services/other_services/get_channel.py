@@ -13,7 +13,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from general_services.factories.channel_factory.channel_scenarios import ChannelScenario
 
 
-class ChannelSelectorManager:
+class ChannelSelectorService:
     def __init__(
             self,
             settings: SettingsStorage,
@@ -29,7 +29,7 @@ class ChannelSelectorManager:
         self.text = text_only
         self.channels_with_users_only = channels_with_users_only
 
-    async def build_options(self, interaction: discord.Interaction) -> list[discord.SelectOption] | None:
+    async def build_options(self, interaction: discord.Interaction) -> list:
         hidden_channels = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_CHANNELS,
             guild_id=interaction.guild_id
@@ -46,13 +46,7 @@ class ChannelSelectorManager:
                     if len(vc.members) > 2
                 ]
 
-        return [
-            discord.SelectOption(
-                label=channel.name,
-                value=str(channel.id)
-            )
-            for channel in channels if channel.id not in hidden_channels
-        ]
+        return [channel for channel in channels if channel.id not in hidden_channels]
 
     async def proceed_channel(self, interaction: discord.Interaction, value: list[str]) -> None:
         channel_id = int(value[0])

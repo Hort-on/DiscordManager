@@ -1,12 +1,30 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 
-from features.for_admins.delete_message.delete_msg_factory import DeleteMessageScenario
+from ui.embed_constructor.embed_constructor import ErrorEmbed
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from features.for_admins.delete_message.service import DeleteMessageService
+    from features.for_admins.delete_message.flow import DeleteMessageFlow
 
 
 class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
-    def __init__(self, channel: discord.TextChannel):
+    def __init__(
+            self,
+            channel: discord.TextChannel,
+            service: DeleteMessageService,
+            navigator: Navigator,
+            flow: DeleteMessageFlow
+    ):
         super().__init__()
         self.channel = channel
+        self.service = service
+        self.navigator = navigator
+        self.flow = flow
 
     amount = discord.ui.TextInput(
         label='How many messages do you want to delete?',
@@ -15,36 +33,38 @@ class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
         max_length=3
     )
 
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        delete_msg_scenario = DeleteMessageScenario.for_delete_msg(
-            self.channel,
-            int(self.amount.value)
-        )
-        await delete_msg_scenario.delete_msg_process(interaction)
-
-
-class DeleteUserMessagesModal(discord.ui.Modal, title='Delete messages from users'):
-    def __init__(self, channel: discord.TextChannel):
-        super().__init__()
-        self.channel = channel
-
-    amount = discord.ui.TextInput(
-        label='How many messages do you want to delete?',
-        placeholder='Enter a number',
-        required=True,
-        max_length=3
-    )
-
     user_names = discord.ui.TextInput(
         label='Type user names',
         placeholder='Please type general user names like: user123, user_2, user etc. separated by coma.',
-        required=True
+        required=False
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        delete_msg_scenario = DeleteMessageScenario.for_delete_user_msg(
+        try:
+            amount = int(self.amount.value)
+        except ValueError:
+            error_embed = ErrorEmbed(
+                description='Amount must be a number.'
+            )
+            await interaction.response.send_message(
+                embed=error_embed,
+                ephemeral=True
+            )
+            return
+
+        if not 1 <= amount <= 100:
+            error_embed = ErrorEmbed(
+                description='Amount must be between 1 and 100.'
+            )
+            await interaction.response.send_message(
+                embed=error_embed,
+                ephemeral=True
+            )
+            return
+
+        await self.flow.delete_message(
+            interaction=interaction,
             channel=self.channel,
-            amount=int(self.amount.value),
-            users=str(self.user_names.value)
+            amount=amount,
+            users=self.user_names.value
         )
-        await delete_msg_scenario.delete_msg_process(interaction)
