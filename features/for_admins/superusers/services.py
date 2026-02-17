@@ -2,55 +2,49 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
-from modules.buttons.for_admins.superusers_buttons.format_users_list import SuperusersFormatter
-
-from ui.embed_constructor.embed_constructor import SuccessEmbed, InfoEmbed, WarningEmbed
-from database.db_factory.db_scenario_factory import DBFactory
 from general_services.other_services.get_member_by_name import get_member_by_name
 
+if TYPE_CHECKING:
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
+    from general_services.other_services.cleanup_service import CleanUpService
 
-# TODO: Подумати щодо оптимізації
-class BaseSuperuserService:
+
+class SuperusersService:
     def __init__(
             self,
             settings: SettingsStorage,
-            db_factory: DBFactory
+            db_factory: DBFactory,
+            cleanup_service: CleanUpService,
     ):
         self.settings = settings
         self.db_factory = db_factory
+        self.cleanup_service = cleanup_service
 
-
-class AddSuperusersService(BaseSuperuserService):
-    def __init__(self):
-        super().__init__()
-
-    async def superuser_proceed(
+    # ================================= METHODS FOR ADD BUTTON =================================
+    async def prepare_users_for_addition(
             self,
-            interaction: discord.Interaction,
-            superuser_names: str
-    ) -> None:
+            guild: discord.Guild,
+            user_names: str
+    ) -> dict[str, str]:
         not_found_users: list[str] = []
         found_users: dict[int, str] = {}
         in_superusers: dict[int, str] = {}
 
         superusers = self.settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
-        usernames = [name.strip() for name in superuser_names.split(',')]
+        usernames = [name.strip() for name in user_names.split(',')]
 
         for username in usernames:
             member = get_member_by_name(
-                interaction=interaction,
+                guild=guild,
                 username=username
             )
 
@@ -64,228 +58,161 @@ class AddSuperusersService(BaseSuperuserService):
 
             found_users[member.id] = username
 
-        await self._format_the_result(
-            interaction=interaction,
+        return await self._validate_users(
+            guild=guild,
             found_users=found_users,
             not_found_result=not_found_users,
             in_superusers=in_superusers
         )
 
-    async def _format_the_result(
+    async def _validate_users(
             self,
-            interaction: discord.Interaction,
+            guild: discord.Guild,
             found_users: dict[int, str],
             not_found_result: list[str],
             in_superusers: dict[int, str]
-    ) -> None:
-        success_embed = None
-        warning_embed = None
-        info_embed = None
+    ) -> dict[str, str]:
 
+        embeds_result: dict[str, str] = {}
         if found_users:
             added_users: list[str] = ['Added superusers:', f'{'-' * 20}']
 
             for user_id in found_users.keys():
-                member = interaction.guild.get_member(user_id)
+                member = guild.get_member(user_id)
                 name = member.display_name
                 added_users.append(f'🔸 {name}')
 
-            success_embed = SuccessEmbed(
-                description='\n'.join(added_users)
-            )
+            embeds_result['success_embed'] = '\n'.join(added_users)
 
         if not_found_result:
             not_found_users: list[str] = ['Not found members:', f'{'-' * 22}',
                                           '\n'.join([f'❗ {name}' for name in not_found_result])]
-            warning_embed = WarningEmbed(
-                description='\n'.join(not_found_users)
-            )
+
+            embeds_result['warning_embed'] = '\n'.join(not_found_users)
 
         if in_superusers:
             already_super: list[str] = ['These members are already superusers:', f'{'-' * 37}',
                                         '\n'.join([f'🔸 {name}' for name in in_superusers.values()])]
-            info_embed = InfoEmbed(
-                description='\n'.join(already_super)
-            )
 
-        await self._save(
-            interaction=interaction,
+            embeds_result['info_embed'] = '\n'.join(already_super)
+
+        return await self._save_users(
+            embeds_result=embeds_result,
+            guild_id=guild.id,
             user_ids=set(u_id for u_id in found_users.keys()),
-            embeds=[success_embed, warning_embed, info_embed],
             found=bool(found_users)
         )
 
-    async def _save(
+    async def _save_users(
             self,
-            interaction: discord.Interaction,
+            embeds_result: dict[str, str],
+            guild_id: int,
             user_ids: set[int],
-            embeds: list[discord.Embed],
             found: bool
-    ) -> None:
+    ) -> dict[str, str]:
         if found:
-            self.settings.set_storage.for_set_add(
-                target=StorageTarget.SUPERUSERS,
-                guild_id=interaction.guild_id,
-                value=user_ids
-            )
-
-            scenario = self.db_factory.for_insert_set(
-                guild_id=interaction.guild_id,
+            write = self.db_factory.for_insert_set(
+                guild_id=guild_id,
                 values=user_ids,
                 table_name='super_users',
                 key='user_id'
             )
 
-            save_to_db_result = await scenario.db_proceed()
-            if not save_to_db_result:
-                warning_embed = WarningEmbed(
-                    description='Something went wrong, please try again later.'
-                )
-
-                await interaction.response.edit_message(embed=warning_embed)
-                return
-
-        await interaction.response.edit_message(embeds=[e for e in embeds if e is not None])
-
-
-class DeleteSuperuserService(BaseSuperuserService):
-    def __init__(
-            self,
-            navigator: Navigator,
-            settings: SettingsStorage
-    ):
-        super().__init__()
-        self.settings = settings
-        self.navigator = navigator
-        self.not_found_users: set[int] = set()
-
-    async def prepare_users(self, interaction: discord.Interaction):
-        self.not_found_users.clear()
-        user_list: dict[int, str] = {}
-
-        superusers = self.settings.set_storage.for_set_get(
-            target=StorageTarget.SUPERUSERS,
-            guild_id=interaction.guild_id
-        )
-
-        for user in superusers:
-            member = interaction.guild.get_member(user)
-
-            if member is not None:
-                display = member.display_name
-                global_name = member.global_name or member.name
-                label = f'{display} ({global_name})'
-                user_list[user] = label
-            else:
-                self.not_found_users.add(user)
-
-        if self.not_found_users:
-            await self._cleanup_none_exists(
-                guild_id=interaction.guild_id,
-                not_found_users=self.not_found_users
+            self.settings.set_storage.for_set_add(
+                target=StorageTarget.SUPERUSERS,
+                guild_id=guild_id,
+                value=user_ids
             )
 
-        return [
-            discord.SelectOption(
-                label=value,
-                value=str(key)
-            )
-            for key, value in user_list.items()
-        ]
+            result = await write.db_proceed()
 
-    async def delete_superuser_callback(
-            self,
-            interaction: discord.Interaction,
-            user_ids_str: list[str]
-    ):
-        user_ids_int = {int(user_id) for user_id in user_ids_str}
+            if not result:
+                embeds_result['error_embed'] = 'Something went wrong, please try again later.'
 
-        scenario = self.db_factory.for_delete_set(
-            guild_id=interaction.guild_id,
+        return embeds_result
+
+    # ================================= METHODS FOR DELETE BUTTON =================================
+    async def delete_superusers(self, guild_id: int, values: list[str]) -> bool:
+        user_ids_int = {int(user_id) for user_id in values}
+
+        delete = self.db_factory.for_delete_set(
+            guild_id=guild_id,
             values=user_ids_int,
             table_name='super_users',
             key='user_id'
         )
 
-        deleted = await scenario.db_proceed()
+        result = await delete.db_proceed()
+        if not result:
+            return False
 
         self.settings.set_storage.for_set_remove(
             target=StorageTarget.SUPERUSERS,
-            guild_id=interaction.guild_id,
+            guild_id=guild_id,
             value=user_ids_int
         )
 
-        await self._processing_users(interaction=interaction, user_ids=user_ids_int, deleted=deleted)
+        return True
 
-    async def _processing_users(
-            self,
-            interaction: discord.Interaction,
-            user_ids: set[int],
-            deleted: bool
-    ):
-        deleted_usernames: list[str] = []
-
-        if deleted:
-            for user_id in user_ids:
-                member = interaction.guild.get_member(user_id)
-                if member:
-                    user_name = member.display_name
-                else:
-                    user = await interaction.client.fetch_user(user_id)
-                    user_name = user.global_name or user.name
-
-                deleted_usernames.append(user_name)
-
-        await self._build_and_send_embed(
-            interaction=interaction,
-            deleted_usernames=deleted_usernames,
+    async def get_superusers_for_deletion(self, guild: discord.Guild, client: discord.Client) -> tuple:
+        superusers = self.get_superusers(
+            guild_id=guild.id
         )
 
-    async def _build_and_send_embed(
-            self,
-            interaction: discord.Interaction,
-            deleted_usernames: list[str]
-    ):
-        formatter = SuperusersFormatter()
-        current_s_users_embed = None
-        success_embed = None
-        if deleted_usernames:
-            deleted: list[str] = ['Deleted users:', f'{'-' * 15}']
-            for name in deleted_usernames:
-                deleted.append(f'🔸{name}')
+        available_users: dict[int, str] = {}
+        not_found_ids: set[int] = set()
 
-            current_s_users_embed = formatter.build_embed(interaction=interaction)
+        for user_id in superusers:
+            member = guild.get_member(user_id)
 
-            success_embed = SuccessEmbed(
-                description='\n'.join(deleted)
+            if member is not None:
+                display = member.display_name
+                global_name = member.global_name or member.name
+                label = f'{display} ({global_name})'
+                available_users[user_id] = label
+            else:
+                not_found_ids.add(user_id)
+
+        if not_found_ids:
+            result = await self.cleanup_service.cleanup_superusers(
+                guild_id=guild.id,
+                user_ids=not_found_ids
             )
 
-        info_embed = None
-        if self.not_found_users:
+            if not result:
+                return (
+                    available_users,
+                    self._fetch_user_global_manes(
+                        not_found_user_ids=not_found_ids,
+                        client=client
+                    ))
+
             not_found_usernames: list[str] = ['These users were not on this server and were deleted as well:',
                                               f'{'-' * 40}']
-            for user_id in self.not_found_users:
-                user = await interaction.client.fetch_user(user_id)
+
+            for user_id in not_found_ids:
+                user = await client.fetch_user(int(user_id))
                 user_name = user.global_name or user.name
                 not_found_usernames.append(f'🔸{user_name}')
 
-            info_embed = InfoEmbed(
-                description='\n'.join(not_found_usernames)
-            )
+            return available_users, '\n'.join(not_found_usernames)
 
-        embeds_to_send = [e for e in [success_embed, info_embed, current_s_users_embed] if e is not None]
-        await interaction.response.edit_message(embeds=embeds_to_send)
+        return available_users, False
 
-    async def _cleanup_none_exists(self, guild_id: int, not_found_users: set[int]):
-        scenario = self.db_factory.for_cleanup_user(
-            guild_id=guild_id,
-            user_ids=not_found_users
-        )
+    @staticmethod
+    async def _fetch_user_global_manes(not_found_user_ids: set[int], client: discord.Client) -> str:
+        not_found_names: list[str] = [
+            'Some users were not found on this server, and were note deleted for some reason.'
+            f' The names of users:', f'{'-' * 15}']
 
-        await scenario.db_proceed()
+        for user_id in not_found_user_ids:
+            user = await client.fetch_user(int(user_id))
+            not_found_names.append(f'🔸{user.global_name}')
 
-        self.settings.dict_storage.for_dict_delete(
-            target=StorageTarget.CHANNELS_TO_SEND,
-            guild_id=guild_id,
-            data=not_found_users
+        return '\n'.join(not_found_names)
+
+    def get_superusers(self, guild_id: int) -> set[int]:
+        return self.settings.set_storage.for_set_get(
+            target=StorageTarget.SUPERUSERS,
+            guild_id=guild_id
         )

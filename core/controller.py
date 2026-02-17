@@ -11,7 +11,7 @@ from features.moderation.verification import CheckVerification
 
 from database.settings_storage.settings import SettingsStorage
 
-from events.member_left import MemberLeftNotification
+from event_services.member_left import MemberLeftNotification
 
 from database.db_factory.db_scenario_factory import DBFactory
 # from discord.ext import tasks

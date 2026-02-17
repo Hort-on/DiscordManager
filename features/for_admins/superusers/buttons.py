@@ -2,89 +2,84 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.superusers_buttons.modals import AddSuperusersModal
-from modules.buttons.for_admins.superusers_buttons.format_users_list import SuperusersFormatter
-from modules.buttons.for_admins.superusers_buttons.services import DeleteSuperuserService
+from features.for_admins.superusers.flow import SuperusersFlow
 
-from core.navigator_context import NavigationContext
-from ui.drop_down_menu.drop_down_selector import DropMenuView
-from ui.embed_constructor.embed_constructor import ErrorEmbed
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from features.for_admins.superusers.formatter import SuperusersFormatter
+    from features.for_admins.superusers.services import SuperusersService
 
 
 class AddSuperuserButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self):
+    def __init__(
+            self,
+            navigator: Navigator,
+            service: SuperusersService
+    ):
         super().__init__(
             label='📥Add super user',
             style=discord.ButtonStyle.green
         )
 
+        self.navigator = navigator
+        self.service = service
+
     async def on_click(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_modal(AddSuperusersModal())
+        flow = SuperusersFlow(
+            navigator=self.navigator,
+            service=self.service
+        )
+
+        await flow.start_for_add(
+            interaction=interaction
+        )
 
 
 class DeleteSuperusersButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(
+            self,
+            navigator: Navigator,
+            service: SuperusersService
+    ):
         super().__init__(
             label='🗑️Delete superusers',
             style=discord.ButtonStyle.red,
         )
         self.navigator = navigator
-        self.del_superuser = DeleteSuperuserService(navigator=navigator)
+        self.service = service
 
     async def on_click(self, interaction: discord.Interaction):
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='superusers_menu')
-
-        options = await self.del_superuser.prepare_users(interaction=interaction)
-
-        if not options:
-            embed = ErrorEmbed(
-                description='No superusers were assigned yet'
-            )
-            await interaction.response.edit_message(embed=embed)
-            return
-
-        formatter = SuperusersFormatter()
-
-        embed = formatter.build_embed(interaction=interaction)
-
-        view = DropMenuView(
+        flow = SuperusersFlow(
             navigator=self.navigator,
-            options=options,
-            placeholder='Please choose the users you want to delete:',
-            callback=self.del_superuser.delete_superuser_callback,
-            max_values=min(25, len(options))
+            service=self.service
         )
 
-        view.context = context
-
-        await interaction.response.edit_message(
-            embed=embed,
-            view=view
+        await flow.start_for_delete(
+            interaction=interaction
         )
 
 
 class SuperusersListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self):
+    def __init__(
+            self,
+            formatter: SuperusersFormatter
+    ):
         super().__init__(
             label='📑Show current superusers',
             style=discord.ButtonStyle.blurple,
         )
-        self.superusers_list = SuperusersFormatter()
+        self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction):
-        embed = self.superusers_list.build_embed(interaction=interaction)
+        embed = self.formatter.build_embed(interaction=interaction)
         await interaction.response.edit_message(embed=embed)

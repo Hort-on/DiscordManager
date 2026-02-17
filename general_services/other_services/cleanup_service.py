@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord
+
 if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from database.db_factory.db_scenario_factory import DBFactory
@@ -77,3 +79,22 @@ class CleanUpService:
         )
 
         return f'⚠️{len(role_ids)} were not found and has been deleted'
+
+    async def cleanup_superusers(self, guild_id: int, user_ids: set[int]) -> bool:
+        delete = self.db_factory.for_cleanup_user(
+            guild_id=guild_id,
+            user_ids=user_ids
+        )
+
+        result = await delete.db_proceed()
+
+        if not result:
+            return False
+
+        self.settings.dict_storage.for_dict_delete(
+            target=StorageTarget.CHANNELS_TO_SEND,
+            guild_id=guild_id,
+            data=user_ids
+        )
+
+        return True
