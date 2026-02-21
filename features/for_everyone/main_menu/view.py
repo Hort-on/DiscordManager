@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-    from database.settings_storage.settings import SettingsStorage
-
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
 
-from modules.buttons.for_users.randomizer.menu import RandomMenuButton
-from modules.buttons.for_admins.admin_menu import AdminMenuButton
-from modules.buttons.for_users.role_manager.menu import RoleManagerMenuButton
+from features.for_admins.admin_menu import AdminMenuButton
+from features.for_everyone.randomizer.menu import RandomMenuButton
+from features.for_everyone.role_manager.menu import RoleManagerMenuButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from database.settings_storage.settings import SettingsStorage
 
 
 class MainMenuView(discord.ui.View):

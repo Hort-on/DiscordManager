@@ -17,6 +17,8 @@ class DB:
 
     async def init_tables(self):
         temp_conn = await aiosqlite.connect(self.path)
+        await temp_conn.execute("PRAGMA synchronous = NORMAL")
+        await temp_conn.execute("PRAGMA journal_mode = WAL")
         await temp_conn.execute("PRAGMA foreign_keys = ON")
         try:
             await temp_conn.execute('''
@@ -36,6 +38,7 @@ class DB:
                     invitation_checking INTEGER NOT NULL DEFAULT 0,
                     spam_check INTEGER NOT NULL DEFAULT 0,
                     member_left INTEGER NOT NULL DEFAULT 0,
+                    bad_words_handler INTEGER NOT NULL DEFAULT 0,
                 
                     send_messages INTEGER NOT NULL DEFAULT 1,
                     write_audit_log INTEGER NOT NULL DEFAULT 1,
@@ -144,7 +147,7 @@ class DB:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     guild_id INTEGER NOT NULL,
                     owner_id INTEGER NOT NULL,
-                    name TEXT NOT NULL,
+                    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
                     
                     UNIQUE(guild_id, owner_id),
                     
@@ -167,6 +170,19 @@ class DB:
                 );
             ''')
 
+            await temp_conn.execute("""
+                CREATE TABLE IF NOT EXISTS BadWords (
+                    guild_id INTEGER NOT NULL,
+                    word TEXT NOT NULL CHECK (length(trim(word)) > 0),
+
+                    PRIMARY KEY (guild_id, word),
+
+                    FOREIGN KEY (guild_id)
+                        REFERENCES GuildSettings(guild_id)
+                        ON DELETE CASCADE
+                );
+            """)
+
             await temp_conn.commit()
         except Exception as e:
             await self.logger.error(DM.get('failure_create_table_msg'), exc=e)
@@ -174,9 +190,20 @@ class DB:
             await temp_conn.close()
 
     @asynccontextmanager
-    async def connect(self):
+    async def connect_read(self):
+        conn = await aiosqlite.connect(self.path)
+        await conn.execute("PRAGMA synchronous = NORMAL")
+        await conn.execute("PRAGMA foreign_keys = ON")
+        try:
+            yield conn
+        finally:
+            await conn.close()
+
+    @asynccontextmanager
+    async def connect_write(self):
         async with self._write_lock:
             conn = await aiosqlite.connect(self.path)
+            await conn.execute("PRAGMA synchronous = NORMAL")
             await conn.execute("PRAGMA foreign_keys = ON")
             try:
                 yield conn

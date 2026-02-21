@@ -2,26 +2,31 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_admins.superusers_buttons.format_users_list import SuperusersFormatter
-
 from core.navigator_context import NavigationContext
+
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from features.for_admins.superusers.formatter import SuperusersFormatter
 
 
 class SuperusersMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(
+            self,
+            navigator: Navigator,
+            formatter: SuperusersFormatter
+    ):
         super().__init__(
             label='👮Superusers management',
             style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
+        self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         context = getattr(self.view, 'context', NavigationContext())
@@ -32,7 +37,6 @@ class SuperusersMenuButton(FirewallButton):
 
         view.context = context
 
-        formatter = SuperusersFormatter()
-        embed = formatter.build_embed(interaction=interaction)
+        embed = self.formatter.build_embed(guild=interaction.guild)
 
         await interaction.response.edit_message(view=view, embed=embed)

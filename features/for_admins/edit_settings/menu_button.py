@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-
 from core.navigator_context import NavigationContext
+
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
 
 
 class EditSettingsMenuButton(FirewallButton):

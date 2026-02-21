@@ -1,8 +1,7 @@
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
-
-from ui.yes_no_service import YesNoView
+from ui.yes_no_service.yes_no_view import YesNoView
 
 
 class UserJoinBirthdayService:

@@ -21,11 +21,11 @@ class SuperusersFlow:
     def __init__(
             self,
             navigator: Navigator,
-            service: SuperusersService,
+            superusers_service: SuperusersService,
             formatter: SuperusersFormatter
     ):
         self.navigator = navigator
-        self.service = service
+        self.superusers_service = superusers_service
         self.formatter = formatter
 
     # ================================= METHODS FOR ADD BUTTON =================================
@@ -35,7 +35,7 @@ class SuperusersFlow:
         ))
 
     async def save_members(self, interaction: discord.Interaction, user_names: str) -> None:
-        result = await self.service.prepare_users_for_addition(
+        result = await self.superusers_service.prepare_users_for_addition(
             guild=interaction.guild,
             user_names=user_names
         )
@@ -118,7 +118,7 @@ class SuperusersFlow:
             values: list[str],
             not_found: str
     ):
-        result = await self.service.delete_superusers(
+        result = await self.superusers_service.delete_superusers(
             guild_id=interaction.guild_id,
             values=values
         )
@@ -161,7 +161,7 @@ class SuperusersFlow:
         )
 
     async def _build_options(self, guild: discord.Guild, client: discord.Client) -> tuple:
-        users, not_found = await self.service.get_superusers_for_deletion(
+        users, not_found = await self.superusers_service.get_superusers_for_deletion(
             guild=guild,
             client=client
         )

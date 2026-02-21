@@ -2,12 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from ui.yes_no_service.yes_no_factory import YesNoViewFactory
-
 import discord
 
-from features.moderation.verification import CheckVerification
 
 from database.settings_storage.settings import SettingsStorage
 
@@ -20,19 +16,28 @@ from general_services.other_services.ask_user_birthday import UserJoinBirthdaySe
 
 # from modules.management.verification.check_verification import CheckVerification
 
+if TYPE_CHECKING:
+    from core.navigator import Navigator
+    from ui.yes_no_service.yes_no_factory import YesNoViewFactory
+    from features.auto_moderation.verification.check_verification import VerificationService
 
-class BotController:
+
+class Controller:
     def __init__(
             self,
             bot,
             settings: SettingsStorage,
             db_factory: DBFactory,
+            navigator: Navigator,
+            verification_service: VerificationService,
             yes_no_factory: YesNoViewFactory
     ):
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
         self.yes_no_factory = yes_no_factory
+        self.navigator = navigator
+        self.verification_service = verification_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -48,11 +53,12 @@ class BotController:
 
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()
-        await self.settings.load_all_settings()
+        await self.settings.load_all_guilds_settings()
 
-        verify_service = CheckVerification(
+        verify_service = VerificationService(
             settings=self.settings,
-            bot=self.bot
+            bot=self.bot,
+            yes_no_factory=self.yes_no_factory
         )
         await verify_service.prepare()
 

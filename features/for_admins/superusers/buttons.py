@@ -20,7 +20,8 @@ class AddSuperuserButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            service: SuperusersService
+            superusers_service: SuperusersService,
+            formatter: SuperusersFormatter
     ):
         super().__init__(
             label='📥Add super user',
@@ -28,12 +29,14 @@ class AddSuperuserButton(FirewallButton):
         )
 
         self.navigator = navigator
-        self.service = service
+        self.superusers_service = superusers_service
+        self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         flow = SuperusersFlow(
             navigator=self.navigator,
-            service=self.service
+            superusers_service=self.superusers_service,
+            formatter=self.formatter
         )
 
         await flow.start_for_add(
@@ -47,19 +50,22 @@ class DeleteSuperusersButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            service: SuperusersService
+            superusers_service: SuperusersService,
+            formatter: SuperusersFormatter
     ):
         super().__init__(
             label='🗑️Delete superusers',
             style=discord.ButtonStyle.red,
         )
         self.navigator = navigator
-        self.service = service
+        self.superusers_service = superusers_service
+        self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction):
         flow = SuperusersFlow(
             navigator=self.navigator,
-            service=self.service
+            superusers_service=self.superusers_service,
+            formatter=self.formatter
         )
 
         await flow.start_for_delete(
@@ -81,5 +87,5 @@ class SuperusersListButton(FirewallButton):
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction):
-        embed = self.formatter.build_embed(interaction=interaction)
+        embed = self.formatter.build_embed(guild=interaction.guild)
         await interaction.response.edit_message(embed=embed)

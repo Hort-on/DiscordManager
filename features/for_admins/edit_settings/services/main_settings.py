@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
 
-    from features.moderation.verification.check_verification import CheckVerification
+    from features.auto_moderation.verification.check_verification import CheckVerification
 
 
 class MainSettingsService:

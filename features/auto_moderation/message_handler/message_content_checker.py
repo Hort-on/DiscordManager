@@ -1,4 +1,4 @@
-from features.for_admins.user_manager import UserManager
+from features.for_admins._ import UserManager
 
 from database.db_factory.db_scenario_factory import DBFactory
 

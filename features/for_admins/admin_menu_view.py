@@ -17,6 +17,9 @@ from ui.buttons.back_button import BackButton
 if TYPE_CHECKING:
     from core.navigator import Navigator
     from database.settings_storage.settings import SettingsStorage
+    from features.for_admins.superusers.formatter import SuperusersFormatter
+    from features.for_admins.delete_message.service import DeleteMessageService
+    from features.for_admins.send_anon_messages.service import SendAnonMessageService
 
 
 class AdminMenuView(discord.ui.View):
@@ -24,6 +27,9 @@ class AdminMenuView(discord.ui.View):
         self,
         navigator: Navigator,
         settings: SettingsStorage,
+        superusers_formatter: SuperusersFormatter,
+        delete_msg_service: DeleteMessageService,
+        send_msg_service: SendAnonMessageService,
         guild_id: int
     ):
         super().__init__(timeout=60)
@@ -33,14 +39,23 @@ class AdminMenuView(discord.ui.View):
             guild_id=guild_id
         )
 
-        self.add_item(SuperusersMenuButton(navigator=navigator))
-        self.add_item(DeleteMessageButton(navigator=navigator))
+        self.add_item(SuperusersMenuButton(
+            navigator=navigator,
+            formatter=superusers_formatter
+        ))
+        self.add_item(DeleteMessageButton(
+            navigator=navigator,
+            delete_msg_service=delete_msg_service
+        ))
         self.add_item(EditSettingsMenuButton(navigator=navigator))
 
         if config.get('birthday'):
             self.add_item(BirthdayMenuButton(navigator=navigator))
 
         if config.get('send_messages'):
-            self.add_item(SendMessageButton(navigator=navigator))
+            self.add_item(SendMessageButton(
+                navigator=navigator,
+                service=send_msg_service
+            ))
 
         self.add_item(BackButton(navigator=navigator))

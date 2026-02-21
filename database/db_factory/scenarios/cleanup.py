@@ -18,7 +18,7 @@ class CleanupGuild(DataBaseScenario):
         )
 
     async def _execute(self) -> bool:
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             query = f'DELETE FROM GuildSettings WHERE guild_id = ?'
             await cursor.execute(query, (self.guild_id,))
             return cursor.total_changes > 0
@@ -46,7 +46,7 @@ class CleanupUser(DataBaseScenario):
 
         placeholders = ', '.join('?' for _ in self.user_ids)
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             for table_key in self.USER_TABLES:
                 table = self._get_table(table_key)
 
@@ -78,7 +78,7 @@ class CleanupSystemChannels(DataBaseScenario):
     async def _execute(self) -> bool:
         table = self._get_table('sys_channels')
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             for key in self.channels:
                 query = (
                     f'UPDATE {table} '
@@ -110,5 +110,5 @@ class CleanUpVerificationRole(DataBaseScenario):
             WHERE guild_id = ?
         """
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.guild_id,))

@@ -4,12 +4,11 @@ from discord.ext import commands
 
 class Bot(commands.Bot):
     async def setup_hook(self):
-        await self.load_extension('cogs.management_cog')
-
-        guild = discord.Object(id=1017855127081717820)
-
-        self.tree.copy_global_to(guild=guild)
-        await self.tree.sync(guild=guild)
+        # guild = discord.Object(id=1017855127081717820)
+        #
+        # self.tree.copy_global_to(guild=guild)
+        # await self.tree.sync(guild=guild)
+        await self.tree.sync()
 
 
 def create_bot():

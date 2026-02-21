@@ -12,7 +12,6 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
     from core.navigator import Navigator
-    from database.settings_storage.settings import SettingsStorage
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
 
@@ -45,7 +44,6 @@ class AddSystemChannelsButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            settings: SettingsStorage,
             sys_channels_service: SystemChannelsService,
             formatter: SettingsFormatter
     ):
@@ -54,7 +52,6 @@ class AddSystemChannelsButton(FirewallButton):
             style=discord.ButtonStyle.green
         )
         self.navigator = navigator
-        self.settings = settings
         self.service = sys_channels_service
         self.formatter = formatter
 
@@ -77,7 +74,6 @@ class DeleteSystemChannelsButton(FirewallButton):
             self,
             navigator: Navigator,
             sys_channels_service: SystemChannelsService,
-            settings: SettingsStorage,
             formatter: SettingsFormatter
     ):
         super().__init__(
@@ -86,7 +82,6 @@ class DeleteSystemChannelsButton(FirewallButton):
         )
         self.service = sys_channels_service
         self.navigator = navigator
-        self.settings = settings
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:

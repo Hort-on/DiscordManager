@@ -18,10 +18,10 @@ if TYPE_CHECKING:
 class DeleteMessageFlow:
     def __init__(
             self,
-            service: DeleteMessageService,
+            delete_msg_service: DeleteMessageService,
             navigator: Navigator
     ):
-        self.service = service
+        self.service = delete_msg_service
         self.navigator = navigator
 
     async def delete_message_start(self, interaction: discord.Interaction) -> None:

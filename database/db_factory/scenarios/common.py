@@ -28,7 +28,7 @@ class GetData(DataBaseScenario):
         columns_sql = ', '.join(self.columns) if self.columns else '*'
         query = f'SELECT {columns_sql} FROM {table} WHERE guild_id = ?'
 
-        async with self.db_connect.connect() as conn:
+        async with self.db_connect.connect_read() as conn:
             async with conn.execute(query, (self.guild_id,)) as cursor:
 
                 col_names = [desc[0] for desc in cursor.description]
@@ -65,7 +65,7 @@ class WriteData(DataBaseScenario):
         query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
                             ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.guild_id, *self.data.values()))
             return cursor.total_changes > 0
 
@@ -103,7 +103,7 @@ class InsertSet(DataBaseScenario):
 
         params = [(self.guild_id, v) for v in self.values]
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.executemany(query, params)
             return cursor.total_changes > 0
 
@@ -143,7 +143,7 @@ class DeleteSet(DataBaseScenario):
 
         params = (self.guild_id, *self.values)
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, params)
             return cursor.total_changes > 0
 
@@ -168,7 +168,7 @@ class FetchAllData(DataBaseScenario):
         table = self._get_table(self.table_name)
         query = f'SELECT * FROM {table} WHERE guild_id = ?'
 
-        async with self.db_connect.connect() as conn:
+        async with self.db_connect.connect_read() as conn:
             async with conn.execute(query, (self.guild_id,)) as cursor:
                 columns = [desc[0] for desc in cursor.description]
                 rows = await cursor.fetchall()
@@ -193,7 +193,7 @@ class InitGuild(DataBaseScenario):
         )
 
     async def _execute(self):
-        async with self.db_connect.connect() as db:
+        async with self.db_connect.connect_write() as db:
             await db.execute(
                 "INSERT OR IGNORE INTO GuildSettings (guild_id) VALUES (?)",
                 (self.guild_id,)

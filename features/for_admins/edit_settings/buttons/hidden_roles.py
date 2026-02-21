@@ -4,15 +4,11 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from database.settings_storage.settings_manager import StorageTarget
-
-from features.for_admins.edit_settings.flows.hiddenr_roles import HiddenRolesFlow
+from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
 
 from core.navigator_context import NavigationContext
 
 from ui.button_protection.admin_buttons_protection import FirewallButton
-from ui.drop_down_menu.drop_down_selector import DropMenuView
-from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 if TYPE_CHECKING:
     from core.navigator import Navigator
@@ -110,15 +106,15 @@ class DeleteHiddenRoleButton(FirewallButton):
 class HiddenRolesListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self):
+    def __init__(self, formatter: SettingsFormatter):
         super().__init__(
             label='📄Hidden roles list',
             style=discord.ButtonStyle.blurple,
         )
+        self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        formatter = SettingsFormatter()
-        embed = await formatter.format_current_hidden_roles(interaction)
+        embed = await self.formatter.format_current_hidden_roles(interaction)
 
         await interaction.response.edit_message(
             embed=embed

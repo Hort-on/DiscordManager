@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-
 from core.navigator_context import NavigationContext
+
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from core.navigator import Navigator
 
 
 class AdminMenuButton(FirewallButton):
@@ -23,6 +23,8 @@ class AdminMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
+        view = self.navigator.go(target='admin_menu', guild_id=interaction.guild_id)
+
         context = getattr(self.view, 'context', NavigationContext())
 
         context.push(
@@ -32,8 +34,6 @@ class AdminMenuButton(FirewallButton):
                 'user_id': interaction.user.id
             }
         )
-
-        view = self.navigator.go(target='admin_menu', guild_id=interaction.guild_id)
 
         view.context = context
 

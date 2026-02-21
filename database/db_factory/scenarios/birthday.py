@@ -26,7 +26,7 @@ class AddBirthdayScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'INSERT INTO {table} (guild_id, user_id, birthday, last_congrats) VALUES (?, ?, ?, ?)'
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.guild_id, self.user_id, self.birthday, None))
             return cursor.total_changes > 0
 
@@ -51,7 +51,7 @@ class DeleteBirthdayScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'DELETE FROM {table} WHERE guild_id = ? AND user_id = ?'
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.guild_id, self.user_id))
             return cursor.total_changes > 0
 
@@ -76,7 +76,7 @@ class ExistBirthdayCheckScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'SELECT 1 FROM {table} WHERE user_id = ? AND guild_id = ? LIMIT 1'
 
-        async with self.db_connect.connect() as conn:
+        async with self.db_connect.connect_read() as conn:
             async with conn.execute(query, (self.user_id, self.guild_id)) as cursor:
                 return await cursor.fetchone() is not None
 
@@ -102,7 +102,7 @@ class GetTodayBirthdayScenario(DataBaseScenario):
         query = f"""SELECT user_id FROM {table} WHERE guild_id = ?
                 AND birthday = ? AND (last_congrats IS NULL OR last_congrats != ?)"""
 
-        async with self.db_connect.connect() as conn:
+        async with self.db_connect.connect_read() as conn:
             async with conn.execute(query, (self.guild_id, self.today, self.today)) as cursor:
                 return await cursor.fetchall()
 
@@ -129,7 +129,7 @@ class UpdateLastCongratsScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'UPDATE {table} SET last_congrats = ? WHERE user_id = ? AND guild_id = ?'
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.date, self.user_id, self.guild_id))
             return cursor.total_changes > 0
 
@@ -152,5 +152,5 @@ class ResetAllCongratsScenario(DataBaseScenario):
         table = self._get_table('birthdays')
         query = f'UPDATE {table} SET last_congrats = NULL'
 
-        async with self.db_connect.connect() as cursor:
+        async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query)

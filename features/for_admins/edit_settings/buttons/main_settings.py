@@ -20,20 +20,20 @@ class MainSettingsButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            service: MainSettingsService,
+            main_settings_service: MainSettingsService,
             formatter: SettingsFormatter
     ):
         super().__init__(
             label='Edit main settings',
             style=discord.ButtonStyle.green
         )
-        self.service = service
+        self.main_settings_service = main_settings_service
         self.navigator = navigator
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         flow = MainSettingsFlow(
-            main_settings_service=self.service,
+            main_settings_service=self.main_settings_service,
             formatter=self.formatter,
             navigator=self.navigator
         )

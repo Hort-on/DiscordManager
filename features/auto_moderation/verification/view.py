@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord.ui
+
+from features.auto_moderation.verification.buttons import AgreeButton, DisagreeButton
+
 if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from ui.yes_no_service.yes_no_factory import YesNoViewFactory
-
-import discord.ui
-
-from features.verification.buttons import AgreeButton, DisagreeButton
 
 
 class VerificationView(discord.ui.View):

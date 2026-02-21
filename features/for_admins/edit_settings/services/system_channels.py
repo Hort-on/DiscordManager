@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
-    from features.moderation.verification.check_verification import CheckVerification
+    from features.auto_moderation.verification.check_verification import CheckVerification
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from core.bot_config import Bot

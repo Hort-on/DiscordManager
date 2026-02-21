@@ -19,7 +19,7 @@ class SuperusersService:
             self,
             settings: SettingsStorage,
             db_factory: DBFactory,
-            cleanup_service: CleanUpService,
+            cleanup_service: CleanUpService
     ):
         self.settings = settings
         self.db_factory = db_factory
