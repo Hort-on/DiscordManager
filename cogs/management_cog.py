@@ -3,15 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.container import BotContainer
     from core.navigator import Navigator
 
 import discord
 
 from discord import app_commands
 from discord.ext import commands
-
-from core.container import AppContainer
 
 
 class ManagementCog(commands.Cog):
@@ -20,7 +17,7 @@ class ManagementCog(commands.Cog):
 
     @app_commands.command(
         name='mg',
-        description='Opens management panel'
+        description='Opens bot menu.'
     )
     async def management(self, interaction: discord.Interaction):
         view = self.navigator.go(
@@ -37,5 +34,5 @@ class ManagementCog(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(
-        ManagementCog(navigator=container.navigator)
+        ManagementCog(navigator=bot.navigator)
     )

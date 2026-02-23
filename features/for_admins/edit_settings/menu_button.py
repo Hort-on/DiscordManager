@@ -10,15 +10,17 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
     from core.navigator import Navigator
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class EditSettingsMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService,):
         super().__init__(
             label='⚙️ Settings management',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
         self.navigator = navigator
 

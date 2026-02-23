@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
+
+from features.auto_moderation.verification.service import VerificationService
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
@@ -10,17 +13,16 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
 
-    from features.auto_moderation.verification.check_verification import CheckVerification
 
-
-class MainSettingsService:
+class MainSettingsService(DBBaseService):
     def __init__(
             self,
             bot: Bot,
             db_factory: DBFactory,
             settings: SettingsStorage,
-            verification_service: CheckVerification
+            verification_service: VerificationService
     ):
+        super().__init__(settings)
 
         self.bot = bot
         self.db_factory = db_factory
@@ -59,23 +61,18 @@ class MainSettingsService:
         )
 
     async def save_new_role(self, guild_id: int, role_id: int) -> bool:
-        write = self.db_factory.for_write_data(
+        write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
             table_name='settings',
             data={'verification_role_id': role_id}
         )
 
-        result = await write.db_proceed()
-        if not result:
-            return False
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.SETTINGS,
-            guild_id=guild_id,
-            data={'verification_role_id': role_id}
+        result = await self.update_db_and_cache(
+            scenario=write_scenario,
+            guild_id=guild_id
         )
 
-        return True
+        return result
 
     async def _save_new_value(self, guild_id: int, config_key: str) -> bool:
         current_value = self.settings.dict_storage.for_dict_get(
@@ -87,47 +84,35 @@ class MainSettingsService:
         current = current_value.get(config_key, False)
         new_value = not current
 
-        write = self.db_factory.for_write_data(
+        write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
             table_name='settings',
             data={config_key: new_value}
         )
 
-        result = await write.db_proceed()
-        if not result:
-            return False
-
-        self.settings.dict_storage.for_dict_update(
-                target=StorageTarget.SETTINGS,
-                guild_id=guild_id,
-                data={config_key: new_value}
+        result = await self.update_db_and_cache(
+            scenario=write_scenario,
+            guild_id=guild_id
         )
 
-        return True
+        return result
 
-    async def _clean_up_verification(self, guild_id: int):
-        delete_channel = self.db_factory.for_cleanup_system_channel(
+    async def _clean_up_verification(self, guild_id: int) -> None:
+        delete_channel_scenario = self.db_factory.for_cleanup_system_channel(
             guild_id=guild_id,
             channels=['verification_channel_id']
         )
 
-        await delete_channel.db_proceed()
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id,
-            data={'verification_channel_id': None}
-        )
-
-        delete_role = self.db_factory.for_cleanup_role_delete(
+        await self.update_db_and_cache(
+            scenario=delete_channel_scenario,
             guild_id=guild_id
         )
 
-        await delete_role.db_proceed()
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.SETTINGS,
-            guild_id=guild_id,
-            data={'verification_role_id': None}
+        delete_role_scenario = self.db_factory.for_cleanup_role_delete(
+            guild_id=guild_id
         )
-    
+
+        await self.update_db_and_cache(
+            scenario=delete_role_scenario,
+            guild_id=guild_id
+        )

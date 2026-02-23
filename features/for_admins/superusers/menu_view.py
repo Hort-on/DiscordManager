@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.formatter import SuperusersFormatter
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class SuperusersMenuView(discord.ui.View):
@@ -23,21 +24,25 @@ class SuperusersMenuView(discord.ui.View):
             self,
             navigator: Navigator,
             superusers_service: SuperusersService,
-            formatter: SuperusersFormatter
+            formatter: SuperusersFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(timeout=60)
 
         self.add_item(AddSuperuserButton(
             navigator=navigator,
             superusers_service=superusers_service,
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(DeleteSuperusersButton(
             navigator=navigator,
             superusers_service=superusers_service,
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(SuperusersListButton(
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(BackButton(navigator=navigator))

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
 from general_services.other_services.get_member_by_name import get_member_by_name
@@ -14,13 +15,15 @@ if TYPE_CHECKING:
     from general_services.other_services.cleanup_service import CleanUpService
 
 
-class SuperusersService:
+class SuperusersService(DBBaseService):
     def __init__(
             self,
             settings: SettingsStorage,
             db_factory: DBFactory,
             cleanup_service: CleanUpService
     ):
+        super().__init__(settings)
+
         self.settings = settings
         self.db_factory = db_factory
         self.cleanup_service = cleanup_service
@@ -111,20 +114,17 @@ class SuperusersService:
             found: bool
     ) -> dict[str, str]:
         if found:
-            write = self.db_factory.for_insert_set(
+            write_scenario = self.db_factory.for_insert_set(
                 guild_id=guild_id,
                 values=user_ids,
                 table_name='super_users',
                 key='user_id'
             )
 
-            self.settings.set_storage.for_set_add(
-                target=StorageTarget.SUPERUSERS,
-                guild_id=guild_id,
-                value=user_ids
+            result = await self.update_db_and_cache(
+                scenario=write_scenario,
+                guild_id=guild_id
             )
-
-            result = await write.db_proceed()
 
             if not result:
                 embeds_result['error_embed'] = 'Something went wrong, please try again later.'
@@ -135,24 +135,19 @@ class SuperusersService:
     async def delete_superusers(self, guild_id: int, values: list[str]) -> bool:
         user_ids_int = {int(user_id) for user_id in values}
 
-        delete = self.db_factory.for_delete_set(
+        delete_scenario = self.db_factory.for_delete_set(
             guild_id=guild_id,
             values=user_ids_int,
             table_name='super_users',
             key='user_id'
         )
 
-        result = await delete.db_proceed()
-        if not result:
-            return False
-
-        self.settings.set_storage.for_set_remove(
-            target=StorageTarget.SUPERUSERS,
-            guild_id=guild_id,
-            value=user_ids_int
+        result = await self.update_db_and_cache(
+            scenario=delete_scenario,
+            guild_id=guild_id
         )
 
-        return True
+        return result
 
     async def get_superusers_for_deletion(self, guild: discord.Guild, client: discord.Client) -> tuple:
         superusers = self.get_superusers(

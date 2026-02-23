@@ -4,12 +4,9 @@ from typing import TYPE_CHECKING
 
 import discord
 
-
-from database.settings_storage.settings import SettingsStorage
-
 from event_services.member_left import MemberLeftNotification
 
-from database.db_factory.db_scenario_factory import DBFactory
+from features.auto_moderation.verification.flow import VerificationFlow
 # from discord.ext import tasks
 from general_services.other_services.ask_user_birthday import UserJoinBirthdayService
 # from general_services.utils.bad_words import invitation_pattern
@@ -18,8 +15,10 @@ from general_services.other_services.ask_user_birthday import UserJoinBirthdaySe
 
 if TYPE_CHECKING:
     from core.navigator import Navigator
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
     from ui.yes_no_service.yes_no_factory import YesNoViewFactory
-    from features.auto_moderation.verification.check_verification import VerificationService
+    from features.auto_moderation.verification.service import VerificationService
 
 
 class Controller:
@@ -55,12 +54,13 @@ class Controller:
         #     self.daily_birthday_check.start()
         await self.settings.load_all_guilds_settings()
 
-        verify_service = VerificationService(
-            settings=self.settings,
+        flow = VerificationFlow(
             bot=self.bot,
-            yes_no_factory=self.yes_no_factory
+            settings=self.settings,
+            yes_no_factory=self.yes_no_factory,
+            service=self.verification_service
         )
-        await verify_service.prepare()
+        await flow.prepare_verification_channel()
 
     async def on_message(self, message) -> None:
         # TODO: потрібно зробити перевірку суперюзерів з бд

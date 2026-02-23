@@ -27,8 +27,9 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
-    from general_services.other_services.cleanup_service import CleanUpService
     from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
+    from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.other_services.cleanup_service import CleanUpService
 
 
 class HiddenChannelsMenuView(discord.ui.View):
@@ -37,7 +38,8 @@ class HiddenChannelsMenuView(discord.ui.View):
             navigator: Navigator,
             hidden_ch_service: HiddenChannelsService,
             formatter: SettingsFormatter,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(timeout=60)
 
@@ -45,16 +47,19 @@ class HiddenChannelsMenuView(discord.ui.View):
             navigator=navigator,
             hidden_ch_service=hidden_ch_service,
             formatter=formatter,
-            cleanup_service=cleanup_service
+            cleanup_service=cleanup_service,
+            buttons_protection=buttons_protection
         ))
         self.add_item(DeleteHiddenChannelButton(
             navigator=navigator,
             hidden_ch_service=hidden_ch_service,
             formatter=formatter,
-            cleanup_service=cleanup_service
+            cleanup_service=cleanup_service,
+            buttons_protection=buttons_protection
         ))
         self.add_item(HiddenChannelsListButton(
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(BackButton(navigator=navigator))
 
@@ -65,7 +70,8 @@ class HiddenRolesMenuView(discord.ui.View):
             navigator: Navigator,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(timeout=60)
 
@@ -73,16 +79,19 @@ class HiddenRolesMenuView(discord.ui.View):
             navigator=navigator,
             formatter=formatter,
             hidden_roles_service=hidden_roles_service,
-            cleanup_service=cleanup_service
+            cleanup_service=cleanup_service,
+            buttons_protection=buttons_protection
         ))
         self.add_item(DeleteHiddenRoleButton(
             navigator=navigator,
             formatter=formatter,
             hidden_roles_service=hidden_roles_service,
-            cleanup_service=cleanup_service
+            cleanup_service=cleanup_service,
+            buttons_protection=buttons_protection
         ))
         self.add_item(HiddenRolesListButton(
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(BackButton(navigator=navigator))
 
@@ -92,21 +101,25 @@ class SystemChannelsMenuView(discord.ui.View):
             self,
             navigator: Navigator,
             sys_channels_service: SystemChannelsService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(timeout=60)
 
         self.add_item(AddSystemChannelsButton(
             navigator=navigator,
             sys_channels_service=sys_channels_service,
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(DeleteSystemChannelsButton(
             navigator=navigator,
             sys_channels_service=sys_channels_service,
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(SystemChannelsListButton(
-            formatter=formatter
+            formatter=formatter,
+            buttons_protection=buttons_protection
         ))
         self.add_item(BackButton(navigator=navigator))

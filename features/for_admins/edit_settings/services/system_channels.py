@@ -2,43 +2,45 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
-    from features.auto_moderation.verification.check_verification import CheckVerification
+    from core.bot_config import Bot
+    from features.auto_moderation.verification.service import VerificationService
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
-    from core.bot_config import Bot
 
 
-class SystemChannelsService:
+class SystemChannelsService(DBBaseService):
     def __init__(
             self,
             bot: Bot,
             db_factory: DBFactory,
             settings: SettingsStorage,
+            service: VerificationService
     ):
+        super().__init__(settings)
+
         self.bot = bot
         self.db_factory = db_factory
         self.settings = settings
+        self.service = service
 
     async def save_system_channel(self, guild_id: int, channel_data: dict[str, int]) -> bool:
-        write = self.db_factory.for_write_data(
+        write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
             table_name='sys_channels',
             data=channel_data
         )
 
-        result = await write.db_proceed()
+        result = await self.update_db_and_cache(
+            scenario=write_scenario,
+            guild_id=guild_id
+        )
 
         if not result:
             return False
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id,
-            data=channel_data
-        )
 
         if 'verification_channel_id' in channel_data:
             await self._check_if_verification(guild_id=guild_id)
@@ -52,33 +54,21 @@ class SystemChannelsService:
             guild_id=guild_id
         )
 
-        if verify_status:
-            verify_service = CheckVerification(
-                settings=self.settings,
-                bot=self.bot
-            )
-
-            await verify_service.prepare()
+        if bool(verify_status):
+            await self.service.prepare()
 
     async def delete_channels(self, guild_id: int, values: list[str]) -> bool:
-        delete = self.db_factory.for_cleanup_system_channel(
+        delete_scenario = self.db_factory.for_cleanup_system_channel(
             guild_id=guild_id,
             channels=values
         )
 
-        result = await delete.db_proceed()
-        if not result:
-            return False
-
-        channel_keys = [ch for ch in values]
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id,
-            data={key: None for key in channel_keys}
+        result = await self.update_db_and_cache(
+            scenario=delete_scenario,
+            guild_id=guild_id
         )
 
-        return True
+        return result
 
     def build_sys_ch_options(self, guild_id: int) -> list[str]:
         sys_channels = self.settings.dict_storage.for_dict_get(

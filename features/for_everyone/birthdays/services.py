@@ -22,7 +22,7 @@ class AddBirthdayService:
     ) -> None:
 
         member = get_member_by_name(
-            interaction=interaction,
+            guild=interaction.guild,
             username=username
         )
 
@@ -65,7 +65,7 @@ class DeleteBirthdayService:
             username: str,
     ) -> None:
         member = get_member_by_name(
-            interaction=interaction,
+            guild=interaction.guild,
             username=username
         )
 

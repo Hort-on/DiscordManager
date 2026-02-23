@@ -5,11 +5,13 @@ from typing import TYPE_CHECKING
 import discord
 
 from features.for_admins.delete_message.flow import DeleteMessageFlow
+
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.delete_message.service import DeleteMessageService
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class DeleteMessageButton(FirewallButton):
@@ -18,11 +20,13 @@ class DeleteMessageButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            delete_msg_service: DeleteMessageService
+            delete_msg_service: DeleteMessageService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='🗑️Delete messages',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
         self.navigator = navigator
         self.delete_msg_service = delete_msg_service

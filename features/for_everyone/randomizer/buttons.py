@@ -2,37 +2,28 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord
+
+from features.for_everyone.randomizer.modals import RandomNumModal, RandomWordModal, RandomTeamByMsgModal
+
+from general_services.factories.channel_factory.scenarios_factory import ChannelFactory
+
 if TYPE_CHECKING:
     from core.navigator import Navigator
 
-import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-
-from modules.buttons.for_users.randomizer.modals import (
-    RandomNumModal,
-    RandomWordModal,
-    RandomTeamByMsgModal
-)
-
-from general_services.factories.channel_factory.scenarios_factory import ChannelFactory
-from general_services.other_services.get_channel import ChannelSelectorManager
-
-
-class RandomNumButton(FirewallButton):
-    scope = 'user'
-
+class RandomNumButton(discord.ui.Button):
     def __init__(self):
         super().__init__(
             label='Random number',
             style=discord.ButtonStyle.secondary
         )
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(RandomNumModal())
 
 
-class RandomWordButton(FirewallButton):
+class RandomWordButton(discord.ui.Button):
     scope = 'user'
 
     def __init__(self):
@@ -41,11 +32,11 @@ class RandomWordButton(FirewallButton):
             style=discord.ButtonStyle.secondary
         )
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(RandomWordModal())
 
 
-class RandomTeamByMsg(FirewallButton):
+class RandomTeamByMsg(discord.ui.Button):
     scope = 'user'
 
     def __init__(self):
@@ -54,11 +45,11 @@ class RandomTeamByMsg(FirewallButton):
             style=discord.ButtonStyle.secondary
         )
 
-    async def on_click(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction):
         await interaction.response.send_modal(RandomTeamByMsgModal())
 
 
-class RandomTeamByChannel(FirewallButton):
+class RandomTeamByChannel(discord.ui.Button):
     scope = 'user'
 
     def __init__(self, navigator: Navigator):
@@ -68,10 +59,10 @@ class RandomTeamByChannel(FirewallButton):
         )
         self.navigator = navigator
 
-    async def on_click(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction):
         scenario = ChannelFactory.for_random_selection()
 
-        manager = ChannelSelectorManager(
+        manager = ChannelSelectorManager( # TODO: має бути flow
             navigator=self.navigator,
             scenario=scenario,
             channels_with_users_only=True

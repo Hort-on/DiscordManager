@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.superusers.services import SuperusersService
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class AddSuperuserButton(FirewallButton):
@@ -21,11 +22,13 @@ class AddSuperuserButton(FirewallButton):
             self,
             navigator: Navigator,
             superusers_service: SuperusersService,
-            formatter: SuperusersFormatter
+            formatter: SuperusersFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='📥Add super user',
-            style=discord.ButtonStyle.green
+            style=discord.ButtonStyle.green,
+            service=buttons_protection
         )
 
         self.navigator = navigator
@@ -51,12 +54,15 @@ class DeleteSuperusersButton(FirewallButton):
             self,
             navigator: Navigator,
             superusers_service: SuperusersService,
-            formatter: SuperusersFormatter
+            formatter: SuperusersFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='🗑️Delete superusers',
             style=discord.ButtonStyle.red,
+            service=buttons_protection
         )
+
         self.navigator = navigator
         self.superusers_service = superusers_service
         self.formatter = formatter
@@ -78,12 +84,15 @@ class SuperusersListButton(FirewallButton):
 
     def __init__(
             self,
-            formatter: SuperusersFormatter
+            formatter: SuperusersFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='📑Show current superusers',
             style=discord.ButtonStyle.blurple,
+            service=buttons_protection
         )
+
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction):

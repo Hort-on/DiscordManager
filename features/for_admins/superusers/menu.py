@@ -11,6 +11,7 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.superusers.formatter import SuperusersFormatter
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class SuperusersMenuButton(FirewallButton):
@@ -19,11 +20,13 @@ class SuperusersMenuButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            formatter: SuperusersFormatter
+            formatter: SuperusersFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='👮Superusers management',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
         self.navigator = navigator
         self.formatter = formatter

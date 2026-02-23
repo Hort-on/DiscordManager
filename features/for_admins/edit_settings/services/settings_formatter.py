@@ -14,7 +14,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from ui.embed_constructor.embed_constructor import WarningEmbed, InfoEmbed
 
 
-class CurrentSettings:
+class SettingsFormatter:
     def __init__(
             self,
             settings: SettingsStorage,
@@ -25,7 +25,7 @@ class CurrentSettings:
         self.db_factory = db_factory
         self.service = cleanup_service
 
-    def current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
+    def format_current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
         settings = self.settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id
@@ -51,7 +51,7 @@ class CurrentSettings:
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
 
-    async def current_system_channels(self, guild: discord.Guild) -> discord.Embed:
+    async def format_current_system_channels(self, guild: discord.Guild) -> discord.Embed:
         not_found_ch: list[str] = []
 
         channels = self.settings.dict_storage.for_dict_get(
@@ -82,7 +82,7 @@ class CurrentSettings:
 
         return info_embed
 
-    async def current_hidden_channels(self, interaction: discord.Interaction) -> discord.Embed:
+    async def format_current_hidden_channels(self, interaction: discord.Interaction) -> discord.Embed:
         not_found_ch: set[int] = set()
 
         lines: list[str] = [f'Hidden channels:', f'{'-' * 16}']
@@ -117,7 +117,7 @@ class CurrentSettings:
 
         return info_embed
 
-    async def current_hidden_roles(self, interaction: discord.Interaction) -> discord.Embed:
+    async def format_current_hidden_roles(self, interaction: discord.Interaction) -> discord.Embed:
         not_found_roles: set[int] = set()
 
         lines: list[str] = [f'Hidden roles:', f'{'-' * 13}']
@@ -151,25 +151,3 @@ class CurrentSettings:
         info_embed = InfoEmbed(description=description)
 
         return info_embed
-
-
-class SettingsFormatter:
-    @staticmethod
-    def format_current_main_settings(interaction: discord.Interaction) -> discord.Embed:
-        embed = CurrentSettings().current_main_settings(interaction=interaction)
-        return embed
-
-    @staticmethod
-    async def format_current_system_channels(guild: discord.Guild) -> discord.Embed:
-        embed = await CurrentSettings().current_system_channels(guild=guild)
-        return embed
-
-    @staticmethod
-    async def format_current_hidden_channels(interaction: discord.Interaction) -> discord.Embed:
-        embed = await CurrentSettings().current_hidden_channels(interaction=interaction)
-        return embed
-
-    @staticmethod
-    async def format_current_hidden_roles(interaction: discord.Interaction) -> discord.Embed:
-        embed = await CurrentSettings().current_hidden_roles(interaction=interaction)
-        return embed

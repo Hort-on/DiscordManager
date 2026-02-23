@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from database.db_factory.db_scenario_factory import DBFactory
-
 import discord
 
-from modules.buttons.for_users.randomizer.modals import RandomTeamByChannelModal
+from database.db_base_service import DBBaseService
+from features.for_everyone.randomizer.modals import RandomTeamByChannelModal
 
 from general_services.utils.messages import DB_MSGS, SYSTEM_MSGS
+
+if TYPE_CHECKING:
+    from database.db_factory.db_scenario_factory import DBFactory
 
 
 class ChannelScenario:
@@ -17,12 +18,9 @@ class ChannelScenario:
         raise NotImplementedError
 
 
-class SaveChannelToDBScenario(ChannelScenario):
-    def __init__(
-            self,
-            db_factory: DBFactory,
-            config_key: str
-    ):
+class SaveChannelToDBScenario(ChannelScenario, DBBaseService):
+    def __init__(self, db_factory: DBFactory, config_key: str):
+        super().__init__()
 
         self.db_factory = db_factory
         self.config_key = config_key
@@ -33,7 +31,7 @@ class SaveChannelToDBScenario(ChannelScenario):
             channel
     ) -> None:
 
-        write = self.db_factory.for_write_data(
+        write_scenario = self.db_factory.for_write_data(
             guild_id=interaction.guild.id,
             table_name='settings',
             data={
@@ -41,7 +39,11 @@ class SaveChannelToDBScenario(ChannelScenario):
             }
         )
 
-        result = await write.db_proceed()
+        result = await self.update_db_and_cache(
+            scenario=write_scenario,
+            guild_id=interaction.guild_id
+        )
+
         if result:
             await interaction.response.edit_message(
                 content=DB_MSGS.get('channel_successful_msg')

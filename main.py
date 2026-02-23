@@ -1,27 +1,32 @@
 from pathlib import Path
-
 import os
 import asyncio
 import logging
+
 from dotenv import load_dotenv
 
-from core.bot_config import bot
-from core.container import BotContainer, AppContainer
-from core.controller import BotController
+from core.bot_config import create_bot
+from core.controller import Controller
+from core.general_services_container import GeneralContainer
+from core.navigator import Navigator
 
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
-
-from features.birthdays import BirthdayManager
-from features.moderation.message_handler import BadWordsHandler
-from modules.verification.service import AntiBotService
-
-from core.navigator import Navigator
 from database.db_factory.db_scenario_factory import DBFactory
-from general_services.logger.logger import Logger
-from ui.yes_no_service import YesNoViewFactory
 
-# Show Discord API errors in console
+from features.auto_moderation.verification.service import VerificationService
+from features.for_admins.module import build_admin_module
+# from features.for_everyone.birthdays.birthday_manager import BirthdayManager
+# from features.auto_moderation.message_handler.bad_words_handler import BadWordsHandler
+
+from general_services.logger.logger import Logger
+from general_services.other_services.cleanup_service import CleanUpService
+
+from ui.button_protection.button_protection_service import ButtonProtectionService
+from ui.yes_no_service.yes_no_factory import YesNoViewFactory
+
+
+# Logging
 logging.basicConfig(level=logging.WARNING)
 logging.getLogger('discord.http').setLevel(logging.DEBUG)
 
@@ -33,48 +38,72 @@ DB_PATH = BASE_DIR / 'database' / 'DATA' / 'assistant_data.sqlite'
 
 
 async def main():
+    bot = create_bot()
+
     logger = Logger()
 
     db_connect = DB(logger=logger, path=DB_PATH)
     await db_connect.init_tables()
+
     db_factory = DBFactory(db_connect=db_connect, logger=logger)
 
     settings = SettingsStorage(bot=bot, db_factory=db_factory)
 
-    birthday_manager = BirthdayManager(bot=bot, settings=settings, db_factory=db_factory)
-
-    bad_words_handler = BadWordsHandler()
-
-    navigator = Navigator()
-
     yes_no_factory = YesNoViewFactory()
 
-    anti_bot_service = AntiBotService(settings=settings, yes_no_factory=yes_no_factory)
+    button_protector = ButtonProtectionService(
+        settings=settings
+    )
 
-    container = BotContainer(
+    cleanup_service = CleanUpService(
+        settings=settings,
+        db_factory=db_factory
+    )
+
+    verification_service = VerificationService(
         bot=bot,
+        settings=settings
+    )
+
+    admin_module = build_admin_module(
+        bot=bot,
+        db_factory=db_factory,
+        settings=settings,
+        cleanup_service=cleanup_service,
+        verification_service=verification_service
+    )
+
+    general_container = GeneralContainer(
+        logger=logger,
         db_connect=db_connect,
         db_factory=db_factory,
-        logger=logger,
         settings=settings,
-        birthday_manager=birthday_manager,
-        bad_words_handler=bad_words_handler,
-        anti_bot_service=anti_bot_service,
-        navigator=navigator,
-        yes_no_factory=yes_no_factory
+        cleanup_service=cleanup_service,
+        button_protection=button_protector
     )
 
-    navigator.container = container
-    BotController(
+    navigator = Navigator(
+        general_container=general_container,
+        admin_module=admin_module
+    )
+
+    bot.navigator = navigator
+
+    Controller(
         bot=bot,
+        navigator=navigator,
         settings=settings,
         db_factory=db_factory,
-        yes_no_factory=yes_no_factory
+        yes_no_factory=yes_no_factory,
+        verification_service=verification_service
     )
 
-    AppContainer.set(container)
+    await bot.load_extension('cogs.management_cog')
+
+    await bot.tree.sync()
 
     await bot.start(TOKEN)
+
 
 if __name__ == '__main__':
     try:

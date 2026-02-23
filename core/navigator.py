@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 import discord
 
 if TYPE_CHECKING:
-    from features.for_admins.module import AdministrationModule
     from core.general_services_container import GeneralContainer
+    from features.for_admins.module import AdministrationModule
 
 
 class Navigator:
     def __init__(
             self,
             general_container: GeneralContainer,
-            admin_module: AdministrationModule
+            admin_module: AdministrationModule,
     ):
         self.admin_module = admin_module
         self.general_container = general_container
@@ -48,6 +48,7 @@ class Navigator:
         return MainMenuView(
                 settings=self.general_container.settings,
                 navigator=self,
+                buttons_protection=self.general_container.button_protection,
                 guild=guild,
                 user_id=user_id
             )
@@ -59,6 +60,7 @@ class Navigator:
             settings=self.general_container.settings,
             superusers_formatter=self.admin_module.superusers_module.superusers_formatter,
             delete_msg_service=self.admin_module.delete_msg_module.delete_msg_service,
+            buttons_protection=self.general_container.button_protection,
             send_msg_service=self.admin_module.send_message_module.send_message_service,
             guild_id=guild_id
         )
@@ -70,7 +72,8 @@ class Navigator:
         return SettingsMenuView(
             navigator=self,
             main_settings_service=edit_settings_container.main_settings_service,
-            settings_formatter=edit_settings_container.settings_formatter_service
+            settings_formatter=edit_settings_container.formatter,
+            buttons_protection=self.general_container.button_protection
         )
 
     def _birthday_menu(self):
@@ -84,7 +87,8 @@ class Navigator:
         return SuperusersMenuView(
             navigator=self,
             superusers_service=self.admin_module.superusers_module.superusers_service,
-            formatter=self.admin_module.superusers_module.superusers_formatter
+            formatter=self.admin_module.superusers_module.superusers_formatter,
+            buttons_protection=self.general_container.button_protection
         )
 
     def _random_menu(self):
@@ -107,7 +111,8 @@ class Navigator:
             navigator=self,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
             formatter=edit_settings_container.formatter,
-            cleanup_service=self.general_container.cleanup_service
+            cleanup_service=self.general_container.cleanup_service,
+            buttons_protection=self.general_container.button_protection
         )
 
     def _hidden_roles_menu(self):
@@ -117,7 +122,8 @@ class Navigator:
             navigator=self,
             formatter=edit_settings_container.formatter,
             hidden_roles_service=edit_settings_container.hidden_roles_service,
-            cleanup_service=self.general_container.cleanup_service
+            cleanup_service=self.general_container.cleanup_service,
+            buttons_protection=self.general_container.button_protection
         )
 
     def _system_channels_menu(self):
@@ -127,5 +133,6 @@ class Navigator:
         return SystemChannelsMenuView(
             navigator=self,
             sys_channels_service=edit_settings_container.system_channels_service,
-            formatter=edit_settings_container.formatter
+            formatter=edit_settings_container.formatter,
+            buttons_protection=self.general_container.button_protection
         )

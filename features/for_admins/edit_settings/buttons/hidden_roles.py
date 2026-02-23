@@ -15,19 +15,22 @@ if TYPE_CHECKING:
     from general_services.other_services.cleanup_service import CleanUpService
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class HiddenRolesMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='Hidden roles management',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
+
         self.navigator = navigator
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def on_click(self, interaction: discord.Interaction) -> None:  # TODO: зробити через flow
         context = getattr(self.view, 'context', NavigationContext())
 
         context.push(target='settings_menu')
@@ -47,12 +50,15 @@ class AddHiddenRoleButton(FirewallButton):
             navigator: Navigator,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='📥Add hidden roles',
-            style=discord.ButtonStyle.green
+            style=discord.ButtonStyle.green,
+            service=buttons_protection
         )
+
         self.navigator = navigator
         self.formatter = formatter
         self.hidden_roles_service = hidden_roles_service
@@ -79,12 +85,15 @@ class DeleteHiddenRoleButton(FirewallButton):
             navigator: Navigator,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='🗑️Delete hidden roles',
             style=discord.ButtonStyle.red,
+            service=buttons_protection
         )
+
         self.navigator = navigator
         self.formatter = formatter
         self.hidden_roles_service = hidden_roles_service
@@ -106,11 +115,13 @@ class DeleteHiddenRoleButton(FirewallButton):
 class HiddenRolesListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, formatter: SettingsFormatter):
+    def __init__(self, formatter: SettingsFormatter, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='📄Hidden roles list',
             style=discord.ButtonStyle.blurple,
+            service=buttons_protection
         )
+
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:

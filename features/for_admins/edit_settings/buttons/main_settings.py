@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class MainSettingsButton(FirewallButton):
@@ -21,12 +22,15 @@ class MainSettingsButton(FirewallButton):
             self,
             navigator: Navigator,
             main_settings_service: MainSettingsService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='Edit main settings',
-            style=discord.ButtonStyle.green
+            style=discord.ButtonStyle.green,
+            service=buttons_protection
         )
+
         self.main_settings_service = main_settings_service
         self.navigator = navigator
         self.formatter = formatter

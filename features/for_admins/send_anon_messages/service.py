@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
@@ -11,12 +12,10 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
 
 
-class SendAnonMessageService:
-    def __init__(
-            self,
-            db_factory: DBFactory,
-            settings: SettingsStorage
-    ):
+class SendAnonMessageService(DBBaseService):
+    def __init__(self, db_factory: DBFactory, settings: SettingsStorage):
+        super().__init__(settings)
+
         self.db_factory = db_factory
         self.settings = settings
 
@@ -31,7 +30,7 @@ class SendAnonMessageService:
         return [channel for channel in channels if channel.id not in hidden_channels]
 
     async def save_channel(self, guild_id: int, user_id: int, channel_id: int) -> bool:
-        write = self.db_factory.for_write_data(
+        write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
             table_name='channels_to_send',
             data={
@@ -41,19 +40,9 @@ class SendAnonMessageService:
             }
         )
 
-        result = await write.db_proceed()
-
-        if not result:
-            return False
-
-        self.settings.dict_storage.for_dict_update(
-            target=StorageTarget.CHANNELS_TO_SEND,
-            guild_id=guild_id,
-            data={
-                'guild_id': guild_id,
-                'user_id': user_id,
-                'channel_id': channel_id
-            }
+        result = await self.update_db_and_cache(
+            scenario=write_scenario,
+            guild_id=guild_id
         )
 
-        return True
+        return result

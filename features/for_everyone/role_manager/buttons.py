@@ -7,15 +7,12 @@ if TYPE_CHECKING:
 
 import discord.ui
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
-from modules.buttons.for_users.role_manager.services import AddRoleService, RemoveRoleService
-
 from core.navigator_context import NavigationContext
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 
-class AddRoleButton(FirewallButton):
+class AddRoleButton(discord.ui.Button):
     def __init__(self, navigator: Navigator):
         super().__init__(
             label='Add role',
@@ -24,7 +21,7 @@ class AddRoleButton(FirewallButton):
         self.navigator = navigator
         self.add_role = AddRoleService(navigator=navigator)
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         context = getattr(self.view, 'context', NavigationContext())
 
         context.push(target='role_manager_menu')
@@ -51,7 +48,7 @@ class AddRoleButton(FirewallButton):
         await interaction.response.edit_message(view=view)
 
 
-class RemoveRoleButton(FirewallButton):
+class RemoveRoleButton(discord.ui.Button):
     def __init__(self, navigator: Navigator):
         super().__init__(
             label='Remove role',

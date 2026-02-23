@@ -13,6 +13,7 @@ from features.for_everyone.role_manager.menu import RoleManagerMenuButton
 if TYPE_CHECKING:
     from core.navigator import Navigator
     from database.settings_storage.settings import SettingsStorage
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class MainMenuView(discord.ui.View):
@@ -20,8 +21,9 @@ class MainMenuView(discord.ui.View):
             self,
             settings: SettingsStorage,
             navigator: Navigator,
+            buttons_protection: ButtonProtectionService,
             guild: discord.Guild,
-            user_id: int
+            user_id: int,
     ):
         super().__init__(timeout=60)
 
@@ -42,4 +44,7 @@ class MainMenuView(discord.ui.View):
             self.add_item(RoleManagerMenuButton(navigator=navigator))
 
         if user_id in superusers or user_id == guild.owner_id:
-            self.add_item(AdminMenuButton(navigator=navigator))
+            self.add_item(AdminMenuButton(
+                navigator=navigator,
+                buttons_protection=buttons_protection
+            ))

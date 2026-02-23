@@ -14,10 +14,6 @@ class AntiBotModal(discord.ui.Modal, title='Anti-bot check'):
             flow: VerificationFlow
     ):
         super().__init__()
-        self.anti_bot_check = AgreeButtonService(
-            settings=settings,
-            yes_no_factory=yes_no_factory
-        )
         self.flow = flow
 
     check_word = discord.ui.TextInput(
@@ -29,4 +25,4 @@ class AntiBotModal(discord.ui.Modal, title='Anti-bot check'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.flow.check_the_word(interaction=interaction, word=self.check_word.value)
+        await self.flow.word_verification(interaction=interaction, word=self.check_word.value)

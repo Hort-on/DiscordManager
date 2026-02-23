@@ -10,6 +10,7 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 
 from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
 
+
 if TYPE_CHECKING:
     from core.navigator import Navigator
 
@@ -18,14 +19,17 @@ if TYPE_CHECKING:
 
     from general_services.other_services.cleanup_service import CleanUpService
 
+    from ui.button_protection.button_protection_service import ButtonProtectionService
+
 
 class HiddenChannelsMenuButtons(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='Hidden channels management',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
 
         self.navigator = navigator
@@ -50,11 +54,13 @@ class AddHiddenChannelButton(FirewallButton):
             navigator: Navigator,
             hidden_ch_service: HiddenChannelsService,
             formatter: SettingsFormatter,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='📥Add hidden channels',
-            style=discord.ButtonStyle.green
+            style=discord.ButtonStyle.green,
+            service=buttons_protection
         )
 
         self.hidden_ch_service = hidden_ch_service
@@ -81,11 +87,13 @@ class DeleteHiddenChannelButton(FirewallButton):
             navigator: Navigator,
             hidden_ch_service: HiddenChannelsService,
             formatter: SettingsFormatter,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='🗑️Delete hidden channels',
-            style=discord.ButtonStyle.red
+            style=discord.ButtonStyle.red,
+            service=buttons_protection
         )
 
         self.hidden_ch_service = hidden_ch_service
@@ -107,10 +115,11 @@ class DeleteHiddenChannelButton(FirewallButton):
 class HiddenChannelsListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, formatter: SettingsFormatter):
+    def __init__(self, formatter: SettingsFormatter, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='📄Hidden channels list',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.blurple,
+            service=buttons_protection
         )
 
         self.formatter = formatter

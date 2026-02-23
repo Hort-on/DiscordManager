@@ -11,11 +11,10 @@ from .services.system_channels import SystemChannelsService
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
-
+    from general_services.other_services.cleanup_service import CleanUpService
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
-
-    from features.auto_moderation.verification.check_verification import VerificationService
+    from features.auto_moderation.verification.service import VerificationService
     from .services.settings_formatter import SettingsFormatter
 
 
@@ -32,7 +31,8 @@ def build_edit_settings_module(
         bot: Bot,
         db_factory: DBFactory,
         settings: SettingsStorage,
-        verification_service: VerificationService
+        verification_service: VerificationService,
+        cleanup_service: CleanUpService
 ) -> EditSettingsModule:
 
     hidden_channel_service = HiddenChannelsService(
@@ -48,10 +48,15 @@ def build_edit_settings_module(
     system_channels_service = SystemChannelsService(
         bot=bot,
         db_factory=db_factory,
-        settings=settings
+        settings=settings,
+        service=verification_service
     )
 
-    formatter = SettingsFormatter()
+    formatter = SettingsFormatter(
+        settings=settings,
+        db_factory=db_factory,
+        cleanup_service=cleanup_service
+    )
 
     main_settings_service = MainSettingsService(
         bot=bot,

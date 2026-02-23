@@ -1,21 +1,26 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 
 from datetime import datetime
 
+from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
-from database.settings_storage.settings import SettingsStorage
 
-from database.db_factory.db_scenario_factory import DBFactory
 from general_services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
 
+if TYPE_CHECKING:
+    from core.bot_config import Bot
+    from database.settings_storage.settings import SettingsStorage
+    from database.db_factory.db_scenario_factory import DBFactory
 
-class BirthdayManager:
-    def __init__(
-            self,
-            bot,
-            settings: SettingsStorage,
-            db_factory: DBFactory
-    ):
+
+# TODO: зробити завантаження у кеш
+class BirthdayManager(DBBaseService):
+    def __init__(self, bot: Bot, settings: SettingsStorage, db_factory: DBFactory):
+        super().__init__(settings)
         self.bot = bot
 
         self.settings = settings

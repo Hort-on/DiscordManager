@@ -2,21 +2,22 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class CreateChannelButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(self, service: ButtonProtectionService):
         super().__init__(
             label='Create a channel',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.blurple,
+            service=service
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:

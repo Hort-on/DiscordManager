@@ -2,29 +2,27 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.container import BotContainer
-
 import discord
 
-from core.container import AppContainer
-
-from modules.buttons.button_protection.protector import ButtonPermissionService
-
 from ui.embed_constructor.embed_constructor import ErrorEmbed
+
+if TYPE_CHECKING:
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class FirewallButton(discord.ui.Button):
     scope: str = 'user'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.container: BotContainer = AppContainer.get()
+    def __init__(self, service: ButtonProtectionService, label: str, style: discord.ButtonStyle):
+        super().__init__(
+            label=label,
+            style=style
+        )
 
-    async def callback(self, interaction: discord.Interaction):
-        permission = ButtonPermissionService(self.container.settings)
+        self.service = service
 
-        if not permission.has_access(
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if not self.service.has_access(
             interaction=interaction,
             scope=self.scope
         ):
@@ -36,5 +34,5 @@ class FirewallButton(discord.ui.Button):
 
         await self.on_click(interaction)
 
-    async def on_click(self, interaction: discord.Interaction):
+    async def on_click(self, interaction: discord.Interaction) -> None:
         raise NotImplementedError

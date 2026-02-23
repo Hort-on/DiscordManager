@@ -14,19 +14,22 @@ if TYPE_CHECKING:
     from core.navigator import Navigator
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class SystemChannelsMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='System channels management',
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
         )
+
         self.navigator = navigator
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def on_click(self, interaction: discord.Interaction) -> None:  # TODO: Зробити через flow
         view = self.navigator.go(target='system_channels_menu')
 
         context = getattr(self.view, 'context', NavigationContext())
@@ -45,12 +48,15 @@ class AddSystemChannelsButton(FirewallButton):
             self,
             navigator: Navigator,
             sys_channels_service: SystemChannelsService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='📥Add\\Change channels',
-            style=discord.ButtonStyle.green
+            style=discord.ButtonStyle.green,
+            service=buttons_protection
         )
+
         self.navigator = navigator
         self.service = sys_channels_service
         self.formatter = formatter
@@ -74,12 +80,15 @@ class DeleteSystemChannelsButton(FirewallButton):
             self,
             navigator: Navigator,
             sys_channels_service: SystemChannelsService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='🗑️Delete system channels',
-            style=discord.ButtonStyle.red
+            style=discord.ButtonStyle.red,
+            service=buttons_protection
         )
+
         self.service = sys_channels_service
         self.navigator = navigator
         self.formatter = formatter
@@ -99,11 +108,13 @@ class DeleteSystemChannelsButton(FirewallButton):
 class SystemChannelsListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, formatter: SettingsFormatter):
+    def __init__(self, formatter: SettingsFormatter, buttons_protection: ButtonProtectionService):
         super().__init__(
             label='📄System channels list',
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.blurple,
+            service=buttons_protection
         )
+
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
