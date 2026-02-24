@@ -28,6 +28,19 @@ class SuperusersFlow:
         self.superusers_service = superusers_service
         self.formatter = formatter
 
+    async def start_for_menu(self, interaction: discord.Interaction) -> None:
+        view = self.navigator.go(target='superusers_menu')
+
+        context = getattr(view, 'context', NavigationContext())
+
+        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
+
+        view.context = context
+
+        embed = self.formatter.build_embed(guild=interaction.guild)
+
+        await interaction.response.edit_message(view=view, embed=embed)
+
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(AddSuperusersModal(

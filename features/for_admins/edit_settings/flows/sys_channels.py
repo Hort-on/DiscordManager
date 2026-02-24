@@ -27,6 +27,17 @@ class SystemChannelsFlow:
         self.service = sys_channels_service
         self.formatter = formatter
 
+    async def start_for_menu(self, interaction: discord.Interaction) -> None:
+        view = self.navigator.go(target='system_channels_menu')
+
+        context = getattr(view, 'context', NavigationContext())
+
+        context.push(target='settings_menu')
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)
+
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
         options = self._sys_channels_options(

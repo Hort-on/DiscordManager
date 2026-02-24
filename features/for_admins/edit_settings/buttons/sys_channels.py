@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
-
 from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
 
 from ui.button_protection.admin_buttons_protection import FirewallButton
@@ -20,7 +18,13 @@ if TYPE_CHECKING:
 class SystemChannelsMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            buttons_protection: ButtonProtectionService,
+            formatter: SettingsFormatter,
+            service: SystemChannelsService
+    ):
         super().__init__(
             label='System channels management',
             style=discord.ButtonStyle.secondary,
@@ -28,17 +32,17 @@ class SystemChannelsMenuButton(FirewallButton):
         )
 
         self.navigator = navigator
+        self.service = service
+        self.formatter = formatter
 
-    async def on_click(self, interaction: discord.Interaction) -> None:  # TODO: Зробити через flow
-        view = self.navigator.go(target='system_channels_menu')
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        flow = SystemChannelsFlow(
+            navigator=self.navigator,
+            sys_channels_service=self.service,
+            formatter=self.formatter
+        )
 
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='settings_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
+        await flow.start_for_menu(interaction=interaction)
 
 
 class AddSystemChannelsButton(FirewallButton):
@@ -68,9 +72,7 @@ class AddSystemChannelsButton(FirewallButton):
             formatter=self.formatter
         )
 
-        await flow.start_for_add(
-            interaction=interaction
-        )
+        await flow.start_for_add(interaction=interaction)
 
 
 class DeleteSystemChannelsButton(FirewallButton):
@@ -100,9 +102,7 @@ class DeleteSystemChannelsButton(FirewallButton):
             formatter=self.formatter
         )
 
-        await flow.start_for_delete(
-            interaction=interaction,
-        )
+        await flow.start_for_delete(interaction=interaction)
 
 
 class SystemChannelsListButton(FirewallButton):

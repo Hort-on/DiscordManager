@@ -8,6 +8,7 @@ from .services.hidden_channels import HiddenChannelsService
 from .services.hidden_roles import HiddenRolesService
 from .services.main_settings import MainSettingsService
 from .services.system_channels import SystemChannelsService
+from .services.settings_formatter import SettingsFormatter
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
@@ -15,7 +16,6 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
-    from .services.settings_formatter import SettingsFormatter
 
 
 @dataclass

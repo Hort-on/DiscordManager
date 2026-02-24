@@ -13,7 +13,7 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 
 class AddRoleButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, role_manager_service: ):
         super().__init__(
             label='Add role',
             style=discord.ButtonStyle.green

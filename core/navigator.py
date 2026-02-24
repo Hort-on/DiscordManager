@@ -73,7 +73,11 @@ class Navigator:
             navigator=self,
             main_settings_service=edit_settings_container.main_settings_service,
             settings_formatter=edit_settings_container.formatter,
-            buttons_protection=self.general_container.button_protection
+            buttons_protection=self.general_container.button_protection,
+            hidden_ch_service=edit_settings_container.hidden_channel_service,
+            hidden_role_service=edit_settings_container.hidden_roles_service,
+            sys_channels_service=edit_settings_container.system_channels_service,
+            cleanup_service=self.general_container.cleanup_service
         )
 
     def _birthday_menu(self):

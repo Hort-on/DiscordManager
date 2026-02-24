@@ -100,8 +100,6 @@ async def main():
 
     await bot.load_extension('cogs.management_cog')
 
-    await bot.tree.sync()
-
     await bot.start(TOKEN)
 
 

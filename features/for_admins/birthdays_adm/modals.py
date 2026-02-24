@@ -1,8 +1,10 @@
 import discord
 
+from modules.buttons.for_admins.birthday_buttons.services import AddBirthdayService, DeleteBirthdayService
+
 
 class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
-    def __init__(self, birthday_service: ):
+    def __init__(self):
         super().__init__()
         self.add_birthday = AddBirthdayService()
 

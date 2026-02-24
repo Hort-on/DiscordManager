@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
-
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
@@ -25,25 +23,34 @@ if TYPE_CHECKING:
 class HiddenChannelsMenuButtons(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            buttons_protection: ButtonProtectionService,
+            formatter: SettingsFormatter,
+            hidden_ch_service: HiddenChannelsService,
+            cleanup_service: CleanUpService
+    ):
         super().__init__(
             label='Hidden channels management',
             style=discord.ButtonStyle.secondary,
             service=buttons_protection
         )
 
+        self.hidden_ch_service = hidden_ch_service
         self.navigator = navigator
+        self.formatter = formatter
+        self.cleanup_service = cleanup_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target='hidden_channels_menu')
+        flow = HiddenChannelsFlow(
+            navigator=self.navigator,
+            formatter=self.formatter,
+            hidden_ch_service=self.hidden_ch_service,
+            cleanup_service=self.cleanup_service
+        )
 
-        context = getattr(self.view, 'context', NavigationContext())
-
-        context.push(target='settings_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
+        await flow.start_for_menu(interaction=interaction)
 
 
 class AddHiddenChannelButton(FirewallButton):

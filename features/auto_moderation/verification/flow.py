@@ -111,6 +111,7 @@ class VerificationFlow:
 
     async def prepare_verification_channel(self):
         view = VerificationView(
+            flow=self,
             bot=self.bot,
             settings=self.settings,
             yes_no_factory=self.yes_no_factory,
@@ -120,7 +121,7 @@ class VerificationFlow:
         self.bot.add_view(view=view)
 
         for guild in self.bot.guilds:
-            channel = self.service.is_verification_enabled(
+            channel = await self.service.is_verification_enabled(
                 guild=guild
             )
 
@@ -130,7 +131,7 @@ class VerificationFlow:
                     view=view
                 )
 
-    async def ensure_verification_message(self, channel, view):
+    async def ensure_verification_message(self, channel, view: VerificationView):
         found = False
         async for message in channel.history(limit=25):
             if message.author == self.bot.user and message.components:
@@ -143,3 +144,4 @@ class VerificationFlow:
             )
 
             await channel.send(embed=embed, view=view)
+            return

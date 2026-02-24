@@ -2,17 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
-
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
 
 from core.navigator_context import NavigationContext
 
+if TYPE_CHECKING:
+    from core.navigator import Navigator
 
-class RandomMenuButton(FirewallButton):
+
+class RandomMenuButton(discord.ui.Button):
     scope = 'user'
 
     def __init__(self, navigator: Navigator):

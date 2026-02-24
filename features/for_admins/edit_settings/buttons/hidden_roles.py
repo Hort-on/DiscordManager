@@ -6,8 +6,6 @@ import discord
 
 from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
 
-from core.navigator_context import NavigationContext
-
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
@@ -21,7 +19,14 @@ if TYPE_CHECKING:
 class HiddenRolesMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            buttons_protection: ButtonProtectionService,
+            formatter: SettingsFormatter,
+            hidden_roles_service: HiddenRolesService,
+            cleanup_service: CleanUpService
+    ):
         super().__init__(
             label='Hidden roles management',
             style=discord.ButtonStyle.secondary,
@@ -29,17 +34,19 @@ class HiddenRolesMenuButton(FirewallButton):
         )
 
         self.navigator = navigator
+        self.formatter = formatter
+        self.hidden_roles_service = hidden_roles_service
+        self.cleanup_service = cleanup_service
 
-    async def on_click(self, interaction: discord.Interaction) -> None:  # TODO: зробити через flow
-        context = getattr(self.view, 'context', NavigationContext())
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        flow = HiddenRolesFlow(
+            navigator=self.navigator,
+            formatter=self.formatter,
+            hidden_roles_service=self.hidden_roles_service,
+            cleanup_service=self.cleanup_service
+        )
 
-        context.push(target='settings_menu')
-
-        view = self.navigator.go(target='hidden_roles_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
+        await flow.start_for_menu(interaction=interaction)
 
 
 class AddHiddenRoleButton(FirewallButton):
@@ -72,9 +79,7 @@ class AddHiddenRoleButton(FirewallButton):
             cleanup_service=self.cleanup_service
         )
 
-        await flow.start_for_add(
-            interaction=interaction
-        )
+        await flow.start_for_add(interaction=interaction)
 
 
 class DeleteHiddenRoleButton(FirewallButton):
@@ -107,9 +112,7 @@ class DeleteHiddenRoleButton(FirewallButton):
             cleanup_service=self.cleanup_service
         )
 
-        await flow.start_for_delete(
-            interaction=interaction
-        )
+        await flow.start_for_delete(interaction=interaction)
 
 
 class HiddenRolesListButton(FirewallButton):
@@ -127,6 +130,4 @@ class HiddenRolesListButton(FirewallButton):
     async def on_click(self, interaction: discord.Interaction) -> None:
         embed = await self.formatter.format_current_hidden_roles(interaction)
 
-        await interaction.response.edit_message(
-            embed=embed
-        )
+        await interaction.response.edit_message(embed=embed)

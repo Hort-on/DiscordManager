@@ -26,6 +26,92 @@ class BirthdayManager(DBBaseService):
         self.settings = settings
         self.db_factory = db_factory
 
+    async def add_new_birthday(
+            self,
+            interaction: discord.Interaction,
+            user_id: int,
+            guild_id: int,
+            user_birthday: str
+    ) -> None:
+
+        try:
+            datetime.strptime(user_birthday, '%d.%m')
+        except ValueError:
+            await interaction.response.edit_message(
+                content=GENERAL_MSGS.get('invalid_date_msg')
+            )
+            return
+
+        member = interaction.guild.get_member(user_id)
+        if not member:
+            await interaction.response.edit_message(
+                content=GENERAL_MSGS.get('user_not_found_msg')
+            )
+            return
+
+        exists_scenario = self.db_factory.for_exists_birthday_check(
+            guild_id=guild_id,
+            user_id=user_id
+
+        )
+        if await exists_scenario.db_proceed():
+            await interaction.response.edit_message(
+                content=BIRTHDAY_MSGS.get('user_exists_msg').format(member=member.display_name)
+            )
+            return
+
+        add_scenario = self.db_factory.for_add_birthday(
+            guild_id=guild_id,
+            user_id=user_id,
+            user_birthday=user_birthday
+        )
+
+        if await add_scenario.db_proceed():
+            await interaction.response.edit_message(
+                content=BIRTHDAY_MSGS.get('success_msg').format(
+                    member=member.display_name,
+                    user_birthday=user_birthday
+                )
+            )
+            return
+
+        await interaction.response.edit_message(
+            content=SYSTEM_MSGS.get('failure_msg')
+        )
+
+    async def delete_birthday(
+            self,
+            interaction: discord.Interaction,
+            user_id: int,
+            guild_id: int
+    ) -> None:
+
+        exists_scenario = self.db_factory.for_exists_birthday_check(
+            guild_id=guild_id,
+            user_id=user_id
+        )
+
+        if not await exists_scenario.db_proceed():
+            await interaction.response.edit_message(
+                content=DB_MSGS.get('user_not_found_msg').format(user_id=user_id)
+            )
+            return
+
+        delete_scenario = self.db_factory.for_delete_birthday(
+            guild_id=guild_id,
+            user_id=user_id
+        )
+
+        if await delete_scenario.db_proceed():
+            await interaction.response.edit_message(
+                content=DB_MSGS.get('delete_user_msg').format(user_id=user_id)
+            )
+            return
+
+        await interaction.response.edit_message(
+            content=SYSTEM_MSGS.get('failure_msg')
+        )
+
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
             is_enabled = self.settings.dict_storage.for_dict_get(

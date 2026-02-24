@@ -15,6 +15,35 @@ if TYPE_CHECKING:
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
+class SuperusersMenuButton(FirewallButton):
+    scope = 'admin'
+
+    def __init__(
+            self,
+            navigator: Navigator,
+            formatter: SuperusersFormatter,
+            superusers_service: SuperusersService,
+            buttons_protection: ButtonProtectionService
+    ):
+        super().__init__(
+            label='👮Superusers management',
+            style=discord.ButtonStyle.secondary,
+            service=buttons_protection
+        )
+        self.navigator = navigator
+        self.formatter = formatter
+        self.superusers_service = superusers_service
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        flow = SuperusersFlow(
+            navigator=self.navigator,
+            superusers_service=self.superusers_service,
+            formatter=self.formatter
+        )
+
+        await flow.start_for_menu(interaction=interaction)
+
+
 class AddSuperuserButton(FirewallButton):
     scope = 'admin'
 
@@ -42,9 +71,7 @@ class AddSuperuserButton(FirewallButton):
             formatter=self.formatter
         )
 
-        await flow.start_for_add(
-            interaction=interaction
-        )
+        await flow.start_for_add(interaction=interaction)
 
 
 class DeleteSuperusersButton(FirewallButton):
@@ -74,9 +101,7 @@ class DeleteSuperusersButton(FirewallButton):
             formatter=self.formatter
         )
 
-        await flow.start_for_delete(
-            interaction=interaction
-        )
+        await flow.start_for_delete(interaction=interaction)
 
 
 class SuperusersListButton(FirewallButton):

@@ -2,18 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.container import BotContainer
-    from core.navigator import Navigator
-
 import discord
-
-from core.container import AppContainer
 
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
-from ui.embed_constructor.embed_constructor import SuccessEmbed
+if TYPE_CHECKING:
+    from core.navigator import Navigator
 
 
 async def _build_and_send_result(
@@ -44,7 +39,7 @@ class AddRoleService:
         self.navigator = navigator
         self.settings = settings
 
-    async def prepare_roles(self, interaction: discord.Interaction):
+    async def prepare_roles_for_addition(self, interaction: discord.Interaction):
         hidden_roles = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_ROLES,
             guild_id=interaction.guild_id
@@ -74,42 +69,7 @@ class AddRoleService:
             )
         ]
 
-    @staticmethod
-    async def add_role_to_user(
-            interaction: discord.Interaction,
-            roles: list[str]
-    ):
-        member_role_ids = {role.id for role in interaction.user.roles}
-        role_ids = {int(r_id) for r_id in roles}
-
-        roles_to_add = []
-
-        for role_id in role_ids:
-            role = interaction.guild.get_role(role_id)
-            if role and role_id not in member_role_ids:
-                roles_to_add.append(role)
-
-        if roles_to_add:
-            await interaction.user.add_roles(*roles_to_add)
-
-        await _build_and_send_result(
-            interaction=interaction,
-            role_ids=role_ids,
-            text='The following roles have been successfully added:'
-        )
-
-
-class RemoveRoleService:
-    def __init__(
-            self,
-            navigator: Navigator,
-            settings: SettingsStorage
-    ):
-
-        self.navigator = navigator
-        self.settings = settings
-
-    async def prepare_roles(self, interaction: discord.Interaction):
+    async def prepare_roles_for_deletion(self, interaction: discord.Interaction):
         hidden_roles = self.settings.set_storage.for_set_get(
             target=StorageTarget.HIDDEN_ROLES,
             guild_id=interaction.guild_id
@@ -133,6 +93,30 @@ class RemoveRoleService:
             )
             for key, value in roles_to_remove.items()
         ]
+
+    @staticmethod
+    async def add_role_to_user(
+            interaction: discord.Interaction,
+            roles: list[str]
+    ):
+        member_role_ids = {role.id for role in interaction.user.roles}
+        role_ids = {int(r_id) for r_id in roles}
+
+        roles_to_add = []
+
+        for role_id in role_ids:
+            role = interaction.guild.get_role(role_id)
+            if role and role_id not in member_role_ids:
+                roles_to_add.append(role)
+
+        if roles_to_add:
+            await interaction.user.add_roles(*roles_to_add)
+
+        await _build_and_send_result(
+            interaction=interaction,
+            role_ids=role_ids,
+            text='The following roles have been successfully added:'
+        )
 
     @staticmethod
     async def remove_role_from_user(
