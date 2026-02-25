@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.navigator_context import NavigationContext
+from core.navigator.routes import Route
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
@@ -30,17 +31,6 @@ class HiddenChannelsFlow:
         self.navigator = navigator
         self.hidden_ch_service = hidden_ch_service
         self.cleanup = cleanup_service
-
-    async def start_for_menu(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target='hidden_channels_menu')
-
-        context = getattr(view, 'context', NavigationContext())
-
-        context.push(target='settings_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -67,7 +57,7 @@ class HiddenChannelsFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='hidden_channels_menu')
+        context.push(target=Route.HIDDEN_CHANNELS_MENU)
 
         view.context = context
 
@@ -136,7 +126,7 @@ class HiddenChannelsFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='hidden_channels_menu')
+        context.push(target=Route.HIDDEN_CHANNELS_MENU)
 
         view.context = context
 
@@ -145,7 +135,7 @@ class HiddenChannelsFlow:
             embed=embed
         )
 
-    def _get_deletable_channels(self, guild: discord.Guild):
+    def _get_deletable_channels(self, guild: discord.Guild) -> list[discord.SelectOption]:
         not_found_channels: set[int] = set()
 
         hidden_channels = self.hidden_ch_service.get_hidden_channels(
@@ -180,7 +170,7 @@ class HiddenChannelsFlow:
             self,
             interaction: discord.Interaction,
             values: list[str],
-    ):
+    ) -> None:
         result = self.hidden_ch_service.delete_channels(
             guild_id=interaction.guild_id,
             values=values,
@@ -199,7 +189,7 @@ class HiddenChannelsFlow:
         )
 
     # ================================= METHOD FOR SENDING RESULT =================================
-    async def _send_result(self, interaction: discord.Interaction, values: list[str]):
+    async def _send_result(self, interaction: discord.Interaction, values: list[str]) -> None:
         ch_ids = set(int(i) for i in values)
 
         ch_names: list[str] = ['These channels have been successfully added to hidden']
@@ -219,3 +209,7 @@ class HiddenChannelsFlow:
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]
         )
+
+    async def for_channels_list(self, interaction: discord.Interaction) -> None:
+        embed = await self.formatter.format_current_hidden_channels(interaction)
+        await interaction.response.edit_message(embed=embed)

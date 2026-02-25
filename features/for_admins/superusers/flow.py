@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.routes import Route
+from core.navigator.navigator_context import NavigationContext
 
 from features.for_admins.superusers.modals import AddSuperusersModal
 
@@ -12,7 +13,7 @@ from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed, WarningEmbed, InfoEmbed
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.formatter import SuperusersFormatter
 
@@ -27,19 +28,6 @@ class SuperusersFlow:
         self.navigator = navigator
         self.superusers_service = superusers_service
         self.formatter = formatter
-
-    async def start_for_menu(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target='superusers_menu')
-
-        context = getattr(view, 'context', NavigationContext())
-
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-        view.context = context
-
-        embed = self.formatter.build_embed(guild=interaction.guild)
-
-        await interaction.response.edit_message(view=view, embed=embed)
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -114,7 +102,7 @@ class SuperusersFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='superusers_menu')
+        context.push(target=Route.SUPERUSERS_MENU)
 
         view.context = context
 
@@ -188,3 +176,7 @@ class SuperusersFlow:
         ]
 
         return options, not_found
+
+    async def for_superusers_list(self, interaction: discord.Interaction) -> None:
+        embed = self.formatter.build_embed(guild=interaction.guild)
+        await interaction.response.edit_message(embed=embed)

@@ -8,7 +8,6 @@ from features.auto_moderation.verification.service import VerificationService
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
-    from ui.yes_no_service.yes_no_factory import YesNoViewFactory
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.flow import VerificationFlow
 
@@ -19,7 +18,6 @@ class AgreeButton(discord.ui.Button):
             flow: VerificationFlow,
             bot: Bot,
             settings: SettingsStorage,
-            yes_no_factory: YesNoViewFactory,
             service: VerificationService
     ):
         super().__init__(
@@ -31,7 +29,6 @@ class AgreeButton(discord.ui.Button):
         self.flow = flow
         self.bot = bot
         self.settings = settings
-        self.yes_no_factory = yes_no_factory
         self.service = service
 
     async def callback(self, interaction: discord.Interaction) -> None:
@@ -44,7 +41,6 @@ class DisagreeButton(discord.ui.Button):
             flow: VerificationFlow,
             bot: Bot,
             settings: SettingsStorage,
-            yes_no_factory: YesNoViewFactory,
             service: VerificationService
     ):
         super().__init__(
@@ -56,7 +52,6 @@ class DisagreeButton(discord.ui.Button):
         self.flow = flow
         self.bot = bot
         self.settings = settings
-        self.yes_no_factory = yes_no_factory
         self.service = service
 
     async def callback(self, interaction: discord.Interaction):

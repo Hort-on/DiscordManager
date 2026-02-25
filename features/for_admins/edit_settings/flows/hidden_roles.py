@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.navigator_context import NavigationContext
+from core.navigator.routes import Route
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
@@ -30,17 +31,6 @@ class HiddenRolesFlow:
         self.navigator = navigator
         self.hidden_roles_service = hidden_roles_service
         self.cleanup = cleanup_service
-
-    async def start_for_menu(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target='hidden_roles_menu')
-
-        context = getattr(view, 'context', NavigationContext())
-
-        context.push(target='settings_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -65,7 +55,7 @@ class HiddenRolesFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='hidden_channels_menu')
+        context.push(target=Route.HIDDEN_ROLES_MENU)
 
         view.context = context
 
@@ -115,7 +105,7 @@ class HiddenRolesFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='hidden_channels_menu')
+        context.push(target=Route.HIDDEN_ROLES_MENU)
 
         view.context = context
 
@@ -211,3 +201,7 @@ class HiddenRolesFlow:
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]
         )
+
+    async def for_roles_list(self, interaction: discord.Interaction):
+        embed = await self.formatter.format_current_hidden_roles(interaction)
+        await interaction.response.edit_message(embed=embed)

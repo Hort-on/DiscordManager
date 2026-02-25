@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import discord
-
 from dataclasses import dataclass
+
+from database.db_base_service import DBBaseService
 
 from typing import TYPE_CHECKING
 
@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from core.bot_config import Bot
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
-    from database.db_base_service import DBBaseService
 
 
 @dataclass
@@ -27,39 +26,17 @@ class BirthdayService(DBBaseService):
         self.settings = settings
         self.db_factory = db_factory
 
-    async def validate_date(
-            self,
-            guild: discord.Guild,
-            user_id: int,
-            birthday: str
-    ) -> BirthdayServiceReturn:
-
-        member = guild.get_member(user_id)  # TODO: має бути у flow а не тут
-
-        if member is None:
-            return BirthdayServiceReturn(
-                value=False,
-                message='User not found. Please try again.'
-            )
-
-        if not self._is_valid_date(birthday):
-            return BirthdayServiceReturn(
-                value=False,
-                message='Invalid date format. Use DD.MM.'
-            )
-
-        return await self.add_birthday(
-            user_id=user_id,
-            guild_id=guild.id,
-            user_birthday=birthday
-        )
-
-    async def add_birthday(
+    async def save_birthday(
             self,
             user_id: int,
             guild_id: int,
             user_birthday: str
     ) -> BirthdayServiceReturn:
+        if not self._is_valid_date(user_birthday):
+            return BirthdayServiceReturn(
+                value=False,
+                message='Invalid date format. Use DD.MM.'
+            )
 
         exists_scenario = self.db_factory.for_exists_birthday_check(
             guild_id=guild_id,
@@ -116,10 +93,7 @@ class BirthdayService(DBBaseService):
             user_id=user_id
         )
 
-        result = self.update_db_and_cache(
-            scenario=delete_scenario,
-            guild_id=guild_id
-        )
+        result = await delete_scenario.db_proceed()
 
         if not result:
             return BirthdayServiceReturn(
@@ -129,7 +103,7 @@ class BirthdayService(DBBaseService):
 
         return BirthdayServiceReturn(
             value=True,
-            message='The user was successfully deleted from birthday.'
+            message='Your birthday has been successfully deleted.'
         )
 
     @staticmethod

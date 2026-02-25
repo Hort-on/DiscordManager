@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.navigator_context import NavigationContext
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed

@@ -4,12 +4,13 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.routes import Route
+from core.navigator.navigator_context import NavigationContext
 
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -25,11 +26,11 @@ class EditSettingsMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction):
+        view = self.navigator.settings_menu()
+
         context = getattr(self.view, 'context', NavigationContext())
 
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-        view = self.navigator.go(target='settings_menu')
+        context.push(target=Route.SETTINGS_MENU)
 
         view.context = context
 

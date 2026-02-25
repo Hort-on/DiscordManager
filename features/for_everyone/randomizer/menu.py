@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.routes import Route
+from core.navigator.navigator_context import NavigationContext
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
 
 class RandomMenuButton(discord.ui.Button):
@@ -21,16 +22,16 @@ class RandomMenuButton(discord.ui.Button):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        context = getattr(self.view, 'context', NavigationContext())
-
         params_main = {
             'guild': interaction.guild,
             'user_id': interaction.user.id
         }
 
-        context.push(target='main_menu', params=params_main)
+        view = self.navigator.random_menu()
 
-        view = self.navigator.go(target='random_menu')
+        context = getattr(self.view, 'context', NavigationContext())
+
+        context.push(target=Route.MAIN_MENU, params=params_main)
 
         view.context = context
 

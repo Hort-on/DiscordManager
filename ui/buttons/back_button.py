@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
 import discord
 
@@ -27,11 +27,7 @@ class BackButton(discord.ui.Button):
 
         target, params = prev
 
-        view = (
-            self.navigator.go(target, **params)
-            if params
-            else self.navigator.go(target)
-        )
+        view = self.navigator.go(target, params)
 
         view.context = context
 

@@ -1,16 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
+
+if TYPE_CHECKING:
+    from features.for_everyone.birthdays.flow import BirthdayFlow
 
 
 class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
-    def __init__(self, birthday_service: ):
+    def __init__(self, flow: BirthdayFlow):
         super().__init__()
-        self.add_birthday = AddBirthdayService()
-
-    username = discord.ui.TextInput(
-        label='Discord username',
-        placeholder='user123',
-        required=True
-    )
+        self.flow = flow
 
     birthday_input = discord.ui.TextInput(
         label='Birthday (DD.MM)',
@@ -21,26 +22,7 @@ class AddBirthdayModal(discord.ui.Modal, title='Please enter a birthday:'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.add_birthday.add_process(
+        await self.flow.add_birthday(
             interaction=interaction,
-            username=self.username.value,
-            birthday=self.birthday_input.value
-        )
-
-
-class DeleteBirthdayModal(discord.ui.Modal, title='Delete birthday'):
-    def __init__(self):
-        super().__init__()
-        self.del_birthday = DeleteBirthdayService()
-
-    username = discord.ui.TextInput(
-        label='Discord username',
-        placeholder='user123',
-        required=True
-    )
-
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.del_birthday.delete_process(
-            interaction=interaction,
-            username=self.username.value,
+            user_birthday=self.birthday_input.value
         )

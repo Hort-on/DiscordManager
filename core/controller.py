@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from core.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
-    from ui.yes_no_service.yes_no_factory import YesNoViewFactory
     from features.auto_moderation.verification.service import VerificationService
 
 
@@ -29,12 +28,10 @@ class Controller:
             db_factory: DBFactory,
             navigator: Navigator,
             verification_service: VerificationService,
-            yes_no_factory: YesNoViewFactory
     ):
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
-        self.yes_no_factory = yes_no_factory
         self.navigator = navigator
         self.verification_service = verification_service
 
@@ -57,7 +54,6 @@ class Controller:
         flow = VerificationFlow(
             bot=self.bot,
             settings=self.settings,
-            yes_no_factory=self.yes_no_factory,
             service=self.verification_service
         )
         await flow.prepare_verification_channel()

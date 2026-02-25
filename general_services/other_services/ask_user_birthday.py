@@ -1,13 +1,11 @@
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
-from ui.yes_no_service.yes_no_view import YesNoView
 
 
 class UserJoinBirthdayService:
     def __init__(self, parent):
         self.settings = parent.settings
-        self.yes_no_factory = parent.yes_no_factory
 
     async def check_if_birthday(self, member):
         guild_id = member.guild.id
@@ -24,9 +22,7 @@ class UserJoinBirthdayService:
 
         if not data.get('verification'):
             scenario = self.yes_no_factory.for_birthday()
-            view = YesNoView(
-                scenario=scenario
-            )
+            view = ...
             try:
                 await member.send(
                     'Welcome to our community.'

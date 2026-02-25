@@ -9,8 +9,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from features.for_admins.delete_message.buttons import DeleteMessageButton
 from features.for_admins.edit_settings.menu_button import EditSettingsMenuButton
 from features.for_admins.send_anon_messages.button import SendMessageButton
-from features.for_admins.superusers.menu import SuperusersMenuButton
-from features.for_everyone.birthdays.menu import BirthdayMenuButton
+from features.for_admins.superusers.buttons import SuperusersMenuButton
 
 from ui.buttons.back_button import BackButton
 
@@ -20,6 +19,7 @@ if TYPE_CHECKING:
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.delete_message.service import DeleteMessageService
     from features.for_admins.send_anon_messages.service import SendAnonMessageService
+    from features.for_admins.superusers.services import SuperusersService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -32,6 +32,7 @@ class AdminMenuView(discord.ui.View):
         buttons_protection: ButtonProtectionService,
         delete_msg_service: DeleteMessageService,
         send_msg_service: SendAnonMessageService,
+        superusers_service: SuperusersService,
         guild_id: int
     ):
         super().__init__(timeout=60)
@@ -44,6 +45,7 @@ class AdminMenuView(discord.ui.View):
         self.add_item(SuperusersMenuButton(
             navigator=navigator,
             formatter=superusers_formatter,
+            superusers_service=superusers_service,
             buttons_protection=buttons_protection
         ))
         self.add_item(DeleteMessageButton(
@@ -55,9 +57,6 @@ class AdminMenuView(discord.ui.View):
             navigator=navigator,
             buttons_protection=buttons_protection
         ))
-
-        if config.get('birthday'):
-            self.add_item(BirthdayMenuButton(navigator=navigator))
 
         if config.get('send_messages'):
             self.add_item(SendMessageButton(

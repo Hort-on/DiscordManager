@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from core.bot_config import create_bot
 from core.controller import Controller
 from core.general_services_container import GeneralContainer
-from core.navigator import Navigator
+from core.navigator.navigator import Navigator
 
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
@@ -16,6 +16,7 @@ from database.db_factory.db_scenario_factory import DBFactory
 
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
+from features.for_everyone.module import build_everyone_module
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 # from features.auto_moderation.message_handler.bad_words_handler import BadWordsHandler
 
@@ -23,7 +24,6 @@ from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
 
 from ui.button_protection.button_protection_service import ButtonProtectionService
-from ui.yes_no_service.yes_no_factory import YesNoViewFactory
 
 
 # Logging
@@ -49,8 +49,6 @@ async def main():
 
     settings = SettingsStorage(bot=bot, db_factory=db_factory)
 
-    yes_no_factory = YesNoViewFactory()
-
     button_protector = ButtonProtectionService(
         settings=settings
     )
@@ -73,6 +71,12 @@ async def main():
         verification_service=verification_service
     )
 
+    everyone_module = build_everyone_module(
+        bot=bot,
+        settings=settings,
+        db_factory=db_factory
+    )
+
     general_container = GeneralContainer(
         logger=logger,
         db_connect=db_connect,
@@ -84,7 +88,8 @@ async def main():
 
     navigator = Navigator(
         general_container=general_container,
-        admin_module=admin_module
+        admin_module=admin_module,
+        everyone_module=everyone_module
     )
 
     bot.navigator = navigator
@@ -94,7 +99,6 @@ async def main():
         navigator=navigator,
         settings=settings,
         db_factory=db_factory,
-        yes_no_factory=yes_no_factory,
         verification_service=verification_service
     )
 

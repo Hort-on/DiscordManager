@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.navigator_context import NavigationContext
+from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import SuccessEmbed, ErrorEmbed
@@ -13,7 +14,7 @@ from features.for_admins.edit_settings.services.system_channels import SystemCha
 from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
 
 class SystemChannelsFlow:
@@ -26,17 +27,6 @@ class SystemChannelsFlow:
         self.navigator = navigator
         self.service = sys_channels_service
         self.formatter = formatter
-
-    async def start_for_menu(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target='system_channels_menu')
-
-        context = getattr(view, 'context', NavigationContext())
-
-        context.push(target='settings_menu')
-
-        view.context = context
-
-        await interaction.response.edit_message(view=view)
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -60,7 +50,7 @@ class SystemChannelsFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='system_channels_menu')
+        context.push(target=Route.SYSTEM_CHANNELS_MENU)
 
         view.context = context
 
@@ -88,7 +78,7 @@ class SystemChannelsFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='system_channels_menu')
+        context.push(target=Route.SYSTEM_CHANNELS_MENU)
 
         view.context = context
 
@@ -162,7 +152,7 @@ class SystemChannelsFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='system_channels_menu')
+        context.push(target=Route.SYSTEM_CHANNELS_MENU)
 
         view.context = context
 
@@ -226,3 +216,7 @@ class SystemChannelsFlow:
                 key=lambda ch: ch.name.lower()
             )
         ]
+
+    async def for_sys_channels_list(self, interaction: discord.Interaction) -> None:
+        embed = await self.formatter.format_current_system_channels(guild=interaction.guild)
+        await interaction.response.edit_message(embed=embed)

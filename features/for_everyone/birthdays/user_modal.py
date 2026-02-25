@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 
-from modules.buttons.for_admins.birthday_buttons.services import AddBirthdayService
+if TYPE_CHECKING:
+    from features.for_everyone.birthdays.flow import BirthdayFlow
 
 
 class UserBirthdayModal(discord.ui.Modal, title='Please add your birthday:'):
-    def __init__(self):
+    def __init__(self, flow: BirthdayFlow):
         super().__init__()
-        self.add_birthday = AddBirthdayService()
+        self.flow = flow
 
     birthday_input = discord.ui.TextInput(
         label='Birthday (DD.MM)',
@@ -17,8 +22,7 @@ class UserBirthdayModal(discord.ui.Modal, title='Please add your birthday:'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.add_birthday.add_process(
+        await self.flow.add_birthday(
             interaction=interaction,
-            username=interaction.user.global_name,
-            birthday=self.birthday_input.value
+            user_birthday=self.birthday_input.value
         )

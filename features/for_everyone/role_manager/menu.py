@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.button_protection.admin_buttons_protection import FirewallButton
+from core.navigator.routes import Route
+from core.navigator.navigator_context import NavigationContext
 
-from core.navigator_context import NavigationContext
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
+if TYPE_CHECKING:
+    from core.navigator.navigator import Navigator
 
 
 class RoleManagerMenuButton(FirewallButton):
@@ -23,16 +24,16 @@ class RoleManagerMenuButton(FirewallButton):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        context = getattr(self.view, 'context', NavigationContext())
-
         params_main = {
             'guild': interaction.guild,
             'user_id': interaction.user.id
         }
 
-        context.push(target='main_menu', params=params_main)
+        view = self.navigator.go(target=Route.ROLE_MANAGER_MENU)
 
-        view = self.navigator.go(target='role_manager_menu')
+        context = getattr(self.view, 'context', NavigationContext())
+
+        context.push(target='main_menu', params=params_main)
 
         view.context = context
 

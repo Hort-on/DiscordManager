@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from modules.buttons.other_buttons.back import BackButton
+from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
 import discord
 

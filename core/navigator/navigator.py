@@ -1,0 +1,193 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
+import discord
+
+from .routes import Route
+
+from features.for_everyone.birthdays.flow import BirthdayFlow
+from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
+from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
+from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
+from features.for_admins.superusers.flow import SuperusersFlow
+
+if TYPE_CHECKING:
+    from core.general_services_container import GeneralContainer
+    from features.for_admins.module import AdministrationModule
+    from features.for_everyone.module import EveryoneModule
+
+
+class Navigator:
+    def __init__(
+            self,
+            general_container: GeneralContainer,
+            admin_module: AdministrationModule,
+            everyone_module: EveryoneModule
+    ):
+        self.general_container = general_container
+        self.admin_module = admin_module
+        self.everyone_module = everyone_module
+
+        self.routes = {
+            Route.MAIN_MENU: self.main_menu,
+            Route.ADMIN_MENU: self.admin_menu,
+            Route.SETTINGS_MENU: self.settings_menu,
+            Route.BIRTHDAY_MENU: self.birthday_menu,
+            Route.SUPERUSERS_MENU: self.superusers_menu,
+            Route.RANDOM_MENU: self.random_menu,
+            Route.ROLE_MANAGER_MENU: self.role_manager_menu,
+            Route.HIDDEN_CHANNELS_MENU: self.hidden_channels_menu,
+            Route.HIDDEN_ROLES_MENU: self.hidden_roles_menu,
+            Route.SYSTEM_CHANNELS_MENU: self.system_channels_menu
+        }
+
+    def go(self, route: Route, params: Any | None = None):
+        factory = self.routes.get(route)
+        if not factory:
+            raise ValueError(f'Unknown route: {route}')
+
+        if params:
+            return factory(**vars(params))
+
+        return factory()
+
+    def main_menu(self, guild: discord.Guild, user_id: int):
+        from features.for_everyone.main_menu.view import MainMenuView
+        birthday_module = self.everyone_module.birthday_module
+        return MainMenuView(
+                settings=self.general_container.settings,
+                navigator=self,
+                buttons_protection=self.general_container.button_protection,
+                birthday_service=birthday_module.service,
+                guild=guild,
+                user_id=user_id
+            )
+
+    def admin_menu(self, guild_id: int):
+        from features.for_admins.admin_menu_view import AdminMenuView
+
+        superusers_module = self.admin_module.superusers_module
+        delete_msg_module = self.admin_module.delete_msg_module
+        send_msg_module = self.admin_module.send_message_module
+
+        return AdminMenuView(
+            navigator=self,
+            settings=self.general_container.settings,
+            superusers_formatter=superusers_module.superusers_formatter,
+            delete_msg_service=delete_msg_module.delete_msg_service,
+            buttons_protection=self.general_container.button_protection,
+            send_msg_service=send_msg_module.send_message_service,
+            superusers_service=superusers_module.superusers_service,
+            guild_id=guild_id
+        )
+
+    def settings_menu(self):
+        from features.for_admins.edit_settings.menu_view import SettingsMenuView
+        edit_settings_container = self.admin_module.edit_main_settings_module
+
+        return SettingsMenuView(
+            navigator=self,
+            main_settings_service=edit_settings_container.main_settings_service,
+            settings_formatter=edit_settings_container.formatter,
+            buttons_protection=self.general_container.button_protection,
+            hidden_ch_service=edit_settings_container.hidden_channel_service,
+            hidden_role_service=edit_settings_container.hidden_roles_service,
+            sys_channels_service=edit_settings_container.system_channels_service,
+            cleanup_service=self.general_container.cleanup_service
+        )
+
+    def birthday_menu(self):
+        from features.for_everyone.birthdays.menu_view import BirthdayMenuView
+
+        flow = BirthdayFlow(
+            navigator=self,
+            service=self.everyone_module.birthday_module.service
+        )
+
+        return BirthdayMenuView(
+            navigator=self,
+            flow=flow
+        )
+
+    def superusers_menu(self):
+        from features.for_admins.superusers.menu_view import SuperusersMenuView
+
+        superusers_module = self.admin_module.superusers_module
+
+        flow = SuperusersFlow(
+            navigator=self,
+            superusers_service=superusers_module.superusers_service,
+            formatter=superusers_module.superusers_formatter
+        )
+
+        return SuperusersMenuView(
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            flow=flow
+        )
+
+    def random_menu(self):
+        from features.for_everyone.randomizer.menu_view import RandomModeView
+        return RandomModeView(
+            navigator=self
+        )
+
+    def role_manager_menu(self):
+        from features.for_everyone.role_manager.menu_view import RoleManagerView
+        return RoleManagerView(
+            navigator=self
+        )
+
+    def hidden_channels_menu(self):
+        from features.for_admins.edit_settings.views import HiddenChannelsMenuView
+
+        edit_settings_container = self.admin_module.edit_main_settings_module
+
+        flow = HiddenChannelsFlow(
+            navigator=self,
+            formatter=edit_settings_container.formatter,
+            hidden_ch_service=edit_settings_container.hidden_channel_service,
+            cleanup_service=self.general_container.cleanup_service
+        )
+
+        return HiddenChannelsMenuView(
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            flow=flow
+        )
+
+    def hidden_roles_menu(self):
+        from features.for_admins.edit_settings.views import HiddenRolesMenuView
+
+        edit_settings_container = self.admin_module.edit_main_settings_module
+
+        flow = HiddenRolesFlow(
+            navigator=self,
+            formatter=edit_settings_container.formatter,
+            hidden_roles_service=edit_settings_container.hidden_roles_service,
+            cleanup_service=self.general_container.cleanup_service
+        )
+
+        return HiddenRolesMenuView(
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            flow=flow
+        )
+
+    def system_channels_menu(self):
+        from features.for_admins.edit_settings.views import SystemChannelsMenuView
+
+        edit_settings_container = self.admin_module.edit_main_settings_module
+
+        flow = SystemChannelsFlow(
+            navigator=self,
+            sys_channels_service=edit_settings_container.system_channels_service,
+            formatter=edit_settings_container.formatter
+        )
+
+        return SystemChannelsMenuView(
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            flow=flow
+        )

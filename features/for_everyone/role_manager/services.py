@@ -29,7 +29,7 @@ async def _build_and_send_result(
     await interaction.response.edit_message(embed=embed)
 
 
-class AddRoleService:
+class RoleManagerService:
     def __init__(
             self,
             navigator: Navigator,

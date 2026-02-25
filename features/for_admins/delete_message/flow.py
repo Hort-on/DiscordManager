@@ -4,7 +4,9 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator_context import NavigationContext
+from core.navigator.navigator_context import NavigationContext
+from core.navigator.params_containers import AdminMenuParams
+from core.navigator.routes import Route
 
 from features.for_admins.delete_message.modals import DeleteMessagesModal
 
@@ -13,7 +15,7 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from features.for_admins.delete_message.service import DeleteMessageService
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
 
 
 class DeleteMessageFlow:
@@ -44,7 +46,10 @@ class DeleteMessageFlow:
 
         context = getattr(view, 'context', NavigationContext())
 
-        context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
+        context.push(target=Route.ADMIN_MENU,
+                     params=AdminMenuParams(
+                         guild_id=interaction.guild_id
+                     ))
 
         view.context = context
 

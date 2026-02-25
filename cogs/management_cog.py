@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
 from discord import app_commands
 from discord.ext import commands
+
+if TYPE_CHECKING:
+    from core.navigator.navigator import Navigator
 
 
 class ManagementCog(commands.Cog):
@@ -20,8 +20,7 @@ class ManagementCog(commands.Cog):
         description='Opens bot menu.'
     )
     async def management(self, interaction: discord.Interaction):
-        view = self.navigator.go(
-            target='main_menu',
+        view = self.navigator.main_menu(
             guild=interaction.guild,
             user_id=interaction.user.id
         )
