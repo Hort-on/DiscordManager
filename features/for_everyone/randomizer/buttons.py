@@ -4,68 +4,86 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from features.for_everyone.randomizer.modals import RandomNumModal, RandomWordModal, RandomTeamByMsgModal
-
-from general_services.factories.channel_factory.scenarios_factory import ChannelFactory
+from core.navigator.navigator_context import NavigationContext
+from core.navigator.params_containers import MainMenuParams
+from core.navigator.routes import Route
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
+    from features.for_everyone.randomizer.flow import RandomizerFlow
+
+
+class RandomizerMenuButton(discord.ui.Button):
+    def __init__(self, navigator: Navigator):
+        super().__init__(
+            label='🎲 Randomizer',
+            style=discord.ButtonStyle.blurple
+        )
+        self.navigator = navigator
+
+    async def on_click(self, interaction: discord.Interaction) -> None:
+        view = self.navigator.random_menu()
+
+        context = getattr(self.view, 'context', NavigationContext())
+
+        context.push(target=Route.MAIN_MENU, params=MainMenuParams(
+            guild=interaction.guild,
+            user_id=interaction.user.id
+        ))
+
+        view.context = context
+
+        await interaction.response.edit_message(view=view)
 
 
 class RandomNumButton(discord.ui.Button):
-    def __init__(self):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__(
             label='Random number',
             style=discord.ButtonStyle.secondary
         )
 
+        self.flow = flow
+
     async def callback(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_modal(RandomNumModal())
+        await self.flow.for_number_start(interaction=interaction)
 
 
 class RandomWordButton(discord.ui.Button):
-    scope = 'user'
-
-    def __init__(self):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__(
             label='Random word',
             style=discord.ButtonStyle.secondary
         )
 
+        self.flow = flow
+
     async def callback(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_modal(RandomWordModal())
+        await self.flow.for_word_start(interaction=interaction)
 
 
-class RandomTeamByMsg(discord.ui.Button):
-    scope = 'user'
-
-    def __init__(self):
+class RandomTeamByText(discord.ui.Button):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__(
             label='Random team by message',
             style=discord.ButtonStyle.secondary
         )
 
-    async def callback(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(RandomTeamByMsgModal())
+        self.flow = flow
+
+    async def start_for_teams_by_text(self, interaction: discord.Interaction):
+        await self.flow.for_teams_by_text_start(interaction=interaction)
 
 
 class RandomTeamByChannel(discord.ui.Button):
-    scope = 'user'
-
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, flow: RandomizerFlow):
         super().__init__(
             label='Random team by channel',
             style=discord.ButtonStyle.secondary
         )
+
         self.navigator = navigator
+        self.flow = flow
 
     async def callback(self, interaction: discord.Interaction):
-        scenario = ChannelFactory.for_random_selection()
-
-        manager = ChannelSelectorManager( # TODO: має бути flow
-            navigator=self.navigator,
-            scenario=scenario,
-            channels_with_users_only=True
-        )
-
-        await manager.select_channel(interaction=interaction)
+        await self.flow.for_teams_by_channel_start(interaction=interaction)

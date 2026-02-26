@@ -6,12 +6,6 @@ import discord
 
 from .routes import Route
 
-from features.for_everyone.birthdays.flow import BirthdayFlow
-from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
-from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
-from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
-from features.for_admins.superusers.flow import SuperusersFlow
-
 if TYPE_CHECKING:
     from core.general_services_container import GeneralContainer
     from features.for_admins.module import AdministrationModule
@@ -98,6 +92,7 @@ class Navigator:
         )
 
     def birthday_menu(self):
+        from features.for_everyone.birthdays.flow import BirthdayFlow
         from features.for_everyone.birthdays.menu_view import BirthdayMenuView
 
         flow = BirthdayFlow(
@@ -111,6 +106,7 @@ class Navigator:
         )
 
     def superusers_menu(self):
+        from features.for_admins.superusers.flow import SuperusersFlow
         from features.for_admins.superusers.menu_view import SuperusersMenuView
 
         superusers_module = self.admin_module.superusers_module
@@ -128,9 +124,19 @@ class Navigator:
         )
 
     def random_menu(self):
+        from features.for_everyone.randomizer.flow import RandomizerFlow
         from features.for_everyone.randomizer.menu_view import RandomModeView
+
+        randomizer_module = self.everyone_module.randomizer_module
+
+        flow = RandomizerFlow(
+            navigator=self,
+            service=randomizer_module.service
+        )
+
         return RandomModeView(
-            navigator=self
+            navigator=self,
+            flow=flow
         )
 
     def role_manager_menu(self):
@@ -140,6 +146,7 @@ class Navigator:
         )
 
     def hidden_channels_menu(self):
+        from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
         from features.for_admins.edit_settings.views import HiddenChannelsMenuView
 
         edit_settings_container = self.admin_module.edit_main_settings_module
@@ -158,6 +165,7 @@ class Navigator:
         )
 
     def hidden_roles_menu(self):
+        from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
         from features.for_admins.edit_settings.views import HiddenRolesMenuView
 
         edit_settings_container = self.admin_module.edit_main_settings_module
@@ -176,6 +184,7 @@ class Navigator:
         )
 
     def system_channels_menu(self):
+        from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
         from features.for_admins.edit_settings.views import SystemChannelsMenuView
 
         edit_settings_container = self.admin_module.edit_main_settings_module

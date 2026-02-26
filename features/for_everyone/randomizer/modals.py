@@ -1,17 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 
-from modules.buttons.for_users.randomizer.services import (
-    RandomNumService,
-    RandomWordService,
-    RandomTeamByChannelService,
-    RandomTeamByMsgService
-)
+from ui.embed_constructor.embed_constructor import ErrorEmbed
+
+if TYPE_CHECKING:
+    from features.for_everyone.randomizer.flow import RandomizerFlow
 
 
 class RandomNumModal(discord.ui.Modal, title='Random number'):
-    def __init__(self):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__()
-        self.random_proceed = RandomNumService()
+        self.flow = flow
 
     first_num = discord.ui.TextInput(
         label='First number',
@@ -28,17 +30,27 @@ class RandomNumModal(discord.ui.Modal, title='Random number'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.random_proceed.random_num_proceed(
-            interaction,
-            int(self.first_num.value),
-            int(self.second_num.value)
+        try:
+            number_1 = int(self.first_num.value)
+            number_2 = int(self.second_num.value)
+        except ValueError:
+            embed = ErrorEmbed(
+                description='The numbers must be written in digits.'
+            )
+            await interaction.response.send_message(ephemeral=True, embed=embed)
+            return
+
+        await self.flow.for_number_proceed(
+            interaction=interaction,
+            first_num=number_1,
+            second_num=number_2
         )
 
 
 class RandomWordModal(discord.ui.Modal, title='Random word'):
-    def __init__(self):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__()
-        self.random_proceed = RandomWordService()
+        self.flow = flow
 
     words = discord.ui.TextInput(
         label='Words',
@@ -48,37 +60,16 @@ class RandomWordModal(discord.ui.Modal, title='Random word'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.random_proceed.random_word_proceed(
-            interaction,
-            str(self.words.value)
+        await self.flow.for_word_proceed(
+            interaction=interaction,
+            words_list=self.words.value
         )
 
 
-class RandomTeamByChannelModal(discord.ui.Modal, title='Random teams automatically'):
-    def __init__(self, channel):
+class RandomTeamByTextModal(discord.ui.Modal, title='Random teams manual'):
+    def __init__(self, flow: RandomizerFlow):
         super().__init__()
-        self.channel = channel
-        self.random_proceed = RandomTeamByChannelService()
-
-    teams_quantity = discord.ui.TextInput(
-        label='Teams quantity',
-        placeholder='Please enter a number of teams',
-        required=True,
-        max_length=2
-    )
-
-    async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.random_proceed.team_by_channel_proceed(
-            interaction,
-            self.channel,
-            int(self.teams_quantity.value)
-        )
-
-
-class RandomTeamByMsgModal(discord.ui.Modal, title='Random teams manual'):
-    def __init__(self):
-        super().__init__()
-        self.random_proceed = RandomTeamByMsgService()
+        self.flow = flow
 
     users_list = discord.ui.TextInput(
         label='List of users',
@@ -95,8 +86,47 @@ class RandomTeamByMsgModal(discord.ui.Modal, title='Random teams manual'):
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        await self.random_proceed.team_by_text_proceed(
-            interaction,
-            str(self.users_list.value),
-            int(self.teams_quantity.value)
+        try:
+            quantity = int(self.teams_quantity.value)
+        except ValueError:
+            embed = ErrorEmbed(
+                description='The number must be written in digits.'
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        await self.flow.team_by_text_proceed(
+            interaction=interaction,
+            users_list=self.users_list.value,
+            teams_quantity=quantity
+        )
+
+
+class RandomTeamByChannelModal(discord.ui.Modal, title='Random teams automatically'):
+    def __init__(self, channel, flow: RandomizerFlow):
+        super().__init__()
+        self.channel = channel
+        self.flow = flow
+
+    teams_quantity = discord.ui.TextInput(
+        label='Teams quantity',
+        placeholder='Please enter a number of teams',
+        required=True,
+        max_length=2
+    )
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        try:
+            quantity = int(self.teams_quantity.value)
+        except ValueError:
+            embed = ErrorEmbed(
+                description='The number must be written in digits.'
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        await self.flow.team_by_channel_proceed(
+            interaction=interaction,
+            channel=self.channel,
+            teams_quantity=quantity
         )
