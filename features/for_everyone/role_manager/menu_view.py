@@ -2,21 +2,29 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from core.navigator import Navigator
-
 import discord
 
-from modules.buttons.for_users.role_manager.buttons import AddRoleButton, RemoveRoleButton
-from modules.buttons.other_buttons.back import BackButton
+from features.for_everyone.role_manager.buttons import AddRoleButton, RemoveRoleButton
+
+from ui.buttons.back_button import BackButton
+
+if TYPE_CHECKING:
+    from core.navigator.navigator import Navigator
+    from features.for_everyone.role_manager.flow import RoleManagerFlow
 
 
 class RoleManagerView(discord.ui.View):
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, flow: RoleManagerFlow):
         super().__init__(timeout=60)
 
-        self.add_item(AddRoleButton(navigator=navigator))
-        self.add_item(RemoveRoleButton(navigator=navigator))
+        self.add_item(AddRoleButton(
+            navigator=navigator,
+            flow=flow
+        ))
+
+        self.add_item(RemoveRoleButton(
+            navigator=navigator,
+            flow=flow
+        ))
 
         self.add_item(BackButton(navigator=navigator))
-

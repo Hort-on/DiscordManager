@@ -9,7 +9,7 @@ from database.settings_storage.settings_manager import StorageTarget
 from features.for_admins.admin_menu import AdminMenuButton
 from features.for_everyone.birthdays.buttons import BirthdayMenuButton
 from features.for_everyone.randomizer.buttons import RandomizerMenuButton
-from features.for_everyone.role_manager.menu import RoleManagerMenuButton
+from features.for_everyone.role_manager.buttons import RoleManagerMenuButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
@@ -25,25 +25,26 @@ class MainMenuView(discord.ui.View):
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
             birthday_service: BirthdayService,
-            guild: discord.Guild,
+            guild_id: int,
             user_id: int,
+            owner_id: int
     ):
         super().__init__(timeout=60)
 
         superusers = settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
-            guild_id=guild.id
+            guild_id=guild_id
         )
 
         config = settings.dict_storage.for_dict_get(
             target=StorageTarget.SETTINGS,
-            guild_id=guild.id
+            guild_id=guild_id
         )
 
         role_manager = settings.dict_storage.for_dict_get(
             'role_manager',
             target=StorageTarget.SETTINGS,
-            guild_id=guild.id
+            guild_id=guild_id
         )
 
         self.add_item(RandomizerMenuButton(navigator=navigator))
@@ -57,7 +58,7 @@ class MainMenuView(discord.ui.View):
                 service=birthday_service
             ))
 
-        if user_id in superusers or user_id == guild.owner_id:
+        if user_id in superusers or user_id == owner_id:
             self.add_item(AdminMenuButton(
                 navigator=navigator,
                 buttons_protection=buttons_protection

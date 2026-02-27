@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.params_containers import AdminMenuParams
+from core.navigator.params_containers import MainMenuParams
 from core.navigator.routes import Route
 from core.navigator.navigator_context import NavigationContext
 
@@ -28,14 +28,17 @@ class BirthdayMenuButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         view = self.navigator.birthday_menu()
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
-        context.push(target=Route.ADMIN_MENU,
-                     params=AdminMenuParams(
-                         guild_id=interaction.guild_id
+        context.push(target=Route.MAIN_MENU,
+                     params=MainMenuParams(
+                         guild_id=interaction.guild_id,
+                         user_id=interaction.user.id,
+                         owner_id=interaction.guild.owner_id
                      ))
-
-        view.context = context
 
         await interaction.response.edit_message(
             content='🎂 Birthday management',

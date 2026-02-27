@@ -53,7 +53,7 @@ class MainSettingsService(DBBaseService):
             ):
                 await self._clean_up_verification(guild_id=guild_id)
 
-            await self.service.prepare()
+            # await self.service.
 
         return await self._save_new_value(
             guild_id=guild_id,

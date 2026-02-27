@@ -21,8 +21,9 @@ class ManagementCog(commands.Cog):
     )
     async def management(self, interaction: discord.Interaction):
         view = self.navigator.main_menu(
-            guild=interaction.guild,
-            user_id=interaction.user.id
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id,
+            owner_id=interaction.guild.owner_id
         )
 
         await interaction.response.send_message(

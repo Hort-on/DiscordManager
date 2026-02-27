@@ -13,7 +13,7 @@ from features.for_admins.superusers.buttons import (
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.superusers.flow import SuperusersFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
 

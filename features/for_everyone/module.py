@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 from dataclasses import dataclass
 
-
 from features.for_everyone.birthdays.module import build_birthday_module
 from features.for_everyone.randomizer.module import build_randomizer_module
+from features.for_everyone.role_manager.module import build_role_manager_module
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
@@ -14,12 +14,14 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from features.for_everyone.birthdays.module import BirthdayForUserModule
     from features.for_everyone.randomizer.module import RandomizerModule
+    from features.for_everyone.role_manager.module import RoleManagerModule
 
 
 @dataclass
 class EveryoneModule:
     birthday_module: BirthdayForUserModule
     randomizer_module: RandomizerModule
+    role_manager_module: RoleManagerModule
 
 
 def build_everyone_module(
@@ -37,7 +39,12 @@ def build_everyone_module(
         settings=settings
     )
 
+    role_manager_module = build_role_manager_module(
+        settings=settings
+    )
+
     return EveryoneModule(
         birthday_module=birthday_module,
-        randomizer_module=randomizer_module
+        randomizer_module=randomizer_module,
+        role_manager_module=role_manager_module
     )

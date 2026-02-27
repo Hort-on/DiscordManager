@@ -7,8 +7,6 @@ import discord
 from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
-    from features.for_admins.delete_message.service import DeleteMessageService
     from features.for_admins.delete_message.flow import DeleteMessageFlow
 
 
@@ -16,14 +14,10 @@ class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
     def __init__(
             self,
             channel: discord.TextChannel,
-            service: DeleteMessageService,
-            navigator: Navigator,
             flow: DeleteMessageFlow
     ):
         super().__init__()
         self.channel = channel
-        self.service = service
-        self.navigator = navigator
         self.flow = flow
 
     amount = discord.ui.TextInput(

@@ -9,7 +9,7 @@ from features.for_admins.send_anon_messages.flow import SendAnonMsg
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.send_anon_messages.service import SendAnonMessageService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 

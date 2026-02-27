@@ -9,7 +9,7 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 from features.for_admins.edit_settings.flows.main_settings import MainSettingsFlow
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from ui.button_protection.button_protection_service import ButtonProtectionService

@@ -9,7 +9,7 @@ from datetime import datetime
 from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
-from general_services.utils.messages import BIRTHDAY_MSGS, SYSTEM_MSGS, DB_MSGS, GENERAL_MSGS
+from general_services.utils.messages import BIRTHDAY_MSGS
 
 if TYPE_CHECKING:
     from core.bot_config import Bot

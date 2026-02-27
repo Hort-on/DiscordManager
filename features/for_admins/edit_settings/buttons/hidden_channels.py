@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 from core.navigator.navigator_context import NavigationContext
 
@@ -47,11 +48,12 @@ class HiddenChannelsMenuButtons(FirewallButton):
     async def on_click(self, interaction: discord.Interaction) -> None:
         view = self.navigator.hidden_channels_menu()
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
-        context.push(target=Route.HIDDEN_CHANNELS_MENU)
-
-        view.context = context
+        context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 

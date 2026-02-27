@@ -22,16 +22,18 @@ class RandomizerMenuButton(discord.ui.Button):
         self.navigator = navigator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.random_menu()
+        view = self.navigator.randomizer_menu()
 
-        context = getattr(self.view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.MAIN_MENU, params=MainMenuParams(
-            guild=interaction.guild,
-            user_id=interaction.user.id
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id,
+            owner_id=interaction.guild.owner_id
         ))
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 

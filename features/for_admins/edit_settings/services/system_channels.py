@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
 
 
+# TODO: виправити помилки
 class SystemChannelsService(DBBaseService):
     def __init__(
             self,
@@ -54,8 +55,8 @@ class SystemChannelsService(DBBaseService):
             guild_id=guild_id
         )
 
-        if bool(verify_status):
-            await self.service.prepare()
+        #if bool(verify_status):
+            # await self.service.prepare()
 
     async def delete_channels(self, guild_id: int, values: list[str]) -> bool:
         delete_scenario = self.db_factory.for_cleanup_system_channel(

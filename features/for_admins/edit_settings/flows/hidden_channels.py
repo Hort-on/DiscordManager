@@ -55,11 +55,12 @@ class HiddenChannelsFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.HIDDEN_CHANNELS_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(
             view=view,
@@ -124,11 +125,12 @@ class HiddenChannelsFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.HIDDEN_CHANNELS_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(
             view=view,

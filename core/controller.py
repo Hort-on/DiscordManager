@@ -8,13 +8,12 @@ from event_services.member_left import MemberLeftNotification
 
 from features.auto_moderation.verification.flow import VerificationFlow
 # from discord.ext import tasks
-from general_services.other_services.ask_user_birthday import UserJoinBirthdayService
 # from general_services.utils.bad_words import invitation_pattern
 
 # from modules.management.verification.check_verification import CheckVerification
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
@@ -37,7 +36,6 @@ class Controller:
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
-        bot.add_listener(self.on_member_join)
         bot.add_listener(self.on_member_remove)
         bot.add_listener(self.on_guild_remove)
         bot.add_listener(self.on_guild_join)
@@ -93,9 +91,6 @@ class Controller:
         #     await handle_spam(message)
         #
         # await self.handle_message(message)
-
-    async def on_member_join(self, member) -> None:
-        await UserJoinBirthdayService(self).check_if_birthday(member=member)  # TODO: правильно назвати імя функції
 
     async def on_member_remove(self, member) -> None:
         await MemberLeftNotification(bot=self.bot, settings=self.settings).check_if_notification(member)

@@ -17,7 +17,6 @@ from database.db_factory.db_scenario_factory import DBFactory
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
 from features.for_everyone.module import build_everyone_module
-from features.for_everyone.randomizer.services import RandomizerService
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 # from features.auto_moderation.message_handler.bad_words_handler import BadWordsHandler
 
@@ -55,8 +54,6 @@ async def main():
     cleanup_service = CleanUpService(settings=settings, db_factory=db_factory)
 
     verification_service = VerificationService(bot=bot, settings=settings)
-
-    randomizer_service = RandomizerService(settings=settings)
 
     admin_module = build_admin_module(
         bot=bot,

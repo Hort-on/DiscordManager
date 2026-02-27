@@ -1,143 +1,104 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import discord
 
-from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
-    from core.navigator.navigator import Navigator
+    from database.settings_storage.settings import SettingsStorage
 
 
-async def _build_and_send_result(
-        interaction: discord.Interaction,
-        role_ids: set[int],
-        text: str
-) -> None:
-    embed = None
-    role_names: list[str] = [text]
-    for role_id in role_ids:
-        role = interaction.guild.get_role(role_id)
-        role_names.append(f'🔸{role.name}')
+@dataclass
+class AddedRolesResult:
+    added_roles: set[discord.Role]
+    not_added_roles: set[discord.Role] | None = None
 
-        embed = SuccessEmbed(
-            description='\n'.join(role_names)
-        )
 
-    await interaction.response.edit_message(embed=embed)
+@dataclass
+class RemoveRolesResult:
+    removed_roles: set[discord.Role]
+    not_removed_roles: set[discord.Role] | None = None
 
 
 class RoleManagerService:
-    def __init__(
-            self,
-            navigator: Navigator,
-            settings: SettingsStorage
-    ):
-
-        self.navigator = navigator
+    def __init__(self, settings: SettingsStorage):
         self.settings = settings
 
-    async def prepare_roles_for_addition(self, interaction: discord.Interaction):
-        hidden_roles = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_ROLES,
-            guild_id=interaction.guild_id
-        )
-
-        member_role_ids = {role.id for role in interaction.user.roles}
-        guild_roles = interaction.guild.roles
-
-        available_roles = {
-            role.id: role.name
-            for role in guild_roles
-            if (
-                    role.id not in hidden_roles
-                    and role.id not in member_role_ids
-                    and role.is_assignable()
-            )
-        }
-
-        return [
-            discord.SelectOption(
-                label=name,
-                value=str(role_id)
-            )
-            for role_id, name in sorted(
-                available_roles.items(),
-                key=lambda item: item[1].lower()
-            )
-        ]
-
-    async def prepare_roles_for_deletion(self, interaction: discord.Interaction):
-        hidden_roles = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_ROLES,
-            guild_id=interaction.guild_id
-        )
-
-        member_roles = interaction.user.roles
-
-        roles_to_remove = {
-            role.id: role.name
-            for role in member_roles
-            if (
-                role.id not in hidden_roles
-                and role.is_assignable()
-            )
-        }
-
-        return [
-            discord.SelectOption(
-                label=value,
-                value=str(key)
-            )
-            for key, value in roles_to_remove.items()
-        ]
-
     @staticmethod
-    async def add_role_to_user(
-            interaction: discord.Interaction,
-            roles: list[str]
-    ):
-        member_role_ids = {role.id for role in interaction.user.roles}
+    async def add_roles_to_user(member: discord.Member, guild: discord.Guild, roles: list[str]) -> AddedRolesResult:
         role_ids = {int(r_id) for r_id in roles}
 
-        roles_to_add = []
+        roles_to_add: set[discord.Role] = set()
 
         for role_id in role_ids:
-            role = interaction.guild.get_role(role_id)
-            if role and role_id not in member_role_ids:
-                roles_to_add.append(role)
+            role = guild.get_role(role_id)
+            if role and role not in member.roles:
+                roles_to_add.add(role)
 
-        if roles_to_add:
-            await interaction.user.add_roles(*roles_to_add)
+        try:
+            await member.add_roles(*roles_to_add)
+        except discord.Forbidden:
+            added_roles: set[discord.Role] = set()
+            not_added_roles: set[discord.Role] = set()
 
-        await _build_and_send_result(
-            interaction=interaction,
-            role_ids=role_ids,
-            text='The following roles have been successfully added:'
+            for role in roles_to_add:
+                try:
+                    await member.add_roles(role)
+                    added_roles.add(role)
+                except discord.Forbidden:
+                    not_added_roles.add(role)
+
+            return AddedRolesResult(
+                added_roles=added_roles,
+                not_added_roles=not_added_roles
+            )
+
+        return AddedRolesResult(
+            added_roles=roles_to_add
         )
 
     @staticmethod
-    async def remove_role_from_user(
-            interaction: discord.Interaction,
+    async def remove_roles_from_user(
+            guild: discord.Guild,
+            member: discord.Member,
             roles: list[str]
-    ):
-        member_role_ids = {role.id for role in interaction.user.roles}
+    ) -> RemoveRolesResult:
         role_ids = {int(r_id) for r_id in roles}
 
-        roles_to_remove = []
+        roles_to_remove: set[discord.Role] = set()
 
         for role_id in role_ids:
-            role = interaction.guild.get_role(role_id)
-            if role and role.id in member_role_ids:
-                roles_to_remove.append(role)
+            role = guild.get_role(role_id)
+            if role in member.roles:
+                roles_to_remove.add(role)
 
-        if roles_to_remove:
-            await interaction.user.remove_roles(*roles_to_remove)
+        try:
+            await member.remove_roles(*roles_to_remove)
+        except discord.Forbidden:
+            removed_roles: set[discord.Role] = set()
+            not_removed_roles: set[discord.Role] = set()
 
-        await _build_and_send_result(
-            interaction=interaction,
-            role_ids=role_ids,
-            text='The following roles have been successfully removed:'
+            for role in roles_to_remove:
+                try:
+                    await member.remove_roles(role)
+                    removed_roles.add(role)
+                except discord.Forbidden:
+                    not_removed_roles.add(role)
+
+            return RemoveRolesResult(
+                removed_roles=removed_roles,
+                not_removed_roles=not_removed_roles
+            )
+
+        return RemoveRolesResult(
+            removed_roles=roles_to_remove
+        )
+
+    def get_hidden_roles(self, guild_id: int) -> set[int]:
+        return self.settings.set_storage.for_set_get(
+            target=StorageTarget.HIDDEN_ROLES,
+            guild_id=guild_id
         )

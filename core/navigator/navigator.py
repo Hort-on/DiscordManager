@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import discord
+from dataclasses import asdict
 
 from .routes import Route
 
@@ -29,7 +29,7 @@ class Navigator:
             Route.SETTINGS_MENU: self.settings_menu,
             Route.BIRTHDAY_MENU: self.birthday_menu,
             Route.SUPERUSERS_MENU: self.superusers_menu,
-            Route.RANDOM_MENU: self.random_menu,
+            Route.RANDOMIZER_MENU: self.randomizer_menu,
             Route.ROLE_MANAGER_MENU: self.role_manager_menu,
             Route.HIDDEN_CHANNELS_MENU: self.hidden_channels_menu,
             Route.HIDDEN_ROLES_MENU: self.hidden_roles_menu,
@@ -42,11 +42,11 @@ class Navigator:
             raise ValueError(f'Unknown route: {route}')
 
         if params:
-            return factory(**vars(params))
+            return factory(**asdict(params))
 
         return factory()
 
-    def main_menu(self, guild: discord.Guild, user_id: int):
+    def main_menu(self, guild_id: int, user_id: int, owner_id: int):
         from features.for_everyone.main_menu.view import MainMenuView
         birthday_module = self.everyone_module.birthday_module
         return MainMenuView(
@@ -54,8 +54,9 @@ class Navigator:
                 navigator=self,
                 buttons_protection=self.general_container.button_protection,
                 birthday_service=birthday_module.service,
-                guild=guild,
-                user_id=user_id
+                guild_id=guild_id,
+                user_id=user_id,
+                owner_id=owner_id
             )
 
     def admin_menu(self, guild_id: int):
@@ -123,7 +124,7 @@ class Navigator:
             flow=flow
         )
 
-    def random_menu(self):
+    def randomizer_menu(self):
         from features.for_everyone.randomizer.flow import RandomizerFlow
         from features.for_everyone.randomizer.menu_view import RandomModeView
 
@@ -140,9 +141,19 @@ class Navigator:
         )
 
     def role_manager_menu(self):
+        from features.for_everyone.role_manager.flow import RoleManagerFlow
         from features.for_everyone.role_manager.menu_view import RoleManagerView
+
+        role_manager_module = self.everyone_module.role_manager_module
+
+        flow = RoleManagerFlow(
+            navigator=self,
+            service=role_manager_module.service
+        )
+
         return RoleManagerView(
-            navigator=self
+            navigator=self,
+            flow=flow
         )
 
     def hidden_channels_menu(self):

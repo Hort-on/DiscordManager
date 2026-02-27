@@ -12,7 +12,7 @@ from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsF
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
     from ui.button_protection.button_protection_service import ButtonProtectionService
@@ -39,13 +39,14 @@ class SystemChannelsMenuButton(FirewallButton):
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.go(target=Route.SYSTEM_CHANNELS_MENU)
+        view = self.navigator.system_channels_menu()
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.SETTINGS_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 

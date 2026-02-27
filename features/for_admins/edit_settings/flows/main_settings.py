@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.navigator_context import NavigationContext
+from core.navigator.params_containers import AdminMenuParams
+from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
 
@@ -36,11 +38,12 @@ class MainSettingsFlow:
             callback=self._proceed_value
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
-        context.push(target='settings_menu')
-
-        view.context = context
+        context.push(target=Route.SETTINGS_MENU)
 
         embed = self.formatter.format_current_main_settings(interaction)
 
@@ -66,11 +69,15 @@ class MainSettingsFlow:
                 callback=self._save_verification_role
             )
 
-            context = getattr(view, 'context', NavigationContext())
+            context = getattr(view, 'context', None)
+            if context is None:
+                context = NavigationContext()
+                view.context = context
 
-            context.push(target='admin_menu', params={'guild_id': interaction.guild_id})
-
-            view.context = context
+            context.push(target=Route.ADMIN_MENU,
+                         params=AdminMenuParams(
+                             guild_id=interaction.guild_id
+                         ))
 
             await interaction.response.edit_message(view=view)
             return

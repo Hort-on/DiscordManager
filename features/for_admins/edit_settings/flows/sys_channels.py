@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.navigator_context import NavigationContext
+from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -48,11 +49,12 @@ class SystemChannelsFlow:
             callback=self._select_new_sys_channel
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.SYSTEM_CHANNELS_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 
@@ -76,11 +78,12 @@ class SystemChannelsFlow:
             )
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.SYSTEM_CHANNELS_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 
@@ -150,11 +153,12 @@ class SystemChannelsFlow:
             callback=self.delete_sys_channel
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
-        context.push(target=Route.SYSTEM_CHANNELS_MENU)
-
-        view.context = context
+        context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 

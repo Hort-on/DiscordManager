@@ -53,11 +53,12 @@ class HiddenRolesFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.HIDDEN_ROLES_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 
@@ -103,11 +104,12 @@ class HiddenRolesFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.HIDDEN_ROLES_MENU)
-
-        view.context = context
 
         await interaction.response.edit_message(
             view=view,

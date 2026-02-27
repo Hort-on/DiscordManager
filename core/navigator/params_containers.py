@@ -10,5 +10,6 @@ class AdminMenuParams:
 
 @dataclass(slots=True)
 class MainMenuParams:
-    guild: discord.Guild
+    guild_id: int
     user_id: int
+    owner_id: int

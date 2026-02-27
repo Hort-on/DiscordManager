@@ -8,7 +8,7 @@ from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import WarningEmbed, ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.send_anon_messages.service import SendAnonMessageService
 
 

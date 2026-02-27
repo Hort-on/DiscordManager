@@ -12,7 +12,7 @@ from features.for_admins.edit_settings.buttons.sys_channels import SystemChannel
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService

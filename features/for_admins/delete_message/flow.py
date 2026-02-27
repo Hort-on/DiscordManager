@@ -44,14 +44,15 @@ class DeleteMessageFlow:
             callback=self._send_modal
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.ADMIN_MENU,
                      params=AdminMenuParams(
                          guild_id=interaction.guild_id
                      ))
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)
 

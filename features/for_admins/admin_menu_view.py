@@ -14,7 +14,7 @@ from features.for_admins.superusers.buttons import SuperusersMenuButton
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
-    from core.navigator import Navigator
+    from core.navigator.navigator import Navigator
     from database.settings_storage.settings import SettingsStorage
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.delete_message.service import DeleteMessageService

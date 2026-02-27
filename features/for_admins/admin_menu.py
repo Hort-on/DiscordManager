@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.routes import Route
-from core.navigator.params_containers import AdminMenuParams
+from core.navigator.params_containers import MainMenuParams
 from core.navigator.navigator_context import NavigationContext
 
 from ui.button_protection.admin_buttons_protection import FirewallButton
@@ -30,15 +30,18 @@ class AdminMenuButton(FirewallButton):
     async def on_click(self, interaction: discord.Interaction):
         view = self.navigator.admin_menu(guild_id=interaction.guild_id)
 
-        context = getattr(self.view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(
-            target=Route.ADMIN_MENU,
-            params=AdminMenuParams(
-                guild_id=interaction.guild_id
+            target=Route.MAIN_MENU,
+            params=MainMenuParams(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                owner_id=interaction.guild.owner_id
             )
         )
-
-        view.context = context
 
         await interaction.response.edit_message(view=view)

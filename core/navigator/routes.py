@@ -7,7 +7,7 @@ class Route(str, Enum):
     SETTINGS_MENU = auto()
     BIRTHDAY_MENU = auto()
     SUPERUSERS_MENU = auto()
-    RANDOM_MENU = auto()
+    RANDOMIZER_MENU = auto()
     ROLE_MANAGER_MENU = auto()
     HIDDEN_CHANNELS_MENU = auto()
     HIDDEN_ROLES_MENU = auto()

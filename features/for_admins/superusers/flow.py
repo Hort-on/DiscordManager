@@ -100,11 +100,12 @@ class SuperusersFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', NavigationContext())
+        context = getattr(view, 'context', None)
+        if context is None:
+            context = NavigationContext()
+            view.context = context
 
         context.push(target=Route.SUPERUSERS_MENU)
-
-        view.context = context
 
         info_embed = self.formatter.build_embed(guild=interaction.guild)
 
