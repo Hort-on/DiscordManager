@@ -28,13 +28,13 @@ class BirthdayManager(DBBaseService):
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
-            is_enabled = self.settings.dict_storage.for_dict_get(
+            is_enabled = self.settings.dict_storage.get_value(
                 'birthday',
                 target=StorageTarget.SETTINGS,
                 guild_id=guild.id
             )
 
-            if not is_enabled.get('birthday'):
+            if not bool(is_enabled):
                 continue
 
             # TODO: зробити точну часову зону для кожної гільдії

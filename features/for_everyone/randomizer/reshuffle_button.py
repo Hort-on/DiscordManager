@@ -8,9 +8,11 @@ class ReshuffleView(discord.ui.View):
         self.args = args
         self.kwargs = kwargs
 
-    @discord.ui.button(
-        label='Reshuffle',
-        style=discord.ButtonStyle.secondary,
-    )
+    @discord.ui.button(label='🔀Reshuffle')
     async def reshuffle(self, interaction: discord.Interaction, _):
-        await self.callback(interaction, *self.args, **self.kwargs)
+        await self.callback(
+            interaction,
+            *self.args,
+            edit_mode=True,
+            **self.kwargs
+        )

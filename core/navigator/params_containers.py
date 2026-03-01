@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-import discord
-
 
 @dataclass(slots=True)
 class AdminMenuParams:

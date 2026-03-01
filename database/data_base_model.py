@@ -33,6 +33,7 @@ class DB:
                 
                     verification INTEGER NOT NULL DEFAULT 0,
                     verification_role_id INTEGER DEFAULT NULL,
+                    verification_message_id INTEGER DEFAULT NULL,
                     
                     block_users INTEGER NOT NULL DEFAULT 0,
                     invitation_checking INTEGER NOT NULL DEFAULT 0,

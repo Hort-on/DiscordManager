@@ -26,10 +26,9 @@ class DictStorageManager:
     def __init__(self, mapping: dict[StorageTarget, dict[int, dict]]):
         self._map = mapping
 
-    def for_dict_get(self, *keys, target: StorageTarget, guild_id: int) -> dict:
-        guild_data = self._map.get(target, {}).get(guild_id, {})
+    def get_all(self, target: StorageTarget, guild_id: int) -> dict:
+        return self._map.get(target, {}).get(guild_id, {})
 
-        if not keys:
-            return guild_data
-
-        return {key: guild_data.get(key) for key in keys}
+    def get_value(self, key: str, target: StorageTarget, guild_id: int):
+        guild_data = self.get_all(target, guild_id)
+        return guild_data.get(key)

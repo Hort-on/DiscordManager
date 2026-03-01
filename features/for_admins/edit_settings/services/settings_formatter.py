@@ -26,7 +26,7 @@ class SettingsFormatter:
         self.service = cleanup_service
 
     def format_current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
-        settings = self.settings.dict_storage.for_dict_get(
+        settings = self.settings.dict_storage.get_all(
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id
         )
@@ -42,7 +42,12 @@ class SettingsFormatter:
 
             if key == 'verification_role_id':
                 role = interaction.guild.get_role(value)
-                status = f'{role.name}' if value else '❌ Not assigned'
+                status = f'{role.name}' if value else '❌ not assigned'
+                lines.append(f'🔸{key:<20}: {status}')
+                continue
+
+            if key == 'verification_message_id':
+                status = '✅ assigned' if value else '❌ not assigned'
                 lines.append(f'🔸{key:<20}: {status}')
                 continue
 
@@ -54,7 +59,7 @@ class SettingsFormatter:
     async def format_current_system_channels(self, guild: discord.Guild) -> discord.Embed:
         not_found_ch: list[str] = []
 
-        channels = self.settings.dict_storage.for_dict_get(
+        channels = self.settings.dict_storage.get_all(
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=guild.id
         )

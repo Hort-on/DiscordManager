@@ -4,21 +4,14 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from features.auto_moderation.verification.service import VerificationService
-
 if TYPE_CHECKING:
-    from core.bot_config import Bot
-    from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.flow import VerificationFlow
 
 
 class AgreeButton(discord.ui.Button):
     def __init__(
             self,
-            flow: VerificationFlow,
-            bot: Bot,
-            settings: SettingsStorage,
-            service: VerificationService
+            flow: VerificationFlow
     ):
         super().__init__(
             label='Agree',
@@ -27,9 +20,6 @@ class AgreeButton(discord.ui.Button):
         )
 
         self.flow = flow
-        self.bot = bot
-        self.settings = settings
-        self.service = service
 
     async def callback(self, interaction: discord.Interaction) -> None:
         await self.flow.agreement_start(interaction=interaction)
@@ -38,10 +28,7 @@ class AgreeButton(discord.ui.Button):
 class DisagreeButton(discord.ui.Button):
     def __init__(
             self,
-            flow: VerificationFlow,
-            bot: Bot,
-            settings: SettingsStorage,
-            service: VerificationService
+            flow: VerificationFlow
     ):
         super().__init__(
             label='Disagree',
@@ -50,9 +37,6 @@ class DisagreeButton(discord.ui.Button):
         )
 
         self.flow = flow
-        self.bot = bot
-        self.settings = settings
-        self.service = service
 
     async def callback(self, interaction: discord.Interaction):
         await self.flow.disagreement_start(interaction=interaction)

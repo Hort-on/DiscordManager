@@ -36,12 +36,12 @@ class MainMenuView(discord.ui.View):
             guild_id=guild_id
         )
 
-        config = settings.dict_storage.for_dict_get(
+        config = settings.dict_storage.get_all(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )
 
-        role_manager = settings.dict_storage.for_dict_get(
+        role_manager = settings.dict_storage.get_value(
             'role_manager',
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
@@ -49,7 +49,7 @@ class MainMenuView(discord.ui.View):
 
         self.add_item(RandomizerMenuButton(navigator=navigator))
 
-        if role_manager.get('role_manager', False):
+        if role_manager:
             self.add_item(RoleManagerMenuButton(navigator=navigator))
 
         if config.get('birthday', False):

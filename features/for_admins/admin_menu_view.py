@@ -37,7 +37,7 @@ class AdminMenuView(discord.ui.View):
     ):
         super().__init__(timeout=60)
 
-        config = settings.dict_storage.for_dict_get(
+        config = settings.dict_storage.get_all(
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
         )

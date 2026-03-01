@@ -21,7 +21,7 @@ class RandomizerMenuButton(discord.ui.Button):
         )
         self.navigator = navigator
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         view = self.navigator.randomizer_menu()
 
         context = getattr(view, 'context', None)
@@ -73,7 +73,7 @@ class RandomTeamByText(discord.ui.Button):
 
         self.flow = flow
 
-    async def start_for_teams_by_text(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction):
         await self.flow.for_teams_by_text_start(interaction=interaction)
 
 

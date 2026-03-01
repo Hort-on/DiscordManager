@@ -6,7 +6,6 @@ import discord
 
 from event_services.member_left import MemberLeftNotification
 
-from features.auto_moderation.verification.flow import VerificationFlow
 # from discord.ext import tasks
 # from general_services.utils.bad_words import invitation_pattern
 
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
+    from features.auto_moderation.verification.view_service import VerificationViewService
 
 
 class Controller:
@@ -27,12 +27,14 @@ class Controller:
             db_factory: DBFactory,
             navigator: Navigator,
             verification_service: VerificationService,
+            verification_view_service: VerificationViewService
     ):
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
         self.navigator = navigator
         self.verification_service = verification_service
+        self.verification_view_service = verification_view_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -49,12 +51,8 @@ class Controller:
         #     self.daily_birthday_check.start()
         await self.settings.load_all_guilds_settings()
 
-        flow = VerificationFlow(
-            bot=self.bot,
-            settings=self.settings,
-            service=self.verification_service
-        )
-        await flow.prepare_verification_channel()
+        await self.verification_view_service.register_persistent_view()
+        await self.verification_view_service.ensure_all_guild_messages()
 
     async def on_message(self, message) -> None:
         # TODO: потрібно зробити перевірку суперюзерів з бд

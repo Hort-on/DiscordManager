@@ -14,7 +14,6 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
-    from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -25,8 +24,7 @@ class SystemChannelsMenuButton(FirewallButton):
             self,
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
-            formatter: SettingsFormatter,
-            service: SystemChannelsService
+            formatter: SettingsFormatter
     ):
         super().__init__(
             label='System channels management',
@@ -35,7 +33,6 @@ class SystemChannelsMenuButton(FirewallButton):
         )
 
         self.navigator = navigator
-        self.service = service
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:

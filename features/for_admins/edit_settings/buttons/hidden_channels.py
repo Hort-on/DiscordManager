@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 from core.navigator.navigator_context import NavigationContext
 

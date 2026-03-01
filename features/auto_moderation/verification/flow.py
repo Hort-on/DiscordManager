@@ -7,9 +7,8 @@ import discord
 from database.settings_storage.settings_manager import StorageTarget
 
 from features.auto_moderation.verification.modals import AntiBotModal
-from features.auto_moderation.verification.views import VerificationView
 
-from ui.embed_constructor.embed_constructor import InfoEmbed, ErrorEmbed, SuccessEmbed, WarningEmbed
+from ui.embed_constructor.embed_constructor import InfoEmbed, ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
@@ -29,13 +28,13 @@ class VerificationFlow:
         self.service = service
 
     async def agreement_start(self, interaction: discord.Interaction):
-        anti_bot = self.settings.dict_storage.for_dict_get(
+        anti_bot = self.settings.dict_storage.get_value(
             'anti_bot',
             target=StorageTarget.SETTINGS,
             guild_id=interaction.guild_id
         )
 
-        if anti_bot:
+        if bool(anti_bot):
             await interaction.response.send_modal(AntiBotModal(
                 flow=self
             ))
@@ -104,39 +103,3 @@ class VerificationFlow:
             embed=info_embed,
             ephemeral=True
         )
-
-    async def prepare_verification_channel(self):
-        view = VerificationView(
-            flow=self,
-            bot=self.bot,
-            settings=self.settings,
-            service=self.service
-        )
-
-        self.bot.add_view(view=view)
-
-        for guild in self.bot.guilds:
-            channel = await self.service.is_verification_enabled(
-                guild=guild
-            )
-
-            if isinstance(channel, discord.TextChannel):
-                await self.ensure_verification_message(
-                    channel=channel,
-                    view=view
-                )
-
-    async def ensure_verification_message(self, channel, view: VerificationView):
-        found = False
-        async for message in channel.history(limit=25):
-            if message.author == self.bot.user and message.components:
-                found = True
-                break
-
-        if not found:
-            embed = WarningEmbed(
-                description='Please before you agree make sure you have carefully read the rules.'
-            )
-
-            await channel.send(embed=embed, view=view)
-            return

@@ -88,7 +88,6 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
             hidden_role_service=edit_settings_container.hidden_roles_service,
-            sys_channels_service=edit_settings_container.system_channels_service,
             cleanup_service=self.general_container.cleanup_service
         )
 

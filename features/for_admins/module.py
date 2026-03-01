@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
+    from features.auto_moderation.verification.view_service import VerificationViewService
     from general_services.other_services.cleanup_service import CleanUpService
 
 
@@ -31,7 +32,8 @@ def build_admin_module(
         db_factory: DBFactory,
         settings: SettingsStorage,
         cleanup_service: CleanUpService,
-        verification_service: VerificationService
+        verification_service: VerificationService,
+        verification_view_service: VerificationViewService
 ) -> AdministrationModule:
 
     delete_msg_module = build_delete_msg_module(
@@ -43,6 +45,7 @@ def build_admin_module(
         db_factory=db_factory,
         settings=settings,
         verification_service=verification_service,
+        verification_view_service=verification_view_service,
         cleanup_service=cleanup_service
     )
 

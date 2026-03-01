@@ -83,7 +83,7 @@ class MainSettingsFlow:
             return
 
         result = await self.service.handle_setting_update(
-            guild_id=interaction.guild_id,
+            guild=interaction.guild,
             config_key=value[0]
         )
 

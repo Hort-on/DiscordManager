@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
-    from features.for_admins.edit_settings.services.system_channels import SystemChannelsService
     from general_services.other_services.cleanup_service import CleanUpService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -31,7 +30,6 @@ class SettingsMenuView(discord.ui.View):
             buttons_protection: ButtonProtectionService,
             hidden_ch_service: HiddenChannelsService,
             hidden_role_service: HiddenRolesService,
-            sys_channels_service: SystemChannelsService,
             cleanup_service: CleanUpService
     ):
         super().__init__(timeout=60)
@@ -47,7 +45,6 @@ class SettingsMenuView(discord.ui.View):
             navigator=navigator,
             buttons_protection=buttons_protection,
             formatter=settings_formatter,
-            service=sys_channels_service
         ))
 
         self.add_item(HiddenChannelsMenuButtons(

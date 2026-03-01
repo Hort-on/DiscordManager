@@ -9,6 +9,7 @@ from .services.hidden_roles import HiddenRolesService
 from .services.main_settings import MainSettingsService
 from .services.system_channels import SystemChannelsService
 from .services.settings_formatter import SettingsFormatter
+from ...auto_moderation.verification.view_service import VerificationViewService
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
@@ -32,6 +33,7 @@ def build_edit_settings_module(
         db_factory: DBFactory,
         settings: SettingsStorage,
         verification_service: VerificationService,
+        verification_view_service: VerificationViewService,
         cleanup_service: CleanUpService
 ) -> EditSettingsModule:
 
@@ -49,7 +51,8 @@ def build_edit_settings_module(
         bot=bot,
         db_factory=db_factory,
         settings=settings,
-        service=verification_service
+        service=verification_service,
+        verification_view_service=verification_view_service
     )
 
     formatter = SettingsFormatter(
@@ -62,7 +65,8 @@ def build_edit_settings_module(
         bot=bot,
         db_factory=db_factory,
         settings=settings,
-        verification_service=verification_service
+        verification_service=verification_service,
+        verification_view_service=verification_view_service
     )
 
     return EditSettingsModule(

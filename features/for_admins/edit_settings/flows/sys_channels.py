@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.navigator_context import NavigationContext
-from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -96,7 +95,7 @@ class SystemChannelsFlow:
         channel_id = int(values[0])
 
         result = await self.service.save_system_channel(
-            guild_id=interaction.guild_id,
+            guild=interaction.guild,
             channel_data={channel_key: channel_id}
         )
 

@@ -117,8 +117,6 @@ class DeleteMessageFlow:
 
         await interaction.response.send_modal(DeleteMessagesModal(
             channel=channel,
-            service=self.service,
-            navigator=self.navigator,
             flow=self
         ))
 

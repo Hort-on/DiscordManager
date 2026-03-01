@@ -14,6 +14,7 @@ from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 from database.db_factory.db_scenario_factory import DBFactory
 
+from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
 from features.for_everyone.module import build_everyone_module
@@ -53,14 +54,17 @@ async def main():
 
     cleanup_service = CleanUpService(settings=settings, db_factory=db_factory)
 
-    verification_service = VerificationService(bot=bot, settings=settings)
+    verification_service = VerificationService(bot=bot, settings=settings, db_factory=db_factory)
+
+    verification_view_service = VerificationViewService(bot=bot, settings=settings, service=verification_service)
 
     admin_module = build_admin_module(
         bot=bot,
         db_factory=db_factory,
         settings=settings,
         cleanup_service=cleanup_service,
-        verification_service=verification_service
+        verification_service=verification_service,
+        verification_view_service=verification_view_service
     )
 
     everyone_module = build_everyone_module(
@@ -91,7 +95,8 @@ async def main():
         navigator=navigator,
         settings=settings,
         db_factory=db_factory,
-        verification_service=verification_service
+        verification_service=verification_service,
+        verification_view_service=verification_view_service
     )
 
     await bot.load_extension('cogs.management_cog')

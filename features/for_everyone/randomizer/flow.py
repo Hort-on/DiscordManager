@@ -31,39 +31,72 @@ class RandomizerFlow:
     async def for_number_start(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(RandomNumModal(flow=self))
 
-    async def for_number_proceed(self, interaction: discord.Interaction, first_num: int, second_num: int) -> None:
+    async def for_number_proceed(
+            self,
+            interaction: discord.Interaction,
+            first_num: int,
+            second_num: int,
+            edit_mode: bool = False
+    ):
         await interaction.response.defer(ephemeral=True)
-        result = random.randint(first_num, second_num)
 
+        if first_num == second_num:
+            embed = ErrorEmbed(
+                description='The numbers must be different.'
+            )
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
+
+        result = random.randint(first_num, second_num)
         view = ReshuffleView(first_num, second_num, callback=self.for_number_proceed)
-        await interaction.followup.send(
-            content=f'The number is: {result}',
-            view=view,
-            ephemeral=True
-        )
+
+        if edit_mode:
+            await interaction.edit_original_response(
+                content=f'The number is: {result}',
+                view=view
+            )
+        else:
+            await interaction.followup.send(
+                content=f'The number is: {result}',
+                view=view,
+                ephemeral=True
+            )
 
     async def for_word_start(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(RandomWordModal(flow=self))
 
-    async def for_word_proceed(self, interaction: discord.Interaction, words_list: str) -> None:
+    async def for_word_proceed(
+            self,
+            interaction: discord.Interaction,
+            words_list: str,
+            edit_mode: bool = False
+    ) -> None:
         await interaction.response.defer(ephemeral=True)
 
-        words = [w.strip() for w in words_list.strip(',')]
+        words = [w.strip() for w in words_list.split(',')]
+        result = random.choice(words)
+
         if len(words) < 2:
             embed = ErrorEmbed(
                 description='There must be at least 2 words'
             )
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, ephemeral=True)
             return
 
-        result = random.choice(words)
-
+        chosen_word = random.choice(result)
         view = ReshuffleView(words_list, callback=self.for_word_proceed)
-        await interaction.followup.send(
-            content=f'The number is: {result}',
-            view=view,
-            ephemeral=True
-        )
+
+        if edit_mode:
+            await interaction.edit_original_response(
+                content=f'The word is: {chosen_word}',
+                view=view
+            )
+        else:
+            await interaction.followup.send(
+                content=f'The word is: {chosen_word}',
+                view=view,
+                ephemeral=True
+            )
 
     async def for_teams_by_text_start(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(RandomTeamByTextModal(flow=self))
@@ -72,9 +105,11 @@ class RandomizerFlow:
             self,
             interaction: discord.Interaction,
             users_list: str,
-            teams_quantity: int
+            teams_quantity: int,
+            edit_mode: bool = False
     ) -> None:
         await interaction.response.defer(ephemeral=True)
+
         members = [m.strip() for m in users_list.split(',')]
 
         if teams_quantity > len(members):
@@ -95,7 +130,10 @@ class RandomizerFlow:
 
         view = ReshuffleView(users_list, teams_quantity, callback=self.team_by_text_proceed)
 
-        await interaction.followup.send(embed=embed, view=view)
+        if edit_mode:
+            await interaction.edit_original_response(embed=embed, view=view)
+        else:
+            await interaction.followup.send(embed=embed, view=view)
 
     async def for_teams_by_channel_start(self, interaction: discord.Interaction) -> None:
         options = self._get_channels(guild=interaction.guild)
@@ -128,8 +166,15 @@ class RandomizerFlow:
             flow=self
         ))
 
-    async def team_by_channel_proceed(self, interaction: discord.Interaction, channel, teams_quantity: int) -> None:
+    async def team_by_channel_proceed(
+            self,
+            interaction: discord.Interaction,
+            channel,
+            teams_quantity: int,
+            edit_mode: bool = False
+    ) -> None:
         await interaction.response.defer(ephemeral=True)
+
         members = [m for m in channel.members if not m.bot]
 
         if teams_quantity > len(members):
@@ -148,7 +193,10 @@ class RandomizerFlow:
 
         view = ReshuffleView(channel, teams_quantity, callback=self.team_by_channel_proceed)
 
-        await interaction.followup.send(embed=embed, view=view)
+        if edit_mode:
+            await interaction.edit_original_response(embed=embed, view=view)
+        else:
+            await interaction.followup.send(embed=embed, view=view)
 
     def _get_channels(self, guild: discord.Guild) -> list:
         hidden_channels = self.service.get_hidden_channels(guild_id=guild.id)
