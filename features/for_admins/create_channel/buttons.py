@@ -17,7 +17,7 @@ class CreateChannelButton(FirewallButton):
         super().__init__(
             label='Create a channel',
             style=discord.ButtonStyle.blurple,
-            service=service
+            protection_service=service
         )
 
     async def on_click(self, interaction: discord.Interaction) -> None:

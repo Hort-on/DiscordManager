@@ -20,20 +20,20 @@ class SendMessageButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
-            service: SendAnonMessageService,
+            send_msg_service: SendAnonMessageService,
             buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='Send message',
             style=discord.ButtonStyle.blurple,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
         self.navigator = navigator
-        self.service = service
+        self.service = send_msg_service
 
     async def on_click(self, interaction: discord.Interaction):
         flow = SendAnonMsg(
-            service=self.service,
+            send_msg_service=self.service,
             navigator=self.navigator
         )
 

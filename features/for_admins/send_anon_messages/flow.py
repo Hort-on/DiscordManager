@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 class SendAnonMsg:
     def __init__(
             self,
-            service: SendAnonMessageService,
+            send_msg_service: SendAnonMessageService,
             navigator: Navigator
     ):
-        self.service = service
+        self.service = send_msg_service
         self.navigator = navigator
 
     async def start_for_send(self, interaction: discord.Interaction):
@@ -40,15 +40,6 @@ class SendAnonMsg:
             callback=self._handle_channel,
         )
 
-        try:
-            await interaction.user.send("To send messages just send the to he bot in DM")
-        except discord.Forbidden:
-            embed = WarningEmbed(
-                description='Please open your Direct Messages.'
-            )
-            await interaction.response.edit_message(embed=embed)
-            return
-
         await interaction.response.edit_message(
             view=view
         )
@@ -56,6 +47,7 @@ class SendAnonMsg:
     async def _handle_channel(self, interaction: discord.Interaction, value: list[str]):
         channel = interaction.guild.get_channel(int(value[0]))
 
+        print(channel.name, channel.id)
         result = await self.service.save_channel(
             guild_id=interaction.guild_id,
             user_id=interaction.user.id,
@@ -70,8 +62,10 @@ class SendAnonMsg:
                 embed=error_embed
             )
             return
+
         success_embed = SuccessEmbed(
-            description=f'Successful, now all you can send anon messages. Selected channel: {channel.name}'
+            description=f'Successful, now all you can send anon messages. Selected channel: {channel.name}. \n'
+                        f'To send messages just send it to the bot in DM.'
         )
 
         await interaction.response.edit_message(

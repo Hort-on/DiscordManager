@@ -26,14 +26,14 @@ class DeleteMessageButton(FirewallButton):
         super().__init__(
             label='🗑️Delete messages',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
         self.navigator = navigator
-        self.delete_msg_service = delete_msg_service
+        self.service = delete_msg_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         flow = DeleteMessageFlow(
-            delete_msg_service=self.delete_msg_service,
+            delete_msg_service=self.service,
             navigator=self.navigator
         )
 

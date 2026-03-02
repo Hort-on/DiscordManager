@@ -40,20 +40,20 @@ class VerificationFlow:
             ))
             return
 
-        result, message = await self.service.assign_role(
+        result = await self.service.assign_role(
             guild=interaction.guild,
             member=interaction.user
         )
 
-        if not result:
+        if not result.value:
             error_embed = ErrorEmbed(
-                description=message
+                description=result.message
             )
             await interaction.response.send_message(embed=error_embed, ephemeral=True)
             return
 
         success_embed = SuccessEmbed(
-            description=message
+            description=result.message
         )
 
         await interaction.response.send_message(embed=success_embed, ephemeral=True)
@@ -77,18 +77,18 @@ class VerificationFlow:
 
             return
 
-        result, message = await self.service.assign_role(
+        result = await self.service.assign_role(
             guild=interaction.guild,
             member=interaction.user
         )
 
-        if not result:
+        if not result.value:
             embed = ErrorEmbed(
-                description=message
+                description=result.message
             )
         else:
             embed = SuccessEmbed(
-                description=message
+                description=result.message
             )
 
         await interaction.followup.send(embed=embed)

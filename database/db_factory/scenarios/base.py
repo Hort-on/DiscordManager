@@ -15,7 +15,8 @@ class DataBaseScenario:
         'roles': "HiddenRoles",
         'temp_channels': "TempChannels",
         'groups': "Groups",
-        'group_members': "GroupMembers"
+        'group_members': "GroupMembers",
+        'bad_words': "BadWords"
     }
 
     USER_TABLES = [

@@ -62,8 +62,17 @@ class WriteData(DataBaseScenario):
         placeholders = ', '.join(['?'] * (len(self.data) + 1))
         update_clause = ', '.join(f'{k}=excluded.{k}' for k in self.data.keys())
 
-        query = f"""INSERT INTO {table} ({columns}) VALUES ({placeholders})
-                            ON CONFLICT(guild_id) DO UPDATE SET {update_clause}"""
+        if 'user_id' in self.data:
+            conflict_target = 'guild_id, user_id'
+        else:
+            conflict_target = 'guild_id'
+
+        query = f"""
+            INSERT INTO {table} ({columns})
+            VALUES ({placeholders})
+            ON CONFLICT({conflict_target})
+            DO UPDATE SET {update_clause}
+        """
 
         async with self.db_connect.connect_write() as cursor:
             await cursor.execute(query, (self.guild_id, *self.data.values()))

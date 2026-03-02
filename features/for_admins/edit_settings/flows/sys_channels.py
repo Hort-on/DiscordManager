@@ -82,7 +82,7 @@ class SystemChannelsFlow:
             context = NavigationContext()
             view.context = context
 
-        context.push(target=Route.SYSTEM_CHANNELS_MENU)
+        context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 

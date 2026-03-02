@@ -73,7 +73,6 @@ class Navigator:
             delete_msg_service=delete_msg_module.delete_msg_service,
             buttons_protection=self.general_container.button_protection,
             send_msg_service=send_msg_module.send_message_service,
-            superusers_service=superusers_module.superusers_service,
             guild_id=guild_id
         )
 

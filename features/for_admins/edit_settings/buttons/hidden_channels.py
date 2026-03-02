@@ -36,7 +36,7 @@ class HiddenChannelsMenuButtons(FirewallButton):
         super().__init__(
             label='Hidden channels management',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.hidden_ch_service = hidden_ch_service
@@ -64,7 +64,7 @@ class AddHiddenChannelButton(FirewallButton):
         super().__init__(
             label='📥Add hidden channels',
             style=discord.ButtonStyle.green,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -80,7 +80,7 @@ class DeleteHiddenChannelButton(FirewallButton):
         super().__init__(
             label='🗑️Delete hidden channels',
             style=discord.ButtonStyle.red,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -96,7 +96,7 @@ class HiddenChannelsListButton(FirewallButton):
         super().__init__(
             label='📄Hidden channels list',
             style=discord.ButtonStyle.blurple,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow

@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.delete_message.service import DeleteMessageService
     from features.for_admins.send_anon_messages.service import SendAnonMessageService
-    from features.for_admins.superusers.services import SuperusersService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -32,7 +31,6 @@ class AdminMenuView(discord.ui.View):
         buttons_protection: ButtonProtectionService,
         delete_msg_service: DeleteMessageService,
         send_msg_service: SendAnonMessageService,
-        superusers_service: SuperusersService,
         guild_id: int
     ):
         super().__init__(timeout=60)
@@ -45,7 +43,6 @@ class AdminMenuView(discord.ui.View):
         self.add_item(SuperusersMenuButton(
             navigator=navigator,
             formatter=superusers_formatter,
-            superusers_service=superusers_service,
             buttons_protection=buttons_protection
         ))
         self.add_item(DeleteMessageButton(
@@ -61,7 +58,7 @@ class AdminMenuView(discord.ui.View):
         if config.get('send_messages'):
             self.add_item(SendMessageButton(
                 navigator=navigator,
-                service=send_msg_service,
+                send_msg_service=send_msg_service,
                 buttons_protection=buttons_protection
             ))
 

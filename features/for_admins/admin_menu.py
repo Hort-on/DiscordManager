@@ -22,7 +22,7 @@ class AdminMenuButton(FirewallButton):
         super().__init__(
             label='🛠️Admin menu',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.navigator = navigator

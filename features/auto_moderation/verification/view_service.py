@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from database.settings_storage.settings import SettingsStorage
+from database.settings_storage.settings_manager import StorageTarget
 from features.auto_moderation.verification.flow import VerificationFlow
 from features.auto_moderation.verification.service import VerificationService
 from features.auto_moderation.verification.views import VerificationView
@@ -35,7 +36,17 @@ class VerificationViewService:
 
     async def ensure_all_guild_messages(self):
         for guild in self.bot.guilds:
+            verification = self.settings.dict_storage.get_value(
+                key='verification',
+                target=StorageTarget.SETTINGS,
+                guild_id=guild.id
+            )
+
+            if not verification:
+                continue
+
             channel = await self.service.get_verification_channel(guild=guild)
+
             if channel is None:
                 continue
 

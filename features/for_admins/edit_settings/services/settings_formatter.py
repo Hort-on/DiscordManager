@@ -43,16 +43,19 @@ class SettingsFormatter:
             if key == 'verification_role_id':
                 role = interaction.guild.get_role(value)
                 status = f'{role.name}' if value else '❌ not assigned'
-                lines.append(f'🔸{key:<20}: {status}')
+                config_name = key.removesuffix('_id').replace('_', ' ')
+                lines.append(f'🔸{config_name:<20}: {status}')
                 continue
 
             if key == 'verification_message_id':
                 status = '✅ assigned' if value else '❌ not assigned'
-                lines.append(f'🔸{key:<20}: {status}')
+                config_name = key.removesuffix('_id').replace('_', ' ')
+                lines.append(f'🔸{config_name:<20}: {status}')
                 continue
 
             status = '✅ Enabled' if value else '❌ Disabled'
-            lines.append(f'🔸{key:<20}: {status}')
+            config_name = key.replace('_', ' ')
+            lines.append(f'🔸{config_name:<20}: {status}')
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
 

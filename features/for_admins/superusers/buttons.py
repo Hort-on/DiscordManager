@@ -13,7 +13,6 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.superusers.formatter import SuperusersFormatter
-    from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.flow import SuperusersFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -25,17 +24,15 @@ class SuperusersMenuButton(FirewallButton):
             self,
             navigator: Navigator,
             formatter: SuperusersFormatter,
-            superusers_service: SuperusersService,
             buttons_protection: ButtonProtectionService
     ):
         super().__init__(
             label='👮Superusers management',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
         self.navigator = navigator
         self.formatter = formatter
-        self.superusers_service = superusers_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         view = self.navigator.superusers_menu()
@@ -62,7 +59,7 @@ class AddSuperuserButton(FirewallButton):
         super().__init__(
             label='📥Add super user',
             style=discord.ButtonStyle.green,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -78,7 +75,7 @@ class DeleteSuperusersButton(FirewallButton):
         super().__init__(
             label='🗑️Delete superusers',
             style=discord.ButtonStyle.red,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -94,7 +91,7 @@ class SuperusersListButton(FirewallButton):
         super().__init__(
             label='📑Show current superusers',
             style=discord.ButtonStyle.blurple,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow

@@ -22,7 +22,7 @@ class EditSettingsMenuButton(FirewallButton):
         super().__init__(
             label='⚙️ Settings management',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
         self.navigator = navigator
 

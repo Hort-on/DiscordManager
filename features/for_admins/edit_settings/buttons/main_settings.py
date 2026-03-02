@@ -28,7 +28,7 @@ class MainSettingsButton(FirewallButton):
         super().__init__(
             label='Edit main settings',
             style=discord.ButtonStyle.green,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.main_settings_service = main_settings_service

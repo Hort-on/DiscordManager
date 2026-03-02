@@ -50,7 +50,6 @@ class MainSettingsService(DBBaseService):
 
     async def handle_setting_update(self, guild: discord.Guild, config_key: str) -> bool:
         if config_key == 'verification':
-
             result = self.is_setting_enabled(guild_id=guild.id, config_key=config_key)
             if result:
                 channel = await self.service.get_verification_channel(guild=guild)
@@ -99,37 +98,9 @@ class MainSettingsService(DBBaseService):
             guild_id=guild.id
         )
 
-        if not self.is_setting_enabled(
-                guild_id=guild.id,
-                config_key=config_key
-        ):
-            await self._clean_up_verification(guild=guild)
-
         return bool(result)
 
-    async def _clean_up_verification(self, guild: discord.Guild) -> None:
-        await self._delete_verification_message(guild=guild)
-
-        delete_channel_scenario = self.db_factory.for_cleanup_system_channel(
-            guild_id=guild.id,
-            channels=['verification_channel_id']
-        )
-
-        await self.update_db_and_cache(
-            scenario=delete_channel_scenario,
-            guild_id=guild.id
-        )
-
-        delete_role_scenario = self.db_factory.for_cleanup_role_delete(
-            guild_id=guild.id
-        )
-
-        await self.update_db_and_cache(
-            scenario=delete_role_scenario,
-            guild_id=guild.id
-        )
-
-    async def _delete_verification_message(self, guild):
+    async def _cleanup_verification_message(self, guild):
         channel_id = self.settings.dict_storage.get_value(
             'verification_channel_id',
             target=StorageTarget.SYSTEM_CHANNELS,
@@ -157,7 +128,7 @@ class MainSettingsService(DBBaseService):
 
         delete_msg = self.db_factory.for_delete_set(
             guild_id=guild.id,
-            values=set(msg_id),
+            values=msg_id,
             table_name='settings',
             key='verification_message_id'
         )

@@ -80,7 +80,7 @@ class RoleManagerFlow:
         await interaction.response.edit_message(view=view)
 
     async def _add_roles_to_user(self, interaction: discord.Interaction, roles: list[str]):
-        added_roles, not_added_roles = await self.service.add_roles_to_user(
+        result = await self.service.add_roles_to_user(
             member=interaction.user,
             guild=interaction.guild,
             roles=roles
@@ -89,16 +89,16 @@ class RoleManagerFlow:
         success_embed = None
         failure_embed = None
 
-        if added_roles:
+        if result.added_roles:
             success_message = ['The following roles have been successfully added:']
-            success_message.extend(f'🔸 {role.name}' for role in added_roles)
+            success_message.extend(f'🔸 {role.name}' for role in result.added_roles)
             success_embed = SuccessEmbed(
                 description='\n'.join(success_message)
             )
 
-        if not_added_roles:
+        if result.not_added_roles:
             failure_message = ['Some of the roles were not added']
-            failure_message.extend(f'🔸 {role.name}' for role in not_added_roles)
+            failure_message.extend(f'🔸 {role.name}' for role in result.not_added_roles)
             failure_embed = WarningEmbed(
                 description='\n'.join(failure_message)
             )
@@ -108,7 +108,7 @@ class RoleManagerFlow:
         await interaction.response.edit_message(embeds=embeds)
 
     async def _remove_roles_from_user(self, interaction: discord.Interaction, roles: list[str]):
-        removed_roles, not_removed_roles = await self.service.remove_roles_from_user(
+        result = await self.service.remove_roles_from_user(
             member=interaction.user,
             guild=interaction.guild,
             roles=roles
@@ -117,16 +117,16 @@ class RoleManagerFlow:
         success_embed = None
         failure_embed = None
 
-        if removed_roles:
+        if result.removed_roles:
             success_message = ['The following roles have been successfully removed:']
-            success_message.extend(f'🔸 {role.name}' for role in removed_roles)
+            success_message.extend(f'🔸 {role.name}' for role in result.removed_roles)
             success_embed = SuccessEmbed(
                 description='\n'.join(success_message)
             )
 
-        if not_removed_roles:
+        if result.not_removed_roles:
             failure_message = ['Some of the roles were not removed']
-            failure_message.extend(f'🔸 {role.name}' for role in not_removed_roles)
+            failure_message.extend(f'🔸 {role.name}' for role in result.not_removed_roles)
             failure_embed = WarningEmbed(
                 description='\n'.join(failure_message)
             )

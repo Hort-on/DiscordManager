@@ -22,18 +22,18 @@ class BirthdayFlow:
         await interaction.response.send_modal(AddBirthdayModal(flow=self))
 
     async def for_delete_button(self, interaction: discord.Interaction):
-        result, message = await self.service.delete_birthday(
+        result = await self.service.delete_birthday(
             user_id=interaction.user.id,
             guild_id=interaction.guild_id
         )
 
-        if not result:
+        if not result.value:
             embed = ErrorEmbed(
-                description=message
+                description=result.message
             )
         else:
             embed = SuccessEmbed(
-                description=message
+                description=result.message
             )
 
         await interaction.response.edit_message(embed=embed)
@@ -41,19 +41,19 @@ class BirthdayFlow:
     async def add_birthday(self, interaction: discord.Interaction, user_birthday: str) -> None:
         await interaction.response.defer(ephemeral=True)
 
-        result, message = await self.service.save_birthday(
+        result = await self.service.save_birthday(
             user_id=interaction.user.id,
             guild_id=interaction.guild_id,
             user_birthday=user_birthday
         )
 
-        if not result:
+        if not result.value:
             embed = ErrorEmbed(
-                description=message
+                description=result.message
             )
         else:
             embed = SuccessEmbed(
-                description=message
+                description=result.message
             )
 
         await interaction.followup.send(embed=embed)

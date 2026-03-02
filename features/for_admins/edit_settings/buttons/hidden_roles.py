@@ -33,7 +33,7 @@ class HiddenRolesMenuButton(FirewallButton):
         super().__init__(
             label='Hidden roles management',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.navigator = navigator
@@ -61,7 +61,7 @@ class AddHiddenRoleButton(FirewallButton):
         super().__init__(
             label='📥Add hidden roles',
             style=discord.ButtonStyle.green,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -77,7 +77,7 @@ class DeleteHiddenRoleButton(FirewallButton):
         super().__init__(
             label='🗑️Delete hidden roles',
             style=discord.ButtonStyle.red,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -93,7 +93,7 @@ class HiddenRolesListButton(FirewallButton):
         super().__init__(
             label='📄Hidden roles list',
             style=discord.ButtonStyle.blurple,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow

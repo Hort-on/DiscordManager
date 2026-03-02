@@ -29,7 +29,7 @@ class SystemChannelsMenuButton(FirewallButton):
         super().__init__(
             label='System channels management',
             style=discord.ButtonStyle.secondary,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.navigator = navigator
@@ -55,7 +55,7 @@ class AddSystemChannelsButton(FirewallButton):
         super().__init__(
             label='📥Add\\Change channels',
             style=discord.ButtonStyle.green,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -71,7 +71,7 @@ class DeleteSystemChannelsButton(FirewallButton):
         super().__init__(
             label='🗑️Delete system channels',
             style=discord.ButtonStyle.red,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow
@@ -87,7 +87,7 @@ class SystemChannelsListButton(FirewallButton):
         super().__init__(
             label='📄System channels list',
             style=discord.ButtonStyle.blurple,
-            service=buttons_protection
+            protection_service=buttons_protection
         )
 
         self.flow = flow

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class SendAnonMessageService(DBBaseService):
-    def __init__(self, db_factory: DBFactory, settings: SettingsStorage):
+    def __init__(self, db_factory: DBFactory, settings: SettingsStorage) -> list[discord.SelectOption]:
         super().__init__(settings)
 
         self.db_factory = db_factory
@@ -27,7 +27,12 @@ class SendAnonMessageService(DBBaseService):
             guild_id=guild.id
         )
 
-        return [channel for channel in channels if channel.id not in hidden_channels]
+        return [discord.SelectOption(
+            label=channel.name,
+            value=str(channel.id)
+        )
+            for channel in channels if channel.id not in hidden_channels
+        ]
 
     async def save_channel(self, guild_id: int, user_id: int, channel_id: int) -> bool:
         write_scenario = self.db_factory.for_write_data(
