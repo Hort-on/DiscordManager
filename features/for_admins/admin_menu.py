@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class AdminMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService):
+    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService, context: NavigationContext):
         super().__init__(
             label='🛠️Admin menu',
             style=discord.ButtonStyle.secondary,
@@ -26,16 +26,17 @@ class AdminMenuButton(FirewallButton):
         )
 
         self.navigator = navigator
+        self.context = context
 
     async def on_click(self, interaction: discord.Interaction):
-        view = self.navigator.admin_menu(guild_id=interaction.guild_id)
+        view = self.navigator.admin_menu(
+            guild_id=interaction.guild_id,
+            context=self.context
+        )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(
+        self.context.push(
             target=Route.MAIN_MENU,
             params=MainMenuParams(
                 guild_id=interaction.guild_id,

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord
+
+from discord import ui
+
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
-
-import discord
-
-from discord import ui
 
 
 class DropMenuView(ui.View):

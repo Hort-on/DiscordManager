@@ -7,6 +7,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from core.navigator.navigator_context import NavigationContext
+
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
 
@@ -20,10 +22,13 @@ class ManagementCog(commands.Cog):
         description='Opens bot menu.'
     )
     async def management(self, interaction: discord.Interaction):
+        context = NavigationContext()
+
         view = self.navigator.main_menu(
             guild_id=interaction.guild_id,
             user_id=interaction.user.id,
-            owner_id=interaction.guild.owner_id
+            owner_id=interaction.guild.owner_id,
+            context=context
         )
 
         await interaction.response.send_message(

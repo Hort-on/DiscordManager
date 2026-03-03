@@ -17,6 +17,7 @@ from database.db_factory.db_scenario_factory import DBFactory
 from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
+from features.for_admins.send_messages.services.send_rules_service import RulesService
 from features.for_everyone.module import build_everyone_module
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 # from features.auto_moderation.message_handler.bad_words_handler import BadWordsHandler
@@ -58,13 +59,16 @@ async def main():
 
     verification_view_service = VerificationViewService(bot=bot, settings=settings, service=verification_service)
 
+    rules_service = RulesService(bot=bot, settings=settings)
+
     admin_module = build_admin_module(
         bot=bot,
         db_factory=db_factory,
         settings=settings,
         cleanup_service=cleanup_service,
         verification_service=verification_service,
-        verification_view_service=verification_view_service
+        verification_view_service=verification_view_service,
+        rules_service=rules_service
     )
 
     everyone_module = build_everyone_module(
@@ -96,7 +100,8 @@ async def main():
         settings=settings,
         db_factory=db_factory,
         verification_service=verification_service,
-        verification_view_service=verification_view_service
+        verification_view_service=verification_view_service,
+        rules_service=rules_service
     )
 
     await bot.load_extension('cogs.management_cog')

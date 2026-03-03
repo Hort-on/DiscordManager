@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 
@@ -13,6 +12,7 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
 
@@ -20,13 +20,16 @@ if TYPE_CHECKING:
 class MainSettingsFlow:
     def __init__(
             self,
+            navigator: Navigator,
+            context: NavigationContext,
             main_settings_service: MainSettingsService,
             formatter: SettingsFormatter,
-            navigator: Navigator,
     ):
+
+        self.navigator = navigator
+        self.context = context
         self.service = main_settings_service
         self.formatter = formatter
-        self.navigator = navigator
 
     async def start_for_main(self, interaction: discord.Interaction):
         options = self._build_settings_options(guild_id=interaction.guild_id)
@@ -38,12 +41,8 @@ class MainSettingsFlow:
             callback=self._proceed_value
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
-
-        context.push(target=Route.SETTINGS_MENU)
+        view.context = self.context
+        self.context.push(target=Route.SETTINGS_MENU)
 
         embed = self.formatter.format_current_main_settings(interaction)
 
@@ -69,20 +68,19 @@ class MainSettingsFlow:
                 callback=self._save_verification_role
             )
 
-            context = getattr(view, 'context', None)
-            if context is None:
-                context = NavigationContext()
-                view.context = context
+            view.context = self.context
 
-            context.push(target=Route.ADMIN_MENU,
-                         params=AdminMenuParams(
-                             guild_id=interaction.guild_id
-                         ))
+            self.context.push(
+                target=Route.ADMIN_MENU,
+                params=AdminMenuParams(
+                    guild_id=interaction.guild_id
+                    )
+            )
 
             await interaction.response.edit_message(view=view)
             return
 
-        result = await self.service.handle_setting_update(
+        result = await self.service.save_new_value(
             guild=interaction.guild,
             config_key=value[0]
         )
@@ -98,9 +96,10 @@ class MainSettingsFlow:
             guild_id=interaction.guild_id,
             config_key=value[0]
         )
+        formatted = value[0].replace('_', ' ').title()
 
         success_embed = SuccessEmbed(
-            description=f"{value[0]} is successfully {'enabled' if current_value else 'disabled'}"
+            description=f"{formatted} is successfully {'enabled' if current_value else 'disabled'}"
         )
 
         settings_embed = self.formatter.format_current_main_settings(interaction)

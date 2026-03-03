@@ -4,36 +4,38 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.params_containers import MainMenuParams
 from core.navigator.routes import Route
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.randomizer.flow import RandomizerFlow
 
 
 class RandomizerMenuButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, context: NavigationContext):
         super().__init__(
             label='🎲 Randomizer',
             style=discord.ButtonStyle.blurple
         )
+
         self.navigator = navigator
+        self.context = context
 
     async def callback(self, interaction: discord.Interaction) -> None:
         view = self.navigator.randomizer_menu()
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.MAIN_MENU, params=MainMenuParams(
-            guild_id=interaction.guild_id,
-            user_id=interaction.user.id,
-            owner_id=interaction.guild.owner_id
-        ))
+        self.context.push(
+            target=Route.MAIN_MENU,
+            params=MainMenuParams(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                owner_id=interaction.guild.owner_id
+            )
+        )
 
         await interaction.response.edit_message(view=view)
 

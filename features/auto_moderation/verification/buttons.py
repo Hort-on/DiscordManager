@@ -14,7 +14,7 @@ class AgreeButton(discord.ui.Button):
             flow: VerificationFlow
     ):
         super().__init__(
-            label='Agree',
+            label='Погоджуся',
             style=discord.ButtonStyle.green,
             custom_id='verify_agree'
         )
@@ -31,7 +31,7 @@ class DisagreeButton(discord.ui.Button):
             flow: VerificationFlow
     ):
         super().__init__(
-            label='Disagree',
+            label='Не погоджуюся',
             style=discord.ButtonStyle.red,
             custom_id='verify_disagree'
         )

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 
@@ -12,6 +11,7 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.superusers.flow import SuperusersFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
@@ -23,6 +23,7 @@ class SuperusersMenuButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             formatter: SuperusersFormatter,
             buttons_protection: ButtonProtectionService
     ):
@@ -31,21 +32,21 @@ class SuperusersMenuButton(FirewallButton):
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )
+
         self.navigator = navigator
+        self.context = context
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.superusers_menu()
+        view = self.navigator.superusers_menu(context=self.context)
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
-
-        context.push(target=Route.ADMIN_MENU,
-                     params=AdminMenuParams(
-                         guild_id=interaction.guild_id
-                     ))
+        view.context = self.context
+        self.context.push(
+            target=Route.ADMIN_MENU,
+            params=AdminMenuParams(
+                guild_id=interaction.guild_id
+                )
+        )
 
         embed = self.formatter.build_embed(guild=interaction.guild)
 

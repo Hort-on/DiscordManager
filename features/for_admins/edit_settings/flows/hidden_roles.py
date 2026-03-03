@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.routes import Route
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
@@ -12,6 +11,7 @@ from ui.drop_down_menu.drop_down_selector import DropMenuView
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
 
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
@@ -23,12 +23,15 @@ class HiddenRolesFlow:
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
             cleanup_service: CleanUpService
     ):
-        self.formatter = formatter
+
         self.navigator = navigator
+        self.context = context
+        self.formatter = formatter
         self.hidden_roles_service = hidden_roles_service
         self.cleanup = cleanup_service
 
@@ -53,12 +56,9 @@ class HiddenRolesFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.HIDDEN_ROLES_MENU)
+        self.context.push(target=Route.HIDDEN_ROLES_MENU)
 
         await interaction.response.edit_message(view=view)
 
@@ -104,12 +104,9 @@ class HiddenRolesFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.HIDDEN_ROLES_MENU)
+        self.context.push(target=Route.HIDDEN_ROLES_MENU)
 
         await interaction.response.edit_message(
             view=view,

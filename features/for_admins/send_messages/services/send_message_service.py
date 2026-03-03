@@ -12,14 +12,14 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
 
 
-class SendAnonMessageService(DBBaseService):
-    def __init__(self, db_factory: DBFactory, settings: SettingsStorage) -> list[discord.SelectOption]:
+class MessageService(DBBaseService):
+    def __init__(self, db_factory: DBFactory, settings: SettingsStorage):
         super().__init__(settings)
 
         self.db_factory = db_factory
         self.settings = settings
 
-    def get_channels(self, guild: discord.Guild):
+    def get_channels(self, guild: discord.Guild) -> list[discord.SelectOption]:
         channels = guild.text_channels
 
         hidden_channels = self.settings.set_storage.for_set_get(

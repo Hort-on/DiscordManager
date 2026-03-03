@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.routes import Route
-from core.navigator.navigator_context import NavigationContext
 
 from features.for_admins.superusers.modals import AddSuperusersModal
 
@@ -14,6 +13,7 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed, War
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.formatter import SuperusersFormatter
 
@@ -22,10 +22,13 @@ class SuperusersFlow:
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             superusers_service: SuperusersService,
             formatter: SuperusersFormatter
     ):
+
         self.navigator = navigator
+        self.context = context
         self.superusers_service = superusers_service
         self.formatter = formatter
 
@@ -100,12 +103,9 @@ class SuperusersFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.SUPERUSERS_MENU)
+        self.context.push(target=Route.SUPERUSERS_MENU)
 
         info_embed = self.formatter.build_embed(guild=interaction.guild)
 

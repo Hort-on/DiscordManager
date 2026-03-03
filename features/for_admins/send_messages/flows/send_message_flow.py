@@ -5,20 +5,20 @@ from typing import TYPE_CHECKING
 import discord
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
-from ui.embed_constructor.embed_constructor import WarningEmbed, ErrorEmbed, SuccessEmbed
+from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
-    from features.for_admins.send_anon_messages.service import SendAnonMessageService
+    from features.for_admins.send_messages.services.send_message_service import MessageService
 
 
-class SendAnonMsg:
+class SendMessageFlow:
     def __init__(
             self,
-            send_msg_service: SendAnonMessageService,
+            message_service: MessageService,
             navigator: Navigator
     ):
-        self.service = send_msg_service
+        self.service = message_service
         self.navigator = navigator
 
     async def start_for_send(self, interaction: discord.Interaction):

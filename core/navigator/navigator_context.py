@@ -7,7 +7,7 @@ class NavigationContext:
     def __init__(self):
         self.stack: list[tuple[Route, Any | None]] = []
 
-    def push(self, target: Route, params: object | None = None):
+    def push(self, target: Route, params: Any | None = None):
         self.stack.append((target, params))
 
     def pop(self):

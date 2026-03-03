@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -15,16 +14,20 @@ from features.for_admins.edit_settings.services.settings_formatter import Settin
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
 
 
 class SystemChannelsFlow:
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             sys_channels_service: SystemChannelsService,
             formatter: SettingsFormatter
     ):
+
         self.navigator = navigator
+        self.context = context
         self.service = sys_channels_service
         self.formatter = formatter
 
@@ -48,12 +51,9 @@ class SystemChannelsFlow:
             callback=self._select_new_sys_channel
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.SYSTEM_CHANNELS_MENU)
+        self.context.push(target=Route.SYSTEM_CHANNELS_MENU)
 
         await interaction.response.edit_message(view=view)
 
@@ -77,12 +77,9 @@ class SystemChannelsFlow:
             )
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.SETTINGS_MENU)
+        self.context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 
@@ -152,12 +149,9 @@ class SystemChannelsFlow:
             callback=self.delete_sys_channel
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.SETTINGS_MENU)
+        self.context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 

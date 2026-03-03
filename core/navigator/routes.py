@@ -12,3 +12,4 @@ class Route(str, Enum):
     HIDDEN_CHANNELS_MENU = auto()
     HIDDEN_ROLES_MENU = auto()
     SYSTEM_CHANNELS_MENU = auto()
+    SEND_MESSAGE_MENU = auto()

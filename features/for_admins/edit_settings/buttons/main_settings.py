@@ -10,6 +10,7 @@ from features.for_admins.edit_settings.flows.main_settings import MainSettingsFl
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from ui.button_protection.button_protection_service import ButtonProtectionService
@@ -21,6 +22,7 @@ class MainSettingsButton(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             main_settings_service: MainSettingsService,
             formatter: SettingsFormatter,
             buttons_protection: ButtonProtectionService
@@ -31,15 +33,17 @@ class MainSettingsButton(FirewallButton):
             protection_service=buttons_protection
         )
 
-        self.main_settings_service = main_settings_service
         self.navigator = navigator
+        self.context = context
+        self.main_settings_service = main_settings_service
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         flow = MainSettingsFlow(
             main_settings_service=self.main_settings_service,
             formatter=self.formatter,
-            navigator=self.navigator
+            navigator=self.navigator,
+            context=self.context
         )
 
         await flow.start_for_main(interaction=interaction)

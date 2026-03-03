@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.routes import Route
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
@@ -12,6 +11,7 @@ from ui.drop_down_menu.drop_down_selector import DropMenuView
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
 
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
@@ -23,12 +23,15 @@ class HiddenChannelsFlow:
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             formatter: SettingsFormatter,
             hidden_ch_service: HiddenChannelsService,
             cleanup_service: CleanUpService
     ):
-        self.formatter = formatter
+
         self.navigator = navigator
+        self.context = context
+        self.formatter = formatter
         self.hidden_ch_service = hidden_ch_service
         self.cleanup = cleanup_service
 
@@ -55,12 +58,9 @@ class HiddenChannelsFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.HIDDEN_CHANNELS_MENU)
+        self.context.push(target=Route.HIDDEN_CHANNELS_MENU)
 
         await interaction.response.edit_message(
             view=view,
@@ -125,12 +125,9 @@ class HiddenChannelsFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.HIDDEN_CHANNELS_MENU)
+        self.context.push(target=Route.HIDDEN_CHANNELS_MENU)
 
         await interaction.response.edit_message(
             view=view,

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from features.for_admins.delete_message.module import DeleteMessageModule, build_delete_msg_module
 from features.for_admins.superusers.module import SuperusersModule, build_superusers_module
-from features.for_admins.send_anon_messages.module import SendMessageModule, build_send_anon_msg_module
+from features.for_admins.send_messages.module import SendMessageModule, build_messages_module
 from features.for_admins.edit_settings.module import EditSettingsModule, build_edit_settings_module
 
 
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
     from features.auto_moderation.verification.view_service import VerificationViewService
+    from features.for_admins.send_messages.services.send_rules_service import RulesService
     from general_services.other_services.cleanup_service import CleanUpService
 
 
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 class AdministrationModule:
     delete_msg_module: DeleteMessageModule
     edit_main_settings_module: EditSettingsModule
-    send_message_module: SendMessageModule
+    message_module: SendMessageModule
     superusers_module: SuperusersModule
 
 
@@ -33,7 +34,8 @@ def build_admin_module(
         settings: SettingsStorage,
         cleanup_service: CleanUpService,
         verification_service: VerificationService,
-        verification_view_service: VerificationViewService
+        verification_view_service: VerificationViewService,
+        rules_service: RulesService
 ) -> AdministrationModule:
 
     delete_msg_module = build_delete_msg_module(
@@ -49,9 +51,10 @@ def build_admin_module(
         cleanup_service=cleanup_service
     )
 
-    send_message_module = build_send_anon_msg_module(
+    message_module = build_messages_module(
         db_factory=db_factory,
-        settings=settings
+        settings=settings,
+        rules_service=rules_service
     )
 
     superusers_module = build_superusers_module(
@@ -63,6 +66,6 @@ def build_admin_module(
     return AdministrationModule(
         delete_msg_module=delete_msg_module,
         edit_main_settings_module=edit_settings_module,
-        send_message_module=send_message_module,
+        message_module=message_module,
         superusers_module=superusers_module
     )

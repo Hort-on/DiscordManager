@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
     from features.auto_moderation.verification.view_service import VerificationViewService
+    from features.for_admins.send_messages.services.send_rules_service import RulesService
 
 
 class Controller:
@@ -27,7 +28,8 @@ class Controller:
             db_factory: DBFactory,
             navigator: Navigator,
             verification_service: VerificationService,
-            verification_view_service: VerificationViewService
+            verification_view_service: VerificationViewService,
+            rules_service: RulesService
     ):
         self.bot = bot
         self.settings = settings
@@ -35,6 +37,7 @@ class Controller:
         self.navigator = navigator
         self.verification_service = verification_service
         self.verification_view_service = verification_view_service
+        self.rules_service = rules_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -60,6 +63,12 @@ class Controller:
 
         if message.author.bot:
             return
+
+        if not message.guild:
+            await self.rules_service.send_message(
+                message=message.content,
+                user_id=message.author.id
+            )
 
         # if message.guild:
         #     nick = message.author.nick if message.author.nick else message.author.name

@@ -13,6 +13,7 @@ from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.edit_settings.services.main_settings import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
@@ -25,6 +26,7 @@ class SettingsMenuView(discord.ui.View):
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             main_settings_service: MainSettingsService,
             settings_formatter: SettingsFormatter,
             buttons_protection: ButtonProtectionService,
@@ -36,6 +38,7 @@ class SettingsMenuView(discord.ui.View):
 
         self.add_item(MainSettingsButton(
             navigator=navigator,
+            context=context,
             main_settings_service=main_settings_service,
             formatter=settings_formatter,
             buttons_protection=buttons_protection
@@ -43,12 +46,14 @@ class SettingsMenuView(discord.ui.View):
 
         self.add_item(SystemChannelsMenuButton(
             navigator=navigator,
+            context=context,
             buttons_protection=buttons_protection,
             formatter=settings_formatter,
         ))
 
         self.add_item(HiddenChannelsMenuButtons(
             navigator=navigator,
+            context=context,
             buttons_protection=buttons_protection,
             formatter=settings_formatter,
             hidden_ch_service=hidden_ch_service,
@@ -57,6 +62,7 @@ class SettingsMenuView(discord.ui.View):
 
         self.add_item(HiddenRolesMenuButton(
             navigator=navigator,
+            context=context,
             buttons_protection=buttons_protection,
             formatter=settings_formatter,
             hidden_roles_service=hidden_role_service,

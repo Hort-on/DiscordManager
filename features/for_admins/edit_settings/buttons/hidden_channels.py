@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.routes import Route
-from core.navigator.navigator_context import NavigationContext
 
 from ui.button_protection.admin_buttons_protection import FirewallButton
 
@@ -13,6 +12,7 @@ from features.for_admins.edit_settings.flows.hidden_channels import HiddenChanne
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
 
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
@@ -28,6 +28,7 @@ class HiddenChannelsMenuButtons(FirewallButton):
     def __init__(
             self,
             navigator: Navigator,
+            context: NavigationContext,
             buttons_protection: ButtonProtectionService,
             formatter: SettingsFormatter,
             hidden_ch_service: HiddenChannelsService,
@@ -39,20 +40,17 @@ class HiddenChannelsMenuButtons(FirewallButton):
             protection_service=buttons_protection
         )
 
-        self.hidden_ch_service = hidden_ch_service
         self.navigator = navigator
+        self.context = context
+        self.hidden_ch_service = hidden_ch_service
         self.formatter = formatter
         self.cleanup_service = cleanup_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.hidden_channels_menu()
+        view = self.navigator.hidden_channels_menu(context=self.context)
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
-
-        context.push(target=Route.SETTINGS_MENU)
+        view.context = self.context
+        self.context.push(target=Route.SETTINGS_MENU)
 
         await interaction.response.edit_message(view=view)
 

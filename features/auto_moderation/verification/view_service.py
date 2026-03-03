@@ -61,8 +61,9 @@ class VerificationViewService:
 
         if not found:
             embed = WarningEmbed(
-                description='Please before you agree make sure you have carefully read the rules.'
-            )
+                description='Будь ласка перш ніж ви погодитеся,'
+                            ' уважно прочитай правила, щоб в подальшому не виникало непорозумінь. Дякуємо.'
+                )
 
             message = await channel.send(embed=embed, view=self.view)
             await self.service.save_message_id(

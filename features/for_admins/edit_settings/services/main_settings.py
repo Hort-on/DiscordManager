@@ -48,22 +48,6 @@ class MainSettingsService(DBBaseService):
 
         return bool(result)
 
-    async def handle_setting_update(self, guild: discord.Guild, config_key: str) -> bool:
-        if config_key == 'verification':
-            result = self.is_setting_enabled(guild_id=guild.id, config_key=config_key)
-            if result:
-                channel = await self.service.get_verification_channel(guild=guild)
-                if channel:
-                    await self.view_service.ensure_single_message(
-                        channel=channel,
-                        guild_id=guild.id
-                    )
-
-        return await self._save_new_value(
-            guild=guild,
-            config_key=config_key
-        )
-
     async def save_new_role(self, guild_id: int, role_id: int) -> bool:
         write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
@@ -78,7 +62,7 @@ class MainSettingsService(DBBaseService):
 
         return bool(result)
 
-    async def _save_new_value(self, guild: discord.Guild, config_key: str) -> bool:
+    async def save_new_value(self, guild: discord.Guild, config_key: str) -> bool:
         current_value = self.settings.dict_storage.get_value(
             config_key,
             target=StorageTarget.SETTINGS,
@@ -86,6 +70,16 @@ class MainSettingsService(DBBaseService):
         )
 
         new_value = not current_value
+
+        if config_key == 'verification' and new_value:
+            channel = await self.service.get_verification_channel(guild=guild)
+            if channel:
+                await self.view_service.ensure_single_message(
+                    channel=channel,
+                    guild_id=guild.id
+                )
+        elif config_key == 'verification' and not new_value:
+            await self._cleanup_verification_message(guild=guild)
 
         write_scenario = self.db_factory.for_write_data(
             guild_id=guild.id,
@@ -123,8 +117,11 @@ class MainSettingsService(DBBaseService):
         if not msg_id:
             return
 
-        message = await channel.fetch_message(msg_id)
-        await message.delete()
+        try:
+            message = await channel.fetch_message(msg_id)
+            await message.delete()
+        except discord.NotFound:
+            pass
 
         delete_msg = self.db_factory.for_delete_set(
             guild_id=guild.id,

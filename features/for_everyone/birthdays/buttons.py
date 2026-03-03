@@ -6,39 +6,39 @@ import discord
 
 from core.navigator.params_containers import MainMenuParams
 from core.navigator.routes import Route
-from core.navigator.navigator_context import NavigationContext
 
 from features.for_everyone.birthdays.flow import BirthdayFlow
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.birthdays.service import BirthdayService
 
 
 class BirthdayMenuButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, service: BirthdayService):
+    def __init__(self, navigator: Navigator, context: NavigationContext, service: BirthdayService):
         super().__init__(
             label='🎂 Birthdays',
             style=discord.ButtonStyle.secondary
         )
 
         self.navigator = navigator
+        self.context = context
         self.service = service
 
     async def callback(self, interaction: discord.Interaction):
         view = self.navigator.birthday_menu()
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.MAIN_MENU,
-                     params=MainMenuParams(
-                         guild_id=interaction.guild_id,
-                         user_id=interaction.user.id,
-                         owner_id=interaction.guild.owner_id
-                     ))
+        self.context.push(
+            target=Route.MAIN_MENU,
+            params=MainMenuParams(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                owner_id=interaction.guild.owner_id
+                )
+        )
 
         await interaction.response.edit_message(
             content='🎂 Birthday management',

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.params_containers import AdminMenuParams
 from core.navigator.routes import Route
 
@@ -14,18 +13,22 @@ from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from features.for_admins.delete_message.service import DeleteMessageService
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
+    from features.for_admins.delete_message.service import DeleteMessageService
 
 
 class DeleteMessageFlow:
     def __init__(
             self,
             delete_msg_service: DeleteMessageService,
-            navigator: Navigator
+            navigator: Navigator,
+            context: NavigationContext
     ):
-        self.service = delete_msg_service
+
         self.navigator = navigator
+        self.context = context
+        self.service = delete_msg_service
 
     async def delete_message_start(self, interaction: discord.Interaction) -> None:
         options = self._build_options(guild=interaction.guild)
@@ -44,15 +47,13 @@ class DeleteMessageFlow:
             callback=self._send_modal
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
-
-        context.push(target=Route.ADMIN_MENU,
-                     params=AdminMenuParams(
-                         guild_id=interaction.guild_id
-                     ))
+        view.context = self.context
+        self.context.push(
+            target=Route.ADMIN_MENU,
+            params=AdminMenuParams(
+                guild_id=interaction.guild_id
+                )
+        )
 
         await interaction.response.edit_message(view=view)
 

@@ -8,17 +8,17 @@ from database.settings_storage.settings_manager import StorageTarget
 
 from features.for_admins.delete_message.buttons import DeleteMessageButton
 from features.for_admins.edit_settings.menu_button import EditSettingsMenuButton
-from features.for_admins.send_anon_messages.button import SendMessageButton
+from features.for_admins.send_messages.buttons import SendMessageMenu
 from features.for_admins.superusers.buttons import SuperusersMenuButton
 
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from database.settings_storage.settings import SettingsStorage
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.delete_message.service import DeleteMessageService
-    from features.for_admins.send_anon_messages.service import SendAnonMessageService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -26,11 +26,11 @@ class AdminMenuView(discord.ui.View):
     def __init__(
         self,
         navigator: Navigator,
+        context: NavigationContext,
         settings: SettingsStorage,
         superusers_formatter: SuperusersFormatter,
-        buttons_protection: ButtonProtectionService,
+        protection_service: ButtonProtectionService,
         delete_msg_service: DeleteMessageService,
-        send_msg_service: SendAnonMessageService,
         guild_id: int
     ):
         super().__init__(timeout=60)
@@ -42,24 +42,29 @@ class AdminMenuView(discord.ui.View):
 
         self.add_item(SuperusersMenuButton(
             navigator=navigator,
+            context=context,
             formatter=superusers_formatter,
-            buttons_protection=buttons_protection
+            buttons_protection=protection_service
         ))
+
         self.add_item(DeleteMessageButton(
             navigator=navigator,
+            context=context,
             delete_msg_service=delete_msg_service,
-            buttons_protection=buttons_protection
+            buttons_protection=protection_service
         ))
+
         self.add_item(EditSettingsMenuButton(
             navigator=navigator,
-            buttons_protection=buttons_protection
+            context=context,
+            buttons_protection=protection_service
         ))
 
         if config.get('send_messages'):
-            self.add_item(SendMessageButton(
+            self.add_item(SendMessageMenu(
                 navigator=navigator,
-                send_msg_service=send_msg_service,
-                buttons_protection=buttons_protection
+                context=context,
+                protection_service=protection_service
             ))
 
         self.add_item(BackButton(navigator=navigator))

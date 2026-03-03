@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from dataclasses import asdict
 
@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from core.general_services_container import GeneralContainer
     from features.for_admins.module import AdministrationModule
     from features.for_everyone.module import EveryoneModule
+    from core.navigator.navigator_context import NavigationContext
 
 
 class Navigator:
@@ -33,20 +34,19 @@ class Navigator:
             Route.ROLE_MANAGER_MENU: self.role_manager_menu,
             Route.HIDDEN_CHANNELS_MENU: self.hidden_channels_menu,
             Route.HIDDEN_ROLES_MENU: self.hidden_roles_menu,
-            Route.SYSTEM_CHANNELS_MENU: self.system_channels_menu
+            Route.SYSTEM_CHANNELS_MENU: self.system_channels_menu,
+            Route.SEND_MESSAGE_MENU: self.send_message_menu,
         }
 
-    def go(self, route: Route, params: Any | None = None):
+    def go(self, route: Route, context: NavigationContext, params=None):
         factory = self.routes.get(route)
-        if not factory:
-            raise ValueError(f'Unknown route: {route}')
 
         if params:
-            return factory(**asdict(params))
+            return factory(**asdict(params), context=context)
 
-        return factory()
+        return factory(context=context)
 
-    def main_menu(self, guild_id: int, user_id: int, owner_id: int):
+    def main_menu(self, guild_id: int, user_id: int, owner_id: int, context: NavigationContext):
         from features.for_everyone.main_menu.view import MainMenuView
         birthday_module = self.everyone_module.birthday_module
         return MainMenuView(
@@ -56,32 +56,33 @@ class Navigator:
                 birthday_service=birthday_module.service,
                 guild_id=guild_id,
                 user_id=user_id,
-                owner_id=owner_id
+                owner_id=owner_id,
+                context=context
             )
 
-    def admin_menu(self, guild_id: int):
+    def admin_menu(self, guild_id: int, context: NavigationContext):
         from features.for_admins.admin_menu_view import AdminMenuView
 
         superusers_module = self.admin_module.superusers_module
         delete_msg_module = self.admin_module.delete_msg_module
-        send_msg_module = self.admin_module.send_message_module
 
         return AdminMenuView(
             navigator=self,
+            context=context,
             settings=self.general_container.settings,
             superusers_formatter=superusers_module.superusers_formatter,
             delete_msg_service=delete_msg_module.delete_msg_service,
-            buttons_protection=self.general_container.button_protection,
-            send_msg_service=send_msg_module.send_message_service,
+            protection_service=self.general_container.button_protection,
             guild_id=guild_id
         )
 
-    def settings_menu(self):
+    def settings_menu(self, context: NavigationContext):
         from features.for_admins.edit_settings.menu_view import SettingsMenuView
         edit_settings_container = self.admin_module.edit_main_settings_module
 
         return SettingsMenuView(
             navigator=self,
+            context=context,
             main_settings_service=edit_settings_container.main_settings_service,
             settings_formatter=edit_settings_container.formatter,
             buttons_protection=self.general_container.button_protection,
@@ -104,7 +105,7 @@ class Navigator:
             flow=flow
         )
 
-    def superusers_menu(self):
+    def superusers_menu(self, context: NavigationContext):
         from features.for_admins.superusers.flow import SuperusersFlow
         from features.for_admins.superusers.menu_view import SuperusersMenuView
 
@@ -112,6 +113,7 @@ class Navigator:
 
         flow = SuperusersFlow(
             navigator=self,
+            context=context,
             superusers_service=superusers_module.superusers_service,
             formatter=superusers_module.superusers_formatter
         )
@@ -138,7 +140,7 @@ class Navigator:
             flow=flow
         )
 
-    def role_manager_menu(self):
+    def role_manager_menu(self, context: NavigationContext):
         from features.for_everyone.role_manager.flow import RoleManagerFlow
         from features.for_everyone.role_manager.menu_view import RoleManagerView
 
@@ -146,6 +148,7 @@ class Navigator:
 
         flow = RoleManagerFlow(
             navigator=self,
+            context=context,
             service=role_manager_module.service
         )
 
@@ -154,7 +157,7 @@ class Navigator:
             flow=flow
         )
 
-    def hidden_channels_menu(self):
+    def hidden_channels_menu(self, context: NavigationContext):
         from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
         from features.for_admins.edit_settings.views import HiddenChannelsMenuView
 
@@ -162,6 +165,7 @@ class Navigator:
 
         flow = HiddenChannelsFlow(
             navigator=self,
+            context=context,
             formatter=edit_settings_container.formatter,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
             cleanup_service=self.general_container.cleanup_service
@@ -173,7 +177,7 @@ class Navigator:
             flow=flow
         )
 
-    def hidden_roles_menu(self):
+    def hidden_roles_menu(self, context: NavigationContext):
         from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
         from features.for_admins.edit_settings.views import HiddenRolesMenuView
 
@@ -181,6 +185,7 @@ class Navigator:
 
         flow = HiddenRolesFlow(
             navigator=self,
+            context=context,
             formatter=edit_settings_container.formatter,
             hidden_roles_service=edit_settings_container.hidden_roles_service,
             cleanup_service=self.general_container.cleanup_service
@@ -192,7 +197,7 @@ class Navigator:
             flow=flow
         )
 
-    def system_channels_menu(self):
+    def system_channels_menu(self, context: NavigationContext):
         from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
         from features.for_admins.edit_settings.views import SystemChannelsMenuView
 
@@ -200,6 +205,7 @@ class Navigator:
 
         flow = SystemChannelsFlow(
             navigator=self,
+            context=context,
             sys_channels_service=edit_settings_container.system_channels_service,
             formatter=edit_settings_container.formatter
         )
@@ -208,4 +214,28 @@ class Navigator:
             navigator=self,
             buttons_protection=self.general_container.button_protection,
             flow=flow
+        )
+
+    def send_message_menu(self):
+        from features.for_admins.send_messages.flows.send_message_flow import SendMessageFlow
+        from features.for_admins.send_messages.flows.send_rules_flow import SendRulesFlow
+        from features.for_admins.send_messages.view import SendMessageMenuView
+
+        message_module = self.admin_module.message_module
+
+        message_flow = SendMessageFlow(
+            navigator=self,
+            message_service=message_module.send_message_service
+        )
+
+        rules_fow = SendRulesFlow(
+            navigator=self,
+            rules_service=message_module.rules_service
+        )
+
+        return SendMessageMenuView(
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            messages_flow=message_flow,
+            rules_flow=rules_fow
         )

@@ -17,8 +17,9 @@ class BackButton(discord.ui.Button):
         self.navigator = navigator
 
     async def callback(self, interaction: discord.Interaction):
-        context = getattr(self.view, 'context', None)
+        context = self.view.context
         if not context:
+            print('Контекст не передано у BackButton')
             return
 
         prev = context.pop()
@@ -27,7 +28,11 @@ class BackButton(discord.ui.Button):
 
         target, params = prev
 
-        view = self.navigator.go(target, params)
+        view = self.navigator.go(
+            route=target,
+            params=params,
+            context=context
+        )
 
         view.context = context
 

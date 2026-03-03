@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.navigator_context import NavigationContext
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -12,12 +11,20 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed, War
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.role_manager.services import RoleManagerService
 
 
 class RoleManagerFlow:
-    def __init__(self, navigator: Navigator, service: RoleManagerService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            context: NavigationContext,
+            service: RoleManagerService
+    ):
+
         self.navigator = navigator
+        self.context = context
         self.service = service
 
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -40,13 +47,9 @@ class RoleManagerFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
+        view.context = self.context
 
-        if context is None:
-            context = NavigationContext()
-            view.context = context
-
-        context.push(target=Route.ROLE_MANAGER_MENU)
+        self.context.push(target=Route.ROLE_MANAGER_MENU)
 
         await interaction.response.edit_message(view=view)
 
@@ -70,12 +73,9 @@ class RoleManagerFlow:
             max_values=min(25, len(options))
         )
 
-        context = getattr(view, 'context', None)
-        if context is None:
-            context = NavigationContext()
-            view.context = context
+        view.context = self.context
 
-        context.push(target=Route.ROLE_MANAGER_MENU)
+        self.context.push(target=Route.ROLE_MANAGER_MENU)
 
         await interaction.response.edit_message(view=view)
 
