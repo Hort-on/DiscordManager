@@ -37,9 +37,10 @@ class DB:
                     
                     block_users INTEGER NOT NULL DEFAULT 0,
                     invitation_checking INTEGER NOT NULL DEFAULT 0,
-                    spam_check INTEGER NOT NULL DEFAULT 0,
+                    spam_checking INTEGER NOT NULL DEFAULT 0,
                     member_left INTEGER NOT NULL DEFAULT 0,
-                    bad_words_handler INTEGER NOT NULL DEFAULT 0,
+                    bad_words_checking INTEGER NOT NULL DEFAULT 0,
+                    caps_checking INTEGER NOT NULL DEFAULT 0,
                 
                     send_messages INTEGER NOT NULL DEFAULT 1,
                     write_audit_log INTEGER NOT NULL DEFAULT 1,

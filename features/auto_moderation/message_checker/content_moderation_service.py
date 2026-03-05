@@ -1,13 +1,53 @@
-from features.for_admins._ import UserManager
+from __future__ import annotations
 
-from database.db_factory.db_scenario_factory import DBFactory
+from typing import TYPE_CHECKING
+
+from collections import defaultdict, deque
+import time
+
+import discord
+
+if TYPE_CHECKING:
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
 
 
-class MessageContentChecker:
-    def __init__(self, db_factory: DBFactory):
+class ContentModerationService:
+    def __init__(self, db_factory: DBFactory, settings: SettingsStorage):
+
         self.db_factory = db_factory
+        self.settings = settings
 
-    def db_info(self, interaction, user_id):
+        self.violators_list = []
+
+        self.user_spam = defaultdict(lambda: deque(maxlen=5))
+        self.user_caps = defaultdict(lambda: deque(maxlen=5))
+
+    def is_spam(self, message: discord.Message) -> bool:
+        now = time.monotonic()
+
+        key = (message.author.id, message.channel.id)
+
+        timestamps = self.user_spam[key]
+        timestamps.append(now)
+
+        return len(timestamps) == 5 and (timestamps[-1] - timestamps[0] <= 5)
+
+    def is_caps(self, message: discord.Message) -> bool:
+        text = message.content
+        total_chars = len(text)
+        if total_chars == 0:
+            return False
+
+        uppercase_chars = sum(1 for char in text if char.isupper())
+        uppercase_ratio = uppercase_chars / total_chars
+
+        return uppercase_ratio >= 0.8
+
+    def is_invitation(self, message: discord.Message) -> bool:
+        ...
+
+    def is_bad_word(self, message: discord.Message) -> bool:
         ...
 
     async def handle_spam(self, message):
@@ -50,14 +90,7 @@ class MessageContentChecker:
             return
 
     def is_caps(self, text):
-        total_chars = len(text)
-        if total_chars == 0:
-            return False
 
-        uppercase_chars = sum(1 for char in text if char.isupper())
-        uppercase_ratio = uppercase_chars / total_chars
-
-        return uppercase_ratio >= 0.6
 
     async def handle_bad_games(self, message, nick):
         if message.channel.id == EXCLUDED_CHANNEL:  # TODO: добавити список каналів котрі будуть ігноруватись в бд
