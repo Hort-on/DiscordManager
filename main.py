@@ -13,6 +13,7 @@ from core.navigator.navigator import Navigator
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 from database.db_factory.db_scenario_factory import DBFactory
+from features.auto_moderation.message_moderation.module import build_automod_module
 
 from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
@@ -20,7 +21,6 @@ from features.for_admins.module import build_admin_module
 from features.for_admins.send_messages.services.send_rules_service import RulesService
 from features.for_everyone.module import build_everyone_module
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
-# from features.auto_moderation.message_handler.bad_words_handler import BadWordsHandler
 
 from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
@@ -77,6 +77,10 @@ async def main():
         db_factory=db_factory
     )
 
+    automod_module = build_automod_module(
+        settings=settings
+    )
+
     general_container = GeneralContainer(
         logger=logger,
         db_connect=db_connect,
@@ -101,10 +105,9 @@ async def main():
         db_factory=db_factory,
         verification_service=verification_service,
         verification_view_service=verification_view_service,
-        rules_service=rules_service
+        rules_service=rules_service,
+        moderation_service=automod_module
     )
-
-    await bot.load_extension('cogs.management_cog')
 
     await bot.start(TOKEN)
 

@@ -24,25 +24,22 @@ class DB:
             await temp_conn.execute('''
                 CREATE TABLE IF NOT EXISTS GuildSettings (
                     guild_id INTEGER PRIMARY KEY,
-                    
                     language TEXT NOT NULL DEFAULT 'en',
-                
                     birthday INTEGER NOT NULL DEFAULT 0,
-                    
                     congrats INTEGER NOT NULL DEFAULT 0,
                 
                     verification INTEGER NOT NULL DEFAULT 0,
                     verification_role_id INTEGER DEFAULT NULL,
                     verification_message_id INTEGER DEFAULT NULL,
                     
-                    block_users INTEGER NOT NULL DEFAULT 0,
-                    invitation_checking INTEGER NOT NULL DEFAULT 0,
+                    invitation_blocking INTEGER NOT NULL DEFAULT 0,
                     spam_checking INTEGER NOT NULL DEFAULT 0,
-                    member_left INTEGER NOT NULL DEFAULT 0,
-                    bad_words_checking INTEGER NOT NULL DEFAULT 0,
+                    flood_checking INTEGER NOT NULL DEFAULT 0,
                     caps_checking INTEGER NOT NULL DEFAULT 0,
                 
                     send_messages INTEGER NOT NULL DEFAULT 1,
+                    member_left INTEGER NOT NULL DEFAULT 0,
+                    block_users INTEGER NOT NULL DEFAULT 0,
                     write_audit_log INTEGER NOT NULL DEFAULT 1,
                     role_manager INTEGER NOT NULL DEFAULT 0,
                     anti_bot INTEGER NOT NULL DEFAULT 0
@@ -171,19 +168,6 @@ class DB:
                         ON DELETE CASCADE
                 );
             ''')
-
-            await temp_conn.execute("""
-                CREATE TABLE IF NOT EXISTS BadWords (
-                    guild_id INTEGER NOT NULL,
-                    word TEXT NOT NULL CHECK (length(trim(word)) > 0),
-
-                    PRIMARY KEY (guild_id, word),
-
-                    FOREIGN KEY (guild_id)
-                        REFERENCES GuildSettings(guild_id)
-                        ON DELETE CASCADE
-                );
-            """)
 
             await temp_conn.commit()
         except Exception as e:

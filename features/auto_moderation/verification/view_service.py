@@ -57,6 +57,10 @@ class VerificationViewService:
         async for message in channel.history(limit=25):
             if message.author == self.bot.user and message.components:
                 found = True
+                await self.service.save_message_id(
+                    message_id=message.id,
+                    guild_id=guild_id
+                )
                 break
 
         if not found:

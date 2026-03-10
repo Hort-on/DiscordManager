@@ -6,11 +6,6 @@ import discord
 
 from event_services.member_left import MemberLeftNotification
 
-# from discord.ext import tasks
-# from general_services.utils.bad_words import invitation_pattern
-
-# from modules.management.verification.check_verification import CheckVerification
-
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
@@ -18,6 +13,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.verification.service import VerificationService
     from features.auto_moderation.verification.view_service import VerificationViewService
     from features.for_admins.send_messages.services.send_rules_service import RulesService
+    from features.auto_moderation.message_moderation.module import AutoModModule
 
 
 class Controller:
@@ -29,7 +25,8 @@ class Controller:
             navigator: Navigator,
             verification_service: VerificationService,
             verification_view_service: VerificationViewService,
-            rules_service: RulesService
+            rules_service: RulesService,
+            moderation_service: AutoModModule
     ):
         self.bot = bot
         self.settings = settings
@@ -38,6 +35,7 @@ class Controller:
         self.verification_service = verification_service
         self.verification_view_service = verification_view_service
         self.rules_service = rules_service
+        self.moderation_service = moderation_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -48,7 +46,6 @@ class Controller:
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:
         print(f'Ми приєдналися як {self.bot.user.name}')
-        # await CheckVerification(parent=self).prepare()
 
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()
@@ -57,10 +54,7 @@ class Controller:
         await self.verification_view_service.register_persistent_view()
         await self.verification_view_service.ensure_all_guild_messages()
 
-    async def on_message(self, message) -> None:
-        # TODO: потрібно зробити перевірку суперюзерів з бд
-        # TODO: потрібно переписати on_message, зробити більш простим та читабельним
-
+    async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
             return
 
@@ -70,34 +64,7 @@ class Controller:
                 user_id=message.author.id
             )
 
-        # if message.guild:
-        #     nick = message.author.nick if message.author.nick else message.author.name
-        #
-        #     if invitation_pattern.search(message.content):
-        #         await invitation_check(nick, message)
-        #
-        #     cleaned_message = bad_words.remove_punctuation(message.content.lower())
-        #     original_message = cleaned_message
-        #     cleaned_message = bad_words.replace_similar_chars(cleaned_message)
-        #
-        #     if blacklist_word_pattern.search(cleaned_message):
-        #         await bad_words.check_for_bad_words(message, nick)
-        #     elif blacklist_word_pattern.search(original_message):
-        #         await bad_words.check_for_bad_words(message, nick)
-        #
-        #     if blacklist_games_pattern.search(cleaned_message):
-        #         await handle_bad_games(message, nick)
-        #     elif blacklist_games_pattern.search(original_message):
-        #         await handle_bad_games(message, nick)
-        #
-        #     if len(message.content) > 5 and is_caps(message.content):
-        #         await message.delete()
-        #         await message.channel.send(f"```{nick}, please stop using the caps.```")
-        #         return
-        #
-        #     await handle_spam(message)
-        #
-        # await self.handle_message(message)
+        await self.moderation_service.moderation_service.process_message(message=message)
 
     async def on_member_remove(self, member) -> None:
         await MemberLeftNotification(bot=self.bot, settings=self.settings).check_if_notification(member)
@@ -118,7 +85,3 @@ class Controller:
     # async def daily_birthday_check(self) -> None:
     #     await self.birthday_manager.check_daily_birthday()
     #
-    # # --------------------------- MESSAGE HANDLING ---------------------------
-    #
-    # async def handle_message(self, message):
-    #     ...

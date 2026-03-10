@@ -138,10 +138,12 @@ class MainSettingsFlow:
             guild_id=guild_id
         )
 
+        keys_to_skip = ['guild_id', 'verification_message_id']
+
         return [
             discord.SelectOption(
                 label=k.replace('_', ' ').title(),
                 value=k
             )
-            for k, v in sorted(current_settings.items(), key=lambda item: item[0])
+            for k, v in sorted(current_settings.items(), key=lambda item: item[0]) if k not in keys_to_skip
         ]

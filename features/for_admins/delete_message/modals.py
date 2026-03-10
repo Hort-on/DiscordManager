@@ -46,9 +46,9 @@ class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
             )
             return
 
-        if not 1 <= amount <= 100:
+        if not 1 <= amount <= 300:
             error_embed = ErrorEmbed(
-                description='Amount must be between 1 and 100.'
+                description='Amount must be between 1 and 300.'
             )
             await interaction.response.send_message(
                 embed=error_embed,
