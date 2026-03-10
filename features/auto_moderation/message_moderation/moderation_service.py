@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-import xxhash
 
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
@@ -75,15 +74,6 @@ class ModerationService:
             if result.value:
                 await self._timeout_for_spam(messages=result.messages, guild=message.guild)
                 return
-
-        content_hash = xxhash.xxh64(self.service.normalize_text(message.content)).intdigest()
-        result = self.service.check_mass_message(
-            content_hash=content_hash,
-            message=message,
-            timestamp=timestamp,
-        )
-        if result.value:
-            await self._timeout_for_spam(messages=result.messages, guild=message.guild)
 
     @staticmethod
     async def _timeout_for_flood(member: discord.Member) -> None:

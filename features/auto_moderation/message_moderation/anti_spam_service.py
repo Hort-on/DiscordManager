@@ -20,8 +20,6 @@ class SpamResult:
 
 
 class AntiSpamService:
-    TIME_WINDOW = 30
-
     def __init__(self, settings: SettingsStorage):
         self.settings = settings
 
@@ -54,24 +52,6 @@ class AntiSpamService:
 
         return ''.join(result)[:300]
 
-    def _cleanup(self, guild_id: int, cache: dict, key, timestamp: float) -> None:
-        """Remove expired entries from a cache deque.
-
-        Supports both plain-timestamp deques and (timestamp, message) tuple deques.
-        """
-        history = cache[guild_id][key]
-
-        while history:
-            entry = history[0]
-            t = entry[0] if isinstance(entry, tuple) else entry
-            if timestamp - t > self.TIME_WINDOW:
-                history.popleft()
-            else:
-                break
-
-        if not history:
-            del cache[guild_id][key]
-
     def check_flood(self, guild_id: int, user_id: int, timestamp: float) -> bool:
         """Return True if the user sent FLOOD_LIMIT messages within 5 seconds."""
         self._cleanup(guild_id, self.user_message_times, user_id, timestamp)
@@ -97,9 +77,13 @@ class AntiSpamService:
         if len(message.content) <= 4:
             return SpamResult(value=False)
 
-        self._cleanup(guild_id, cache, key, timestamp)
-
         history = cache[guild_id][key]
+        self._cleanup(
+            guild_id=guild_id,
+            cache=cache,
+            key=key,
+            timestamp=timestamp
+        )
         history.append((timestamp, message))
 
         known: list[discord.Message] = [msg for _, msg in history]
@@ -108,21 +92,6 @@ class AntiSpamService:
             return SpamResult(value=True, messages=known)
 
         return SpamResult(value=False)
-
-    def check_mass_message(
-        self,
-        content_hash: int,
-        message: discord.Message,
-        timestamp: float,
-    ) -> SpamResult:
-        """Detect the same message content being sent repeatedly."""
-        return self._detect_spam(
-            cache=self.content_cache,
-            key=content_hash,
-            guild_id=message.guild.id,
-            timestamp=timestamp,
-            message=message,
-        )
 
     def check_link_spam(self, message: discord.Message, timestamp: float) -> SpamResult:
         """Detect repeated links from the same domain. Checks all links in the message."""
@@ -216,3 +185,22 @@ class AntiSpamService:
     @staticmethod
     def is_similar(hash1: int, hash2: int, threshold: int = 5) -> bool:
         return (hash1 ^ hash2).bit_count() <= threshold
+
+    @staticmethod
+    def _cleanup(guild_id: int, cache: dict, key: str | int, timestamp: float) -> None:
+        """Removes expired entries from a cache deque.
+
+        Supports both plain-timestamp deques and (timestamp, message) tuple deques.
+        """
+        history = cache[guild_id][key]
+
+        while history:
+            entry = history[0]
+            t = entry[0] if isinstance(entry, tuple) else entry
+            if timestamp - t > 60:
+                history.popleft()
+            else:
+                break
+
+        if not history:
+            del cache[guild_id][key]
