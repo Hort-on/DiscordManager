@@ -74,11 +74,8 @@ class ModerationService:
             result = self.service.check_link_spam(message=message, timestamp=timestamp)
             if result.value:
                 await self._timeout_for_spam(messages=result.messages, guild=message.guild)
-                await self._handle_mass_message(message=message, timestamp=timestamp)
+                return
 
-    # TODO: не працює
-    async def _handle_mass_message(self, message: discord.Message, timestamp: float) -> None:
-        """Check whether identical (normalized) content is being sent across many messages."""
         content_hash = xxhash.xxh64(self.service.normalize_text(message.content)).intdigest()
         result = self.service.check_mass_message(
             content_hash=content_hash,
@@ -128,7 +125,7 @@ class ModerationService:
         user_list = '\n'.join(actioned_names)
         await self._send_notification(
             guild=guild,
-            message=f'The following users were actioned for raiding:\n{user_list} and have been banned',
+            message=f'The following users were actioned for raiding: \n{user_list}\n and have been banned',
         )
 
     async def _delete_invitation(self, message: discord.Message) -> None:
