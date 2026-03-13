@@ -14,10 +14,11 @@ from ui.buttons.back_button import BackButton
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
-    from features.for_admins.edit_settings.services.main_settings import MainSettingsService
+    from features.for_admins.edit_settings.services.main_settings.main_service import MainSettingsService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
+    from features.for_admins.edit_settings.services.main_settings.role_service import VerificationRoleService
     from general_services.other_services.cleanup_service import CleanUpService
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -32,41 +33,51 @@ class SettingsMenuView(discord.ui.View):
             buttons_protection: ButtonProtectionService,
             hidden_ch_service: HiddenChannelsService,
             hidden_role_service: HiddenRolesService,
+            service_for_role: VerificationRoleService,
             cleanup_service: CleanUpService
     ):
         super().__init__(timeout=60)
 
-        self.add_item(MainSettingsButton(
-            navigator=navigator,
-            context=context,
-            main_settings_service=main_settings_service,
-            formatter=settings_formatter,
-            buttons_protection=buttons_protection
-        ))
+        self.add_item(
+            MainSettingsButton(
+                navigator=navigator,
+                context=context,
+                main_settings_service=main_settings_service,
+                formatter=settings_formatter,
+                buttons_protection=buttons_protection,
+                service_for_role=service_for_role
+            )
+        )
 
-        self.add_item(SystemChannelsMenuButton(
-            navigator=navigator,
-            context=context,
-            buttons_protection=buttons_protection,
-            formatter=settings_formatter,
-        ))
+        self.add_item(
+            SystemChannelsMenuButton(
+                navigator=navigator,
+                context=context,
+                buttons_protection=buttons_protection,
+                formatter=settings_formatter,
+            )
+        )
 
-        self.add_item(HiddenChannelsMenuButtons(
-            navigator=navigator,
-            context=context,
-            buttons_protection=buttons_protection,
-            formatter=settings_formatter,
-            hidden_ch_service=hidden_ch_service,
-            cleanup_service=cleanup_service
-        ))
+        self.add_item(
+            HiddenChannelsMenuButtons(
+                navigator=navigator,
+                context=context,
+                buttons_protection=buttons_protection,
+                formatter=settings_formatter,
+                hidden_ch_service=hidden_ch_service,
+                cleanup_service=cleanup_service
+            )
+        )
 
-        self.add_item(HiddenRolesMenuButton(
-            navigator=navigator,
-            context=context,
-            buttons_protection=buttons_protection,
-            formatter=settings_formatter,
-            hidden_roles_service=hidden_role_service,
-            cleanup_service=cleanup_service
-        ))
+        self.add_item(
+            HiddenRolesMenuButton(
+                navigator=navigator,
+                context=context,
+                buttons_protection=buttons_protection,
+                formatter=settings_formatter,
+                hidden_roles_service=hidden_role_service,
+                cleanup_service=cleanup_service
+            )
+        )
 
         self.add_item(BackButton(navigator=navigator))

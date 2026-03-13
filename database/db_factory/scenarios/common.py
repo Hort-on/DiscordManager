@@ -44,7 +44,7 @@ class WriteData(DataBaseScenario):
             logger: Logger,
             guild_id: int,
             table_name: str,
-            data: dict[str, int]
+            data: dict[str, int | str]
     ):
         super().__init__(
             db_connect=db_connect,

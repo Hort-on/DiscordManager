@@ -6,7 +6,8 @@ from dataclasses import dataclass
 
 from .services.hidden_channels import HiddenChannelsService
 from .services.hidden_roles import HiddenRolesService
-from .services.main_settings import MainSettingsService
+from .services.main_settings.main_service import MainSettingsService
+from .services.main_settings.role_service import VerificationRoleService
 from .services.system_channels import SystemChannelsService
 from .services.settings_formatter import SettingsFormatter
 from ...auto_moderation.verification.view_service import VerificationViewService
@@ -26,6 +27,7 @@ class EditSettingsModule:
     system_channels_service: SystemChannelsService
     formatter: SettingsFormatter
     main_settings_service: MainSettingsService
+    verification_role_service: VerificationRoleService
 
 
 def build_edit_settings_module(
@@ -69,10 +71,16 @@ def build_edit_settings_module(
         verification_view_service=verification_view_service
     )
 
+    verification_role_service = VerificationRoleService(
+        settings=settings,
+        db_factory=db_factory
+    )
+
     return EditSettingsModule(
         hidden_channel_service=hidden_channel_service,
         hidden_roles_service=hidden_roles_service,
         system_channels_service=system_channels_service,
         formatter=formatter,
-        main_settings_service=main_settings_service
+        main_settings_service=main_settings_service,
+        verification_role_service=verification_role_service
     )

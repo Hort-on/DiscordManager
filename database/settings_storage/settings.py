@@ -7,6 +7,7 @@ from database.settings_storage.settings_manager import (
 )
 
 from database.db_factory.db_scenario_factory import DBFactory
+from general_services.utils.translations import TRANSLATIONS
 
 
 class SettingsStorage:
@@ -21,19 +22,20 @@ class SettingsStorage:
         self._guild_hidden_channels: dict[int, set[int]] = {}
         self._guild_hidden_roles: dict[int, set[int]] = {}
         self._guild_superusers: dict[int, set[int]] = {}
-        self._guild_bad_words: dict[int, set[str]] = {}
+
+        self._guild_languages: dict[int, dict[str, str]] = {}
 
         self.set_storage: SetStorageManager = SetStorageManager({
             StorageTarget.HIDDEN_CHANNELS: self._guild_hidden_channels,
             StorageTarget.SUPERUSERS: self._guild_superusers,
             StorageTarget.HIDDEN_ROLES: self._guild_hidden_roles,
-            StorageTarget.BAD_WORDS: self._guild_bad_words
         })
 
         self.dict_storage: DictStorageManager = DictStorageManager({
             StorageTarget.SETTINGS: self._guild_settings,
             StorageTarget.SYSTEM_CHANNELS: self._guild_system_channels,
-            StorageTarget.CHANNELS_TO_SEND: self._guild_channels_to_send
+            StorageTarget.CHANNELS_TO_SEND: self._guild_channels_to_send,
+            StorageTarget.LANGUAGE: self._guild_languages
         })
 
     async def load_all_guilds_settings(self) -> None:
@@ -57,6 +59,8 @@ class SettingsStorage:
 
         if result:
             self._guild_settings[guild_id] = result[0]
+            lang = result[0].get('language')
+            self._guild_languages[guild_id] = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
 
         # ------------------------------- load system channels -------------------------------- #
         sys_channels = self.db_factory.for_fetch_all(
@@ -122,16 +126,4 @@ class SettingsStorage:
         if hidden_roles:
             self._guild_hidden_roles[guild_id] = {
                 row['role_id'] for row in hidden_roles
-            }
-
-        # ------------------------------ load guilds bad words -------------------------------- #
-        get_bad_words = self.db_factory.for_fetch_all(
-            guild_id=guild_id,
-            table_name='bad_words'
-        )
-        bad_words = await get_bad_words.db_proceed()
-
-        if bad_words:
-            self._guild_bad_words[guild_id] = {
-                row['word'] for row in bad_words
             }

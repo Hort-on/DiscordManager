@@ -8,7 +8,7 @@ class StorageTarget(Enum):
     CHANNELS_TO_SEND = auto()
     SUPERUSERS = auto()
     HIDDEN_ROLES = auto()
-    BAD_WORDS = auto()
+    LANGUAGE = auto()
 
 
 class SetStorageManager:

@@ -47,7 +47,7 @@ class DBFactory:
             *columns
         )
 
-    def for_write_data(self, guild_id: int, table_name: str, data: dict[str, int]) -> WriteData:
+    def for_write_data(self, guild_id: int, table_name: str, data: dict[str, int | str]) -> WriteData:
         return WriteData(
             db_connect=self.db_connect,
             logger=self.logger,

@@ -48,20 +48,6 @@ class MainSettingsService(DBBaseService):
 
         return bool(result)
 
-    async def save_new_role(self, guild_id: int, role_id: int) -> bool:
-        write_scenario = self.db_factory.for_write_data(
-            guild_id=guild_id,
-            table_name='settings',
-            data={'verification_role_id': role_id}
-        )
-
-        result = await self.update_db_and_cache(
-            scenario=write_scenario,
-            guild_id=guild_id
-        )
-
-        return bool(result)
-
     async def save_new_value(self, guild: discord.Guild, config_key: str) -> bool:
         current_value = self.settings.dict_storage.get_value(
             config_key,
@@ -94,7 +80,7 @@ class MainSettingsService(DBBaseService):
 
         return bool(result)
 
-    async def _cleanup_verification_message(self, guild):
+    async def _cleanup_verification_message(self, guild) -> None:
         channel_id = self.settings.dict_storage.get_value(
             'verification_channel_id',
             target=StorageTarget.SYSTEM_CHANNELS,
@@ -134,3 +120,23 @@ class MainSettingsService(DBBaseService):
             scenario=delete_msg,
             guild_id=guild.id
         )
+
+    async def save_new_language(self, guild_id: int) -> bool:
+        result = self.settings.dict_storage.get_value(
+            key='language',
+            target=StorageTarget.SETTINGS,
+            guild_id=guild_id
+        )
+
+        save_lang = self.db_factory.for_write_data(
+            guild_id=guild_id,
+            table_name='settings',
+            data={'language': f'{'uk' if result == 'en' else 'en'}'}
+        )
+
+        result = await self.update_db_and_cache(
+            scenario=save_lang,
+            guild_id=guild_id
+        )
+
+        return bool(result)
