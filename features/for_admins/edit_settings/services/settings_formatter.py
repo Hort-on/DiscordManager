@@ -11,7 +11,7 @@ import discord
 
 from database.settings_storage.settings_manager import StorageTarget
 
-from ui.embed_constructor.embed_constructor import WarningEmbed, InfoEmbed
+from ui.embed_constructor.embed_constructor import InfoEmbed
 
 
 class SettingsFormatter:
@@ -31,33 +31,28 @@ class SettingsFormatter:
             guild_id=interaction.guild_id
         )
 
-        if not settings:
-            return WarningEmbed(description='No settings found.')
+        lines: list[str] = [f'Setting{" " * 14}Status', f'{"-" * 23}  {"-" * 12}']
 
-        lines: list[str] = [f'Setting{' ' * 14}Status', f'{'-' * 23}  {'-' * 12}']
-
-        for key, value in sorted(settings.items(), key=lambda item: item[0]):
+        for key, value in sorted(settings.items()):
             if key == 'guild_id':
                 continue
 
-            if key == 'verification_role_id':
-                role = interaction.guild.get_role(value)
-                status = f'{role.name}' if value else '❌ not assigned'
-                config_name = key.removesuffix('_id').replace('_', ' ')
-                lines.append(f'🔸{config_name:<20}: {status}')
-                continue
-
-            if key == 'verification_message_id':
-                status = '✅ assigned' if value else '❌ not assigned'
-                config_name = key.removesuffix('_id').replace('_', ' ')
-                lines.append(f'🔸{config_name:<20}: {status}')
-                continue
-
-            status = '✅ Enabled' if value else '❌ Disabled'
-            config_name = key.replace('_', ' ')
+            config_name = key.removesuffix('_id').replace('_', ' ')
+            status = self._format_status(interaction=interaction, key=key, value=value)
             lines.append(f'🔸{config_name:<20}: {status}')
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
+
+    @staticmethod
+    def _format_status(interaction: discord.Interaction, key: str, value) -> str:
+        if key == 'verification_role_id':
+            role = interaction.guild.get_role(value)
+            return role.name if value else '❌ not assigned'
+
+        if key == 'verification_message_id':
+            return '✅ assigned' if value else '❌ not assigned'
+
+        return '✅ Enabled' if value else '❌ Disabled'
 
     async def format_current_system_channels(self, guild: discord.Guild) -> discord.Embed:
         not_found_ch: list[str] = []
@@ -90,72 +85,48 @@ class SettingsFormatter:
 
         return info_embed
 
-    async def format_current_hidden_channels(self, interaction: discord.Interaction) -> discord.Embed:
-        not_found_ch: set[int] = set()
+    async def format_current_hidden(
+            self,
+            interaction: discord.Interaction,
+            target: StorageTarget,
+    ) -> discord.Embed:
+        is_channel = target == StorageTarget.HIDDEN_CHANNELS
 
-        lines: list[str] = [f'Hidden channels:', f'{'-' * 16}']
+        guild = interaction.guild
 
-        hidden_channels = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_CHANNELS,
-            guild_id=interaction.guild_id
+        title = 'Hidden channels:' if is_channel else 'Hidden roles:'
+        not_found_label = '❌ HIDDEN CHANNELS NOT FOUND' if is_channel else '❌ HIDDEN ROLES NOT FOUND'
+
+        lines: list[str] = [title, '-' * 16]
+        not_found: set[int] = set()
+
+        items = self.settings.set_storage.for_set_get(
+            target=target,
+            guild_id=guild.id
         )
-        if not hidden_channels:
-            lines.append('❌ HIDDEN CHANNELS NOT FOUND')
-        else:
-            for channel_id in hidden_channels:
-                channel = interaction.client.get_channel(channel_id)
 
-                if not channel:
-                    not_found_ch.add(channel_id)
+        if not items:
+            lines.append(not_found_label)
+        else:
+            for item_id in items:
+                item = (
+                    guild.get_channel(item_id)
+                    if is_channel else
+                    guild.get_role(item_id)
+                )
+
+                if not item:
+                    not_found.add(item_id)
                     continue
 
-                channel_name = channel.name if channel else '❌ Not assigned'
-                lines.append(f'🔸 {channel_name}')
+                lines.append(f'🔸 {item.name}')
 
-        if not_found_ch:
-            msg = await self.service.clean_up_hidden_channels(
-                guild_id=interaction.guild_id,
-                values=not_found_ch
+        if not_found:
+            message = await (
+                self.service.clean_up_hidden_channels(guild_id=guild.id, values=not_found)
+                if is_channel else
+                self.service.clean_up_hidden_roles(guild_id=guild.id, role_ids=not_found)
             )
-            lines.append(f'\n\n{msg}')
+            lines.append(f'\n\n{message}')
 
-        description = '```text\n' + '\n'.join(lines) + '\n```'
-
-        info_embed = InfoEmbed(description=description)
-
-        return info_embed
-
-    async def format_current_hidden_roles(self, interaction: discord.Interaction) -> discord.Embed:
-        not_found_roles: set[int] = set()
-
-        lines: list[str] = [f'Hidden roles:', f'{'-' * 13}']
-
-        hidden_roles = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_ROLES,
-            guild_id=interaction.guild_id
-        )
-        if not hidden_roles:
-            lines.append('❌ HIDDEN ROLES NOT FOUND')
-        else:
-            for role_id in hidden_roles:
-                role = interaction.guild.get_role(role_id)
-
-                if not role:
-                    not_found_roles.add(role_id)
-                    continue
-
-                channel_name = role.name if role else '❌ Not assigned'
-                lines.append(f'🔸 {channel_name}')
-
-        if not_found_roles:
-            msg = await self.service.clean_up_hidden_roles(
-                guild_id=interaction.guild_id,
-                role_ids=not_found_roles
-            )
-            lines.append(f'\n\n{msg}')
-
-        description = '```text\n' + '\n'.join(lines) + '\n```'
-
-        info_embed = InfoEmbed(description=description)
-
-        return info_embed
+        return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')

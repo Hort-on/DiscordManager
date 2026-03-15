@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.navigator.routes import Route
+from database.settings_storage.settings_manager import StorageTarget
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -83,7 +84,10 @@ class HiddenRolesFlow:
 
     # ================================= METHODS FOR DELETE BUTTON =================================
     async def start_for_delete(self, interaction: discord.Interaction) -> None:
-        embed = await self.formatter.format_current_hidden_channels(interaction)
+        embed = await self.formatter.format_current_hidden(
+            interaction=interaction,
+            target=StorageTarget.HIDDEN_ROLES
+        )
 
         options = self._get_deletable_roles(
             interaction=interaction,
@@ -195,12 +199,18 @@ class HiddenRolesFlow:
             description=result_msg
         )
 
-        settings_embed = await self.formatter.format_current_hidden_roles(interaction)
+        settings_embed = await self.formatter.format_current_hidden(
+            interaction=interaction,
+            target=StorageTarget.HIDDEN_ROLES
+        )
 
         await interaction.response.edit_message(
             embeds=[settings_embed, success_embed]
         )
 
     async def for_roles_list(self, interaction: discord.Interaction):
-        embed = await self.formatter.format_current_hidden_roles(interaction)
+        embed = await self.formatter.format_current_hidden(
+            interaction=interaction,
+            target=StorageTarget.HIDDEN_ROLES
+        )
         await interaction.response.edit_message(embed=embed)

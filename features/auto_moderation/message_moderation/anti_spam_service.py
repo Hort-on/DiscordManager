@@ -20,6 +20,8 @@ class SpamResult:
 
 
 class AntiSpamService:
+    SUPPORTED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'webp')
+
     def __init__(self, settings: SettingsStorage):
         self.settings = settings
 
@@ -41,10 +43,12 @@ class AntiSpamService:
         for char in text:
             if not char.isalnum() and char != ' ':
                 continue
+
             if char == prev:
                 repeat += 1
                 if repeat >= 2:
                     continue
+
             else:
                 repeat = 0
             result.append(char)
@@ -120,7 +124,7 @@ class AntiSpamService:
                 results.append(result)
 
         if results:
-            merged = {id(message): message for item in results for message in item.messages}
+            merged = self._get_spam_messages(results=results)
             return SpamResult(value=True, messages=list(merged.values()))
 
         return SpamResult(value=False)
@@ -133,38 +137,81 @@ class AntiSpamService:
             return SpamResult(value=False)
 
         guild_id = message.guild.id
-        self._cleanup(guild_id, self.user_attachment_times, message.author.id, timestamp)
+        self._cleanup(
+            guild_id=guild_id,
+            cache=self.user_attachment_times,
+            key=message.author.id,
+            timestamp=timestamp
+        )
 
-        history = self.user_attachment_times[guild_id][message.author.id]
-        history.append(timestamp)
+        self.user_attachment_times[guild_id][message.author.id].append(timestamp)
 
         for attachment in message.attachments:
-            if attachment.size > 2_000_000:
-                continue
-            if not attachment.content_type.startswith('image'):
-                continue
-            if not any(attachment.filename.lower().endswith(ext) for ext in ('png', 'jpg', 'jpeg', 'webp')):
-                continue
+            if self._is_valid_image(attachment=attachment):
+                img_hash = await self.image_dhash(attachment=attachment)
 
-            img_hash = await self.image_dhash(attachment)
-
-            for old_hash in list(self.attachment_hash_cache[guild_id].keys()):
-                if self.is_similar(img_hash, old_hash) and timestamp - history[0] < 60:
-                    messages = []
-
-                    for msgs in self.attachment_hash_cache[guild_id].values():
-                        for _, msg in msgs:
-                            messages.append(msg)
-
-                    if not any(m is message for m in messages):
-                        messages.append(message)
+                if await self._is_spam_image(
+                    img_hash=img_hash,
+                    guild_id=guild_id,
+                    user_id=message.author.id,
+                    timestamp=timestamp
+                ):
+                    messages = self._get_messages(guild_id=guild_id, message=message)
 
                     return SpamResult(value=True, messages=messages)
 
-            self._cleanup(guild_id, self.attachment_hash_cache, img_hash, timestamp)
-            self.attachment_hash_cache[guild_id][img_hash].append((timestamp, message))
+                self._cleanup(
+                    guild_id=guild_id,
+                    cache=self.attachment_hash_cache,
+                    key=img_hash,
+                    timestamp=timestamp
+                )
+                self.attachment_hash_cache[guild_id][img_hash].append((timestamp, message))
 
         return SpamResult(value=False)
+
+    def _is_valid_image(self, attachment: discord.Attachment) -> bool:
+        return (
+            attachment.size <= 2_000_000
+            and attachment.content_type.startswith('image')
+            and attachment.filename.lower().endswith(self.SUPPORTED_EXTENSIONS)
+        )
+
+    async def _is_spam_image(
+            self,
+            img_hash: int,
+            guild_id: int,
+            user_id: int,
+            timestamp: float
+    ) -> bool:
+        history = self.user_attachment_times[guild_id][user_id]
+
+        for old_hash in list(self.attachment_hash_cache[guild_id].keys()):
+            if self.is_similar(img_hash, old_hash) and timestamp - history[0] < 60:
+                return True
+
+        return False
+
+    def _get_messages(self, guild_id: int, message: discord.Message) -> list[discord.Message]:
+        messages = []
+
+        for msgs in self.attachment_hash_cache[guild_id].values():
+            for _, msg in msgs:
+                messages.append(msg)
+
+        if not any(m is message for m in messages):
+            messages.append(message)
+
+        return messages
+
+    @staticmethod
+    def _get_spam_messages(results: list[SpamResult]) -> dict[int, discord.Message]:
+        result: dict[int, discord.Message] = {}
+        for item in results:
+            for message in item.messages:
+                result[message.id] = message
+
+        return result
 
     @staticmethod
     async def image_dhash(attachment: discord.Attachment) -> int:

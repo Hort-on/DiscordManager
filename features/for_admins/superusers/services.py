@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import discord
@@ -13,6 +14,12 @@ if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from general_services.other_services.cleanup_service import CleanUpService
+
+
+@dataclass
+class AvailableUsers:
+    available_users: dict[int, str]
+    not_found_ids: set[int] | None
 
 
 class SuperusersService(DBBaseService):
@@ -150,7 +157,55 @@ class SuperusersService(DBBaseService):
         return result
 
     async def get_superusers_for_deletion(self, guild: discord.Guild, client: discord.Client) -> tuple:
-        superusers = self.get_superusers(
+        users = self.get_available_users(guild=guild)
+
+        if users.not_found_ids:
+            result = await self.cleanup_service.cleanup_superusers(
+                guild_id=guild.id,
+                user_ids=users.not_found_ids
+            )
+
+            if not result:
+                return (
+                    users.available_users,
+                    self._fetch_user_global_manes(
+                        not_found_user_ids=users.not_found_ids,
+                        client=client
+                    )
+                )
+
+            not_found_usernames: list[str] = ['These users were not on this server and were deleted as well:',
+                                              f'{'-' * 40}']
+
+            for user_id in users.not_found_ids:
+                user = await client.fetch_user(int(user_id))
+                user_name = user.global_name or user.name
+                not_found_usernames.append(f'🔸{user_name}')
+
+            return users.available_users, '\n'.join(not_found_usernames)
+
+        return users.available_users, False
+
+    @staticmethod
+    async def _fetch_user_global_manes(not_found_user_ids: set[int], client: discord.Client) -> str:
+        not_found_names: list[str] = [
+            'Some users were not found on this server, and were note deleted for some reason.'
+            f' The names of users:', f'{'-' * 15}']
+
+        for user_id in not_found_user_ids:
+            user = await client.fetch_user(int(user_id))
+            not_found_names.append(f'🔸{user.global_name}')
+
+        return '\n'.join(not_found_names)
+
+    def get_current_superusers(self, guild_id: int) -> set[int]:
+        return self.settings.set_storage.for_set_get(
+            target=StorageTarget.SUPERUSERS,
+            guild_id=guild_id
+        )
+
+    def get_available_users(self, guild: discord.Guild) -> AvailableUsers:
+        superusers = self.get_current_superusers(
             guild_id=guild.id
         )
 
@@ -168,46 +223,7 @@ class SuperusersService(DBBaseService):
             else:
                 not_found_ids.add(user_id)
 
-        if not_found_ids:
-            result = await self.cleanup_service.cleanup_superusers(
-                guild_id=guild.id,
-                user_ids=not_found_ids
-            )
-
-            if not result:
-                return (
-                    available_users,
-                    self._fetch_user_global_manes(
-                        not_found_user_ids=not_found_ids,
-                        client=client
-                    ))
-
-            not_found_usernames: list[str] = ['These users were not on this server and were deleted as well:',
-                                              f'{'-' * 40}']
-
-            for user_id in not_found_ids:
-                user = await client.fetch_user(int(user_id))
-                user_name = user.global_name or user.name
-                not_found_usernames.append(f'🔸{user_name}')
-
-            return available_users, '\n'.join(not_found_usernames)
-
-        return available_users, False
-
-    @staticmethod
-    async def _fetch_user_global_manes(not_found_user_ids: set[int], client: discord.Client) -> str:
-        not_found_names: list[str] = [
-            'Some users were not found on this server, and were note deleted for some reason.'
-            f' The names of users:', f'{'-' * 15}']
-
-        for user_id in not_found_user_ids:
-            user = await client.fetch_user(int(user_id))
-            not_found_names.append(f'🔸{user.global_name}')
-
-        return '\n'.join(not_found_names)
-
-    def get_superusers(self, guild_id: int) -> set[int]:
-        return self.settings.set_storage.for_set_get(
-            target=StorageTarget.SUPERUSERS,
-            guild_id=guild_id
+        return AvailableUsers(
+            available_users=available_users,
+            not_found_ids=not_found_ids
         )
