@@ -108,6 +108,9 @@ class ModerationService:
                     pass
 
             await user.edit(timed_out_until=timeout_until, reason='Auto moderation: Raid')
+
+            self.service.clear_user(guild_id=guild.id, user_id=user.id)
+
             actioned_names.append(f'🔸 {display_name} (timed out)')
 
         await self._delete_spam(messages=messages)
