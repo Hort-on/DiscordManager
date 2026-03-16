@@ -7,7 +7,7 @@ from database.settings_storage.settings_manager import (
 )
 
 from database.db_factory.db_scenario_factory import DBFactory
-from general_services.utils.translations import TRANSLATIONS
+from general_services.translator.translations import TRANSLATIONS
 
 
 class SettingsStorage:

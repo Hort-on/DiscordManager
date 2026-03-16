@@ -1,42 +1,109 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from datetime import datetime
+
+import discord
+
 from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 
-from general_services.utils.messages import GENERAL_MSGS as GM
+if TYPE_CHECKING:
+    from core.bot_config import Bot
+    from general_services.translator.translator import Translator
 
 
 class MemberLeftNotification:
-    def __init__(self, bot, settings: SettingsStorage):
+    def __init__(self, bot: Bot, settings: SettingsStorage, translator: Translator):
         self.bot = bot
         self.settings = settings
+        self.translator = translator
 
-    async def check_if_notification(self, member):
-        result = self.settings.dict_storage.for_dict_get(
+    async def check_if_notification(self, member: discord.Member):
+        result = self.settings.dict_storage.get_value(
             'member_left',
             target=StorageTarget.SETTINGS,
             guild_id=member.guild.id
         )
+        if not result:
+            return
 
-        channel = self.settings.dict_storage.for_dict_get(
-            'sys_channels',
+        channel_id = self.settings.dict_storage.get_value(
+            'notification_channel_id',
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=member.guild.id
         )
 
-        if not result.get('member_left') and channel.get('notification_channel_id'):
+        if not channel_id:
             return
 
-        await self.send_notification(member=member)
+        await self.send_notification(member=member, channel_id=channel_id)
 
-    async def send_notification(self, member):
-        channel_id = self.settings.dict_storage.for_dict_get(
-            'notification_channel_id',
-            target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=member.guild.id,
-        )
-
+    async def send_notification(self, member: discord.Member, channel_id: int):
         channel = self.bot.get_channel(channel_id)
 
         if not channel:
             return
 
-        await channel.send(GM.get('user_left_msg').format(member=member.name))
+        guild_id = member.guild.id
+
+        now = datetime.now()
+        duration = now - member.joined_at
+
+        days = duration.days
+
+        embed = discord.Embed(
+            title=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='member_left_title'
+            ),
+            description=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='member_left_msg',
+                member=member.mention
+            ),
+            color=discord.Color.blue(),
+            timestamp=now
+        )
+
+        embed.set_thumbnail(url=member.display_avatar.url)
+
+        embed.add_field(
+            name=self.translator.t(
+                guild_id=guild_id,
+                section='GENERAL',
+                key='user'
+            ),
+            value=f'{member.display_name if member.display_name else member.global_name}',
+            inline=False
+        )
+
+        embed.add_field(
+            name=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='member_joined',
+            ),
+            value=f'<t:{int(member.joined_at.timestamp())}:F>',
+            inline=False
+        )
+
+        embed.add_field(
+            name=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='time_on_server'
+            ),
+            value=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='days_on_server',
+                days=days
+            ),
+            inline=False
+        )
+
+        await channel.send(embed=embed)

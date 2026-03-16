@@ -8,37 +8,72 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 if TYPE_CHECKING:
     from features.for_admins.delete_message.flow import DeleteMessageFlow
+    from general_services.translator.translator import Translator
 
 
-class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
+class DeleteMessagesModal(discord.ui.Modal):
     def __init__(
             self,
             channel: discord.TextChannel,
-            flow: DeleteMessageFlow
+            flow: DeleteMessageFlow,
+            translator: Translator,
+            guild_id: int
     ):
-        super().__init__()
+        super().__init__(
+            title=translator.t(
+                guild_id=guild_id,
+                section='DELETE_MESSAGES',
+                key='delete_msg_title'
+            )
+        )
+
         self.channel = channel
         self.flow = flow
+        self.translator = translator
+        self.guild_id = guild_id
 
-    amount = discord.ui.TextInput(
-        label='How many messages do you want to delete?',
-        placeholder='Please enter a number between 1 and 100',
-        required=True,
-        max_length=3
-    )
+        self.amount = discord.ui.TextInput(
+            label=translator.t(
+                guild_id=guild_id,
+                section='DELETE_MESSAGES',
+                key='msg_amount'
+            ),
+            placeholder=translator.t(
+                guild_id=guild_id,
+                section='DELETE_MESSAGES',
+                key='amount_placeholder'
+            ),
+            required=True,
+            max_length=3
+        )
 
-    user_names = discord.ui.TextInput(
-        label='Type user names',
-        placeholder='Please type general user names like: user123, user_2, user etc. separated by coma.',
-        required=False
-    )
+        self.user_names = discord.ui.TextInput(
+            label=translator.t(
+                guild_id=guild_id,
+                section='DELETE_MESSAGES',
+                key='ask_user_names'
+            ),
+            placeholder=translator.t(
+                guild_id=guild_id,
+                section='DELETE_MESSAGES',
+                key='names_placeholder'
+            ),
+            required=False
+        )
+
+        self.add_item(self.amount)
+        self.add_item(self.user_names)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         try:
             amount = int(self.amount.value)
         except ValueError:
             error_embed = ErrorEmbed(
-                description='Amount must be a number.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='DELETE_MESSAGES',
+                    key='error_number'
+                )
             )
             await interaction.response.send_message(
                 embed=error_embed,
@@ -48,7 +83,11 @@ class DeleteMessagesModal(discord.ui.Modal, title='Delete messages'):
 
         if not 1 <= amount <= 300:
             error_embed = ErrorEmbed(
-                description='Amount must be between 1 and 300.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='DELETE_MESSAGES',
+                    key='wrong_amount'
+                )
             )
             await interaction.response.send_message(
                 embed=error_embed,

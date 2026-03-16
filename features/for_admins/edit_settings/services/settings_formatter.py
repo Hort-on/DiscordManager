@@ -52,6 +52,9 @@ class SettingsFormatter:
         if key == 'verification_message_id':
             return '✅ assigned' if value else '❌ not assigned'
 
+        if key == 'language':
+            return 'ukrainian' if value == 'uk' else 'english'
+
         return '✅ Enabled' if value else '❌ Disabled'
 
     async def format_current_system_channels(self, guild: discord.Guild) -> discord.Embed:

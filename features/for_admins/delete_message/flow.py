@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Counter
 
 import discord
 
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_admins.delete_message.service import DeleteMessageService
+    from general_services.translator.translator import Translator
 
 
 class DeleteMessageFlow:
@@ -23,19 +24,25 @@ class DeleteMessageFlow:
             self,
             delete_msg_service: DeleteMessageService,
             navigator: Navigator,
-            context: NavigationContext
+            context: NavigationContext,
+            translator: Translator
     ):
 
         self.navigator = navigator
         self.context = context
         self.service = delete_msg_service
+        self.translator = translator
 
     async def delete_message_start(self, interaction: discord.Interaction) -> None:
         options = self._build_options(guild=interaction.guild)
 
         if not options:
             embed = ErrorEmbed(
-                description=f'The guild does not have text channels.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='not_found_channels'
+                )
             )
             await interaction.response.edit_message(embed=embed)
             return
@@ -43,7 +50,11 @@ class DeleteMessageFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the channel:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='SYSTEM_GENERAL',
+                key='ask_for_channel'
+            ),
             callback=self._send_modal
         )
 
@@ -68,58 +79,65 @@ class DeleteMessageFlow:
 
         users_names = users.strip() if users else None
 
-        if not users_names:
-            len_result = await self.service.delete_any_message_process(
+        if users_names:
+            result = await self._delete_message_from_users(
+                guild=interaction.guild,
                 channel=channel,
-                amount=amount
+                amount=amount,
+                users=users_names
             )
 
-            if len_result == 0:
-                error_embed = ErrorEmbed(
-                    description='No messages were found in the selected channel or from the selected users.'
-                )
-                await interaction.followup.send(
-                    embed=error_embed
+            if not result:
+                embed = ErrorEmbed(
+                    description=self.translator.t(
+                        guild_id=interaction.guild_id,
+                        section='SYSTEM_GENERAL',
+                        key='msg_not_found'
+                    )
                 )
             else:
-                success_embed = SuccessEmbed(
-                    description=f'{len_result} messages were successfully deleted from the channel: {channel.name}.'
-                )
-                await interaction.followup.send(
-                    embed=success_embed
-                )
-                return
+                embed = SuccessEmbed(description=result)
 
-        result = await self.service.delete_message_from_users(
-            guild=interaction.guild,
-            channel=channel,
-            amount=amount,
-            users=users_names
-        )
-        if not result:
-            error_embed = ErrorEmbed(
-                description='No messages were found in the selected channel or from the selected users.'
-            )
-            await interaction.followup.send(
-                embed=error_embed
-            )
+            await interaction.followup.send(embed=embed)
             return
 
-        success_embed = SuccessEmbed(
-            description=result
+        len_result = await self._delete_any_message_process(
+            channel=channel,
+            amount=amount
         )
-        await interaction.followup.send(
-            embed=success_embed
-        )
+
+        if len_result == 0:
+            embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='msg_not_found'
+                )
+            )
+        else:
+            embed = SuccessEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='DELETE_MESSAGES',
+                    key='success_msg_deletion',
+                    len_result=len_result,
+                    channel_name=channel.name
+                )
+            )
+
+        await interaction.followup.send(embed=embed)
 
     async def _send_modal(self, interaction: discord.Interaction, value: list[str]) -> None:
         channel_id = int(value[0])
         channel = interaction.client.get_channel(channel_id)
 
-        await interaction.response.send_modal(DeleteMessagesModal(
-            channel=channel,
-            flow=self
-        ))
+        await interaction.response.send_modal(
+            DeleteMessagesModal(
+                channel=channel,
+                flow=self,
+                translator=self.translator
+            )
+        )
 
     def _build_options(self, guild: discord.Guild) -> list[discord.SelectOption]:
         channels = self.service.get_channels(guild=guild)
@@ -131,3 +149,54 @@ class DeleteMessageFlow:
             )
             for channel in channels
         ]
+
+    async def _delete_message_from_users(
+            self,
+            guild: discord.Guild,
+            channel: discord.TextChannel,
+            amount: int,
+            users: str
+    ) -> str | bool:
+        user_names = self.service.get_users(
+            guild=guild,
+            users=users
+        )
+
+        result_msg = []
+
+        users = set(user_names)
+
+        def _check(m) -> bool:
+            return m.author in users
+
+        deleted = await channel.purge(
+            limit=amount,
+            check=_check
+        )
+
+        if not deleted:
+            return False
+
+        counter = Counter(msg.author.display_name for msg in deleted)
+        for user_name, count in counter.items():
+            result_msg.append(
+                self.translator.t(
+                    guild_id=guild.id,
+                    section='DELETE_MESSAGES',
+                    key='success_msg_del_user',
+                    count=count,
+                    user_name=user_name
+                )
+            )
+
+        final_msg = ''.join(result_msg)
+
+        return final_msg
+
+    @staticmethod
+    async def _delete_any_message_process(
+            channel: discord.TextChannel,
+            amount: int
+    ) -> int:
+        deleted = await channel.purge(limit=amount)
+        return 0 if not deleted else len(deleted)

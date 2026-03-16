@@ -24,6 +24,7 @@ from features.for_everyone.module import build_everyone_module
 
 from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
+from general_services.translator.translator import Translator
 
 from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -61,6 +62,8 @@ async def main():
 
     rules_service = RulesService(bot=bot, settings=settings)
 
+    translator = Translator(settings=settings)
+
     admin_module = build_admin_module(
         bot=bot,
         db_factory=db_factory,
@@ -78,7 +81,8 @@ async def main():
     )
 
     automod_module = build_automod_module(
-        settings=settings
+        settings=settings,
+        translator=translator
     )
 
     general_container = GeneralContainer(
@@ -86,6 +90,7 @@ async def main():
         db_connect=db_connect,
         db_factory=db_factory,
         settings=settings,
+        translator=translator,
         cleanup_service=cleanup_service,
         button_protection=button_protector
     )
@@ -106,7 +111,8 @@ async def main():
         verification_service=verification_service,
         verification_view_service=verification_view_service,
         rules_service=rules_service,
-        moderation_service=automod_module
+        moderation_service=automod_module,
+        translator=translator
     )
 
     await bot.start(TOKEN)

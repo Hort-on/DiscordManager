@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.delete_message.service import DeleteMessageService
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class AdminMenuView(discord.ui.View):
@@ -28,6 +29,7 @@ class AdminMenuView(discord.ui.View):
         navigator: Navigator,
         context: NavigationContext,
         settings: SettingsStorage,
+        translator: Translator,
         superusers_formatter: SuperusersFormatter,
         protection_service: ButtonProtectionService,
         delete_msg_service: DeleteMessageService,
@@ -48,10 +50,12 @@ class AdminMenuView(discord.ui.View):
         ))
 
         self.add_item(DeleteMessageButton(
+            guild_id=guild_id,
             navigator=navigator,
             context=context,
             delete_msg_service=delete_msg_service,
-            buttons_protection=protection_service
+            buttons_protection=protection_service,
+            translator=translator
         ))
 
         self.add_item(EditSettingsMenuButton(

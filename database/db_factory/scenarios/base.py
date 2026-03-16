@@ -1,7 +1,6 @@
 from database.data_base_model import DB
 
 from general_services.logger.logger import Logger
-from general_services.utils.messages import DB_MSGS as DM
 
 
 class DataBaseScenario:

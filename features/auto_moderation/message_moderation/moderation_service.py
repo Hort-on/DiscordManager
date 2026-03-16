@@ -8,18 +8,21 @@ from typing import TYPE_CHECKING
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
+
 from ui.embed_constructor.embed_constructor import WarningEmbed
 
 if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.message_moderation.anti_spam_service import AntiSpamService
+    from general_services.translator.translator import Translator
 
 
 class ModerationService:
-    def __init__(self, settings: SettingsStorage, service: AntiSpamService):
+    def __init__(self, settings: SettingsStorage, service: AntiSpamService, translator: Translator):
         self.settings = settings
         self.service = service
         self.now = time.monotonic
+        self.translator = translator
 
     async def process_message(self, message: discord.Message) -> None:
         data = self.settings.dict_storage.get_all(
@@ -40,9 +43,9 @@ class ModerationService:
 
         if data.get('flood_checking', False):
             if self.service.check_flood(
-                guild_id=message.guild.id,
-                user_id=message.author.id,
-                timestamp=timestamp,
+                    guild_id=message.guild.id,
+                    user_id=message.author.id,
+                    timestamp=timestamp,
             ):
                 await self._timeout_for_flood(member=message.author)
 
@@ -54,10 +57,10 @@ class ModerationService:
             await self._check_spam(message=message, timestamp=timestamp, attachments=attachments)
 
     async def _check_spam(
-        self,
-        message: discord.Message,
-        timestamp: float,
-        attachments: list[discord.Attachment],
+            self,
+            message: discord.Message,
+            timestamp: float,
+            attachments: list[discord.Attachment],
     ) -> None:
         if message.mention_everyone and len(attachments) >= 3:
             await self._timeout_for_spam(messages=[message], guild=message.guild)
@@ -75,16 +78,26 @@ class ModerationService:
                 await self._timeout_for_spam(messages=result.messages, guild=message.guild)
                 return
 
-    @staticmethod
-    async def _timeout_for_flood(member: discord.Member) -> None:
+    async def _timeout_for_flood(self, member: discord.Member) -> None:
         timeout_until = datetime.now(timezone.utc) + timedelta(minutes=20)
-        await member.edit(timed_out_until=timeout_until, reason='Auto moderation: Flood')
+        await member.edit(
+            timed_out_until=timeout_until,
+            reason=self.translator.t(
+                guild_id=member.guild.id,
+                section='MODERATION',
+                key='flood'
+            )
+        )
 
     async def _timeout_for_spam(
-        self, messages: list[discord.Message], guild: discord.Guild
+            self,
+            messages: list[discord.Message],
+            guild: discord.Guild
     ) -> None:
         if not messages:
             return
+
+        guild_id = guild.id
 
         timeout_until = datetime.now(timezone.utc) + timedelta(hours=48)
         allowed_ban = self.settings.dict_storage.get_value(
@@ -95,37 +108,99 @@ class ModerationService:
 
         users = {msg.author for msg in messages}
         actioned_names: list[str] = []
+        not_banned: list[str] = []
 
         for user in users:
-            display_name = user.display_name or user.global_name
+            name = user.display_name or user.global_name
+
+            if user.top_role >= guild.me.top_role:
+                not_banned.append(f'🔸 {name}')
+                continue
 
             if allowed_ban:
                 try:
-                    await user.ban(delete_message_days=1, reason='Auto moderation: Raid')
-                    actioned_names.append(f'🔸 {display_name} (banned)')
+                    await user.ban(
+                        delete_message_days=1,
+                        reason=self.translator.t(
+                            guild_id=guild_id,
+                            section='MODERATION',
+                            key='raid'
+                        )
+                    )
+                    actioned_names.append(
+                        self.translator.t(
+                            guild_id=guild_id,
+                            section='MODERATION',
+                            key='banned',
+                            display_name=name
+                        )
+                    )
                     continue
-                except discord.Forbidden:
-                    pass
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    print(f"Ban failed: {e}")
 
-            await user.edit(timed_out_until=timeout_until, reason='Auto moderation: Raid')
+            await user.edit(
+                timed_out_until=timeout_until,
+                reason=self.translator.t(
+                    guild_id=guild_id,
+                    section='MODERATION',
+                    key='raid'
+                )
+            )
 
             self.service.clear_user(guild_id=guild.id, user_id=user.id)
 
-            actioned_names.append(f'🔸 {display_name} (timed out)')
+            actioned_names.append(
+                self.translator.t(
+                    guild_id=guild_id,
+                    section='MODERATION',
+                    key='timed_out',
+                    display_name=name
+                )
+            )
 
         await self._delete_spam(messages=messages)
 
         user_list = '\n'.join(actioned_names)
+
+        messages_to_sent: list[str] = [self.translator.t(
+            guild_id=guild_id,
+            section='MODERATION',
+            key='actioned_users',
+            user_list=user_list
+        )]
+
+        if not_banned:
+            messages_to_sent.append(
+                self.translator.t(
+                    guild_id=guild_id,
+                    section='MODERATION',
+                    key='actioned_users_not_banned',
+                    not_banned='\n'.join(not_banned)
+                )
+            )
+
         await self._send_notification(
             guild=guild,
-            message=f'The following users were actioned for raiding: \n{user_list}\n and have been banned',
+            message='\n'. join(messages_to_sent),
         )
 
     async def _delete_invitation(self, message: discord.Message) -> None:
-        display = message.author.display_name or message.author.global_name
+        name = message.author.display_name or message.author.global_name
 
-        notification = f'User {display} sent an invite link: {message.content}'
-        warning = f'{message.author.mention} only administrators can send invitations on this server.'
+        notification = self.translator.t(
+            guild_id=message.guild.id,
+            section='MODERATION',
+            key='invite_notification',
+            name=name
+        )
+
+        warning = self.translator.t(
+            guild_id=message.guild.id,
+            section='MODERATION',
+            key='invite_warning',
+            mention=message.author.mention
+        )
 
         try:
             await message.delete()

@@ -76,6 +76,15 @@ class MainSettingsFlow:
                     await interaction.response.edit_message(embed=error_embed)
                     return
 
+                settings_embed = self.formatter.format_current_main_settings(interaction)
+                success_embed = SuccessEmbed(
+                    description='Language is successfully changed'
+                )
+
+                await interaction.response.edit_message(
+                    embeds=[settings_embed, success_embed]
+                )
+
             case _:
                 result = await self.service.save_new_value(
                     guild=interaction.guild,
