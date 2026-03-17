@@ -23,7 +23,7 @@ class SettingsStorage:
         self._guild_hidden_roles: dict[int, set[int]] = {}
         self._guild_superusers: dict[int, set[int]] = {}
 
-        self._guild_languages: dict[int, dict[str, str]] = {}
+        self._guild_languages: dict[int, str] = {}
 
         self.set_storage: SetStorageManager = SetStorageManager({
             StorageTarget.HIDDEN_CHANNELS: self._guild_hidden_channels,
@@ -59,8 +59,9 @@ class SettingsStorage:
 
         if result:
             self._guild_settings[guild_id] = result[0]
-            lang = result[0].get('language')
-            self._guild_languages[guild_id] = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
+
+            lang = result[0].get('language', 'en')
+            self._guild_languages[guild_id] = lang
 
         # ------------------------------- load system channels -------------------------------- #
         sys_channels = self.db_factory.for_fetch_all(
