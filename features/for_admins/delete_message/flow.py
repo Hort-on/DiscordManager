@@ -135,7 +135,8 @@ class DeleteMessageFlow:
             DeleteMessagesModal(
                 channel=channel,
                 flow=self,
-                translator=self.translator
+                translator=self.translator,
+                guild_id=interaction.guild_id
             )
         )
 

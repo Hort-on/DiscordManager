@@ -7,7 +7,6 @@ from database.settings_storage.settings_manager import (
 )
 
 from database.db_factory.db_scenario_factory import DBFactory
-from general_services.translator.translations import TRANSLATIONS
 
 
 class SettingsStorage:
@@ -23,8 +22,6 @@ class SettingsStorage:
         self._guild_hidden_roles: dict[int, set[int]] = {}
         self._guild_superusers: dict[int, set[int]] = {}
 
-        self._guild_languages: dict[int, str] = {}
-
         self.set_storage: SetStorageManager = SetStorageManager({
             StorageTarget.HIDDEN_CHANNELS: self._guild_hidden_channels,
             StorageTarget.SUPERUSERS: self._guild_superusers,
@@ -35,7 +32,6 @@ class SettingsStorage:
             StorageTarget.SETTINGS: self._guild_settings,
             StorageTarget.SYSTEM_CHANNELS: self._guild_system_channels,
             StorageTarget.CHANNELS_TO_SEND: self._guild_channels_to_send,
-            StorageTarget.LANGUAGE: self._guild_languages
         })
 
     async def load_all_guilds_settings(self) -> None:
@@ -59,9 +55,6 @@ class SettingsStorage:
 
         if result:
             self._guild_settings[guild_id] = result[0]
-
-            lang = result[0].get('language', 'en')
-            self._guild_languages[guild_id] = lang
 
         # ------------------------------- load system channels -------------------------------- #
         sys_channels = self.db_factory.for_fetch_all(

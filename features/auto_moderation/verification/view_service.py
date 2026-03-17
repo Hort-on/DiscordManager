@@ -8,26 +8,35 @@ from database.settings_storage.settings import SettingsStorage
 from database.settings_storage.settings_manager import StorageTarget
 from features.auto_moderation.verification.flow import VerificationFlow
 from features.auto_moderation.verification.service import VerificationService
-from features.auto_moderation.verification.views import VerificationView
+from features.auto_moderation.verification.view import VerificationView
 
 from ui.embed_constructor.embed_constructor import WarningEmbed
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
+    from general_services.translator.translator import Translator
 
 
 class VerificationViewService:
-    def __init__(self, bot: Bot, settings: SettingsStorage, service: VerificationService):
+    def __init__(
+            self,
+            bot: Bot,
+            settings: SettingsStorage,
+            service: VerificationService,
+            translator: Translator,
+    ):
         self.bot = bot
         self.settings = settings
         self.service = service
+        self.translator = translator
         self.view = None
 
     async def register_persistent_view(self):
         flow = VerificationFlow(
             bot=self.bot,
             settings=self.settings,
-            service=self.service
+            service=self.service,
+            translator=self.translator
         )
 
         self.view = VerificationView(flow=flow)
@@ -65,11 +74,39 @@ class VerificationViewService:
 
         if not found:
             embed = WarningEmbed(
-                description='Будь ласка перш ніж ви погодитеся,'
-                            ' уважно прочитай правила, щоб в подальшому не виникало непорозумінь. Дякуємо.'
+                description=self.translator.t(
+                    guild_id=guild_id,
+                    section='VERIFICATION',
+                    key='ensure_msg'
                 )
+            )
 
-            message = await channel.send(embed=embed, view=self.view)
+            flow = VerificationFlow(
+                bot=self.bot,
+                settings=self.settings,
+                service=self.service,
+                translator=self.translator
+            )
+
+            view = VerificationView(flow=flow)
+
+            for item in view.children:
+                item: discord.ui.Button
+
+                if item.custom_id == "verify_agree":
+                    item.label = self.translator.t(
+                        guild_id=guild_id,
+                        section='VERIFICATION',
+                        key='agree_button'
+                    )
+                elif item.custom_id == "verify_disagree":
+                    item.label = self.translator.t(
+                        guild_id=guild_id,
+                        section='VERIFICATION',
+                        key='disagree_button'
+                    )
+
+            message = await channel.send(embed=embed, view=view)
             await self.service.save_message_id(
                 message_id=message.id,
                 guild_id=guild_id

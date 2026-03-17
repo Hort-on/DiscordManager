@@ -9,12 +9,9 @@ if TYPE_CHECKING:
 
 
 class AgreeButton(discord.ui.Button):
-    def __init__(
-            self,
-            flow: VerificationFlow
-    ):
+    def __init__(self, flow: VerificationFlow):
         super().__init__(
-            label='Погоджуся',
+            label='Agree',
             style=discord.ButtonStyle.green,
             custom_id='verify_agree'
         )
@@ -26,12 +23,9 @@ class AgreeButton(discord.ui.Button):
 
 
 class DisagreeButton(discord.ui.Button):
-    def __init__(
-            self,
-            flow: VerificationFlow
-    ):
+    def __init__(self, flow: VerificationFlow):
         super().__init__(
-            label='Не погоджуюся',
+            label='Disagree',
             style=discord.ButtonStyle.red,
             custom_id='verify_disagree'
         )

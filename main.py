@@ -52,17 +52,22 @@ async def main():
 
     settings = SettingsStorage(bot=bot, db_factory=db_factory)
 
+    translator = Translator(settings=settings)
+
     button_protector = ButtonProtectionService(settings=settings)
 
     cleanup_service = CleanUpService(settings=settings, db_factory=db_factory)
 
     verification_service = VerificationService(bot=bot, settings=settings, db_factory=db_factory)
 
-    verification_view_service = VerificationViewService(bot=bot, settings=settings, service=verification_service)
-
     rules_service = RulesService(bot=bot, settings=settings)
 
-    translator = Translator(settings=settings)
+    verification_view_service = VerificationViewService(
+        bot=bot,
+        settings=settings,
+        service=verification_service,
+        translator=translator
+    )
 
     admin_module = build_admin_module(
         bot=bot,

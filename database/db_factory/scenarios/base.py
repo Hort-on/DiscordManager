@@ -40,7 +40,7 @@ class DataBaseScenario:
         try:
             return await self._execute()
         except Exception as e:
-            await self.logger.error(DM.get('failure_read_msg'), exc=e)
+            await self.logger.error(message='Помилка читання\\запису бази даних', exc=e)
             return None
 
     async def _execute(self):

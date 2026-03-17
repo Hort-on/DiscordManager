@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import discord
@@ -14,6 +15,13 @@ if TYPE_CHECKING:
     from core.bot_config import Bot
     from database.settings_storage.settings import SettingsStorage
     from features.auto_moderation.verification.service import VerificationService
+    from general_services.translator.translator import Translator
+
+
+@dataclass
+class AssignVerificationRoleResult:
+    value: bool
+    message: str
 
 
 class VerificationFlow:
@@ -21,11 +29,15 @@ class VerificationFlow:
             self,
             bot: Bot,
             settings: SettingsStorage,
-            service: VerificationService
+            service: VerificationService,
+            translator: Translator
     ):
         self.bot = bot
         self.settings = settings
         self.service = service
+        self.translator = translator
+
+        self.users_count: dict[tuple[int, int], int] = {}
 
     async def agreement_start(self, interaction: discord.Interaction):
         anti_bot = self.settings.dict_storage.get_value(
@@ -35,12 +47,16 @@ class VerificationFlow:
         )
 
         if bool(anti_bot):
-            await interaction.response.send_modal(AntiBotModal(
-                flow=self
-            ))
+            await interaction.response.send_modal(
+                AntiBotModal(
+                    flow=self,
+                    translator=self.translator,
+                    guild_id=interaction.guild_id
+                )
+            )
             return
 
-        result = await self.service.assign_role(
+        result = await self._assign_role(
             guild=interaction.guild,
             member=interaction.user
         )
@@ -61,7 +77,7 @@ class VerificationFlow:
     async def word_verification(self, interaction: discord.Interaction, word: str) -> None:
         await interaction.response.defer(ephemeral=True)
 
-        result_word = await self.service.check_the_word(
+        result_word = await self._check_the_word(
             guild_id=interaction.guild_id,
             member=interaction.user,
             word=word
@@ -69,15 +85,17 @@ class VerificationFlow:
 
         if not result_word:
             fail_embed = ErrorEmbed(
-                description='You wrote the word incorrectly.'
-                            ' You have one more attempt.'
-                            ' If you fail, you will be kicked off the server'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='VERIFICATION',
+                    key='wrong_word'
+                )
             )
             await interaction.followup.send(embed=fail_embed)
 
             return
 
-        result = await self.service.assign_role(
+        result = await self._assign_role(
             guild=interaction.guild,
             member=interaction.user
         )
@@ -93,13 +111,89 @@ class VerificationFlow:
 
         await interaction.followup.send(embed=embed)
 
-    @staticmethod
-    async def disagreement_start(interaction: discord.Interaction):
+    async def disagreement_start(self, interaction: discord.Interaction):
         info_embed = InfoEmbed(
-            description='You have declined the rules, you will not be given an access to this server,'
-                        ' until you agree with the rules.'
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='VERIFICATION',
+                key='declined'
+            )
         )
         await interaction.response.send_message(
             embed=info_embed,
             ephemeral=True
+        )
+
+    async def _check_the_word(
+            self,
+            guild_id: int,
+            member: discord.Member,
+            word: str
+    ) -> bool:
+        if word.lower() != 'hello':
+            key = (member.id, guild_id)
+
+            count = self.users_count.get(key, 0) + 1
+            self.users_count[key] = count
+
+            if count >= 2:
+                try:
+                    msg = self.translator.t(
+                        guild_id=guild_id,
+                        section='VERIFICATION',
+                        key='not_passed'
+                    )
+                    await member.kick(reason=msg)
+                except discord.Forbidden:
+                    pass
+                finally:
+                    self.users_count.pop(key, None)
+
+            return False
+
+        return True
+
+    async def _assign_role(self, guild: discord.Guild, member: discord.Member) -> AssignVerificationRoleResult:
+        verification_role = self.settings.dict_storage.get_value(
+            key='verification_role_id',
+            target=StorageTarget.SETTINGS,
+            guild_id=guild.id
+        )
+
+        if not verification_role:
+            message = self.translator.t(
+                guild_id=guild.id,
+                section='VERIFICATION',
+                key='role_not_assigned'
+            )
+
+            return AssignVerificationRoleResult(
+                value=False,
+                message=message
+            )
+
+        role = guild.get_role(verification_role)
+        if not role:
+            message = self.translator.t(
+                guild_id=guild.id,
+                section='VERIFICATION',
+                key='role_not_found'
+            )
+            return AssignVerificationRoleResult(
+                value=False,
+                message=message
+            )
+
+        await member.add_roles(role)
+
+        self.users_count.pop((member.id, guild.id), None)
+
+        message = self.translator.t(
+            guild_id=guild.id,
+            section='VERIFICATION',
+            key='welcome_msg'
+        )
+        return AssignVerificationRoleResult(
+            value=True,
+            message=message
         )

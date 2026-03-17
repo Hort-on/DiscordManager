@@ -19,13 +19,14 @@ class Translator:
             key='language',
             target=StorageTarget.SETTINGS,
             guild_id=guild_id
-        ) or 'en'
+        )
 
-        language = TRANSLATIONS.get(lang_code, TRANSLATIONS['en'])
+        section_data = TRANSLATIONS.get(section, {})
+        key_data = section_data.get(key)
 
-        text = language.get(section, {}).get(key)
+        if not key_data:
+            return key
 
-        if text is None:
-            text = TRANSLATIONS['en'].get(section, {}).get(key, key)
+        text = key_data.get(lang_code)
 
         return text.format(**kwargs)

@@ -1,19 +1,21 @@
-en = {
-    'SYSTEM_GENERAL': {
-        'user': "User",
+SYSTEM_GENERAL = {
+    'user': {
+        'en': "User",
+        'uk': "Користувач"
+    },
 
-        'not_found_channels': "The guild does not have text channels.",
-        'ask_for_channel': "Please select the channel:",
-        'msg_not_found': "No messages were found in the selected channel or from the selected users.",
-    }
-}
+    'not_found_text_channels': {
+        'en': "The guild does not have text channels.",
+        'uk': "Сервер немає текстових каналів."
+    },
 
-uk = {
-    'SYSTEM_GENERAL': {
-        'user': "Користувач",
-        
-        'not_found_channels': "Сервер немає текстових каналів.",
-        'ask_for_channel': 'Будь ласка оберіть канал:',
-        'msg_not_found': "Не знайдено повідомлень в обраному каналі або від обраного користувача.",
+    'ask_for_channel': {
+        'en': "Please select the channel:",
+        'uk': "Будь ласка оберіть канал:"
+    },
+
+    'msg_not_found': {
+        'en': "No messages were found in the selected channel or from the selected users.",
+        'uk': "Не знайдено повідомлень в обраному каналі або від обраного користувача."
     }
 }
