@@ -70,13 +70,14 @@ class Navigator:
             navigator=self,
             context=context,
             settings=self.general_container.settings,
+            translator=self.general_container.translator,
             superusers_formatter=superusers_module.superusers_formatter,
             delete_msg_service=delete_msg_module.delete_msg_service,
             protection_service=self.general_container.button_protection,
             guild_id=guild_id
         )
 
-    def settings_menu(self, context: NavigationContext):
+    def settings_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.edit_settings.menu_view import SettingsMenuView
         edit_settings_container = self.admin_module.edit_main_settings_module
 
@@ -88,7 +89,10 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
             hidden_role_service=edit_settings_container.hidden_roles_service,
-            cleanup_service=self.general_container.cleanup_service
+            cleanup_service=self.general_container.cleanup_service,
+            service_for_role=self.admin_module.edit_main_settings_module.verification_role_service,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def birthday_menu(self):
@@ -157,7 +161,7 @@ class Navigator:
             flow=flow
         )
 
-    def hidden_channels_menu(self, context: NavigationContext):
+    def hidden_channels_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
         from features.for_admins.edit_settings.views import HiddenChannelsMenuView
 
@@ -174,10 +178,12 @@ class Navigator:
         return HiddenChannelsMenuView(
             navigator=self,
             buttons_protection=self.general_container.button_protection,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
-    def hidden_roles_menu(self, context: NavigationContext):
+    def hidden_roles_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
         from features.for_admins.edit_settings.views import HiddenRolesMenuView
 
@@ -194,10 +200,12 @@ class Navigator:
         return HiddenRolesMenuView(
             navigator=self,
             buttons_protection=self.general_container.button_protection,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
-    def system_channels_menu(self, context: NavigationContext):
+    def system_channels_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
         from features.for_admins.edit_settings.views import SystemChannelsMenuView
 
@@ -213,7 +221,9 @@ class Navigator:
         return SystemChannelsMenuView(
             navigator=self,
             buttons_protection=self.general_container.button_protection,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def send_message_menu(self):

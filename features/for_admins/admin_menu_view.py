@@ -42,33 +42,43 @@ class AdminMenuView(discord.ui.View):
             guild_id=guild_id
         )
 
-        self.add_item(SuperusersMenuButton(
-            navigator=navigator,
-            context=context,
-            formatter=superusers_formatter,
-            buttons_protection=protection_service
-        ))
-
-        self.add_item(DeleteMessageButton(
-            guild_id=guild_id,
-            navigator=navigator,
-            context=context,
-            delete_msg_service=delete_msg_service,
-            buttons_protection=protection_service,
-            translator=translator
-        ))
-
-        self.add_item(EditSettingsMenuButton(
-            navigator=navigator,
-            context=context,
-            buttons_protection=protection_service
-        ))
-
-        if config.get('send_messages'):
-            self.add_item(SendMessageMenu(
+        self.add_item(
+            SuperusersMenuButton(
                 navigator=navigator,
                 context=context,
-                protection_service=protection_service
-            ))
+                formatter=superusers_formatter,
+                buttons_protection=protection_service
+            )
+        )
+
+        self.add_item(
+            DeleteMessageButton(
+                guild_id=guild_id,
+                navigator=navigator,
+                context=context,
+                delete_msg_service=delete_msg_service,
+                buttons_protection=protection_service,
+                translator=translator
+            )
+        )
+
+        self.add_item(
+            EditSettingsMenuButton(
+                navigator=navigator,
+                context=context,
+                buttons_protection=protection_service,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
+
+        if config.get('send_messages'):
+            self.add_item(
+                SendMessageMenu(
+                    navigator=navigator,
+                    context=context,
+                    protection_service=protection_service
+                )
+            )
 
         self.add_item(BackButton(navigator=navigator))

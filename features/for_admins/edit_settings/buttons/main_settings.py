@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.main_settings.role_service import VerificationRoleService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class MainSettingsButton(FirewallButton):
@@ -28,10 +29,16 @@ class MainSettingsButton(FirewallButton):
             main_settings_service: MainSettingsService,
             service_for_role: VerificationRoleService,
             formatter: SettingsFormatter,
-            buttons_protection: ButtonProtectionService
+            buttons_protection: ButtonProtectionService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='Edit main settings',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='edit_main_menu'
+            ),
             style=discord.ButtonStyle.green,
             protection_service=buttons_protection
         )

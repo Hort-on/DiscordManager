@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class EditSettingsMenuButton(FirewallButton):
@@ -23,18 +24,28 @@ class EditSettingsMenuButton(FirewallButton):
             navigator: Navigator,
             context: NavigationContext,
             buttons_protection: ButtonProtectionService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='⚙️ Settings management',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='settings_menu'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )
 
         self.navigator = navigator
         self.context = context
+        self.translator = translator
 
     async def on_click(self, interaction: discord.Interaction):
-        view = self.navigator.settings_menu(context=self.context)
+        view = self.navigator.settings_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
 
         view.context = self.context
         self.context.push(
@@ -44,7 +55,4 @@ class EditSettingsMenuButton(FirewallButton):
             )
         )
 
-        await interaction.response.edit_message(
-            content='⚙️ Settings management',
-            view=view
-        )
+        await interaction.response.edit_message(view=view)

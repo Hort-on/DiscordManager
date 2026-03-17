@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class HiddenRolesMenuButton(FirewallButton):
@@ -29,10 +31,16 @@ class HiddenRolesMenuButton(FirewallButton):
             buttons_protection: ButtonProtectionService,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='Hidden roles management',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='hidden_roles_menu'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )
@@ -44,10 +52,18 @@ class HiddenRolesMenuButton(FirewallButton):
         self.cleanup_service = cleanup_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.hidden_roles_menu(context=self.context)
+        view = self.navigator.hidden_roles_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
 
         view.context = self.context
-        self.context.push(target=Route.SETTINGS_MENU)
+        self.context.push(
+            target=Route.SETTINGS_MENU,
+            params=GeneralParams(
+                guild_id=interaction.guild_id
+            )
+        )
 
         await interaction.response.edit_message(view=view)
 
@@ -55,9 +71,19 @@ class HiddenRolesMenuButton(FirewallButton):
 class AddHiddenRoleButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: HiddenRolesFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: HiddenRolesFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📥Add hidden roles',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='add_hidden_roles'
+            ),
             style=discord.ButtonStyle.green,
             protection_service=buttons_protection
         )
@@ -71,9 +97,19 @@ class AddHiddenRoleButton(FirewallButton):
 class DeleteHiddenRoleButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: HiddenRolesFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: HiddenRolesFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='🗑️Delete hidden roles',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='delete_hidden_roles'
+            ),
             style=discord.ButtonStyle.red,
             protection_service=buttons_protection
         )
@@ -87,9 +123,19 @@ class DeleteHiddenRoleButton(FirewallButton):
 class HiddenRolesListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: HiddenRolesFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: HiddenRolesFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📄Hidden roles list',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='hidden_roles_list'
+            ),
             style=discord.ButtonStyle.blurple,
             protection_service=buttons_protection
         )

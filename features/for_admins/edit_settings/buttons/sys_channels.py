@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator_context import NavigationContext
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class SystemChannelsMenuButton(FirewallButton):
@@ -25,10 +27,16 @@ class SystemChannelsMenuButton(FirewallButton):
             navigator: Navigator,
             context: NavigationContext,
             buttons_protection: ButtonProtectionService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='System channels management',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='sys_ch_menu'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )
@@ -38,9 +46,17 @@ class SystemChannelsMenuButton(FirewallButton):
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.system_channels_menu(context=self.context)
+        view = self.navigator.system_channels_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
         view.context = self.context
-        self.context.push(target=Route.SETTINGS_MENU)
+        self.context.push(
+            target=Route.SETTINGS_MENU,
+            params=GeneralParams(
+                guild_id=interaction.guild_id
+            )
+        )
 
         await interaction.response.edit_message(view=view)
 
@@ -48,9 +64,19 @@ class SystemChannelsMenuButton(FirewallButton):
 class AddSystemChannelsButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SystemChannelsFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SystemChannelsFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📥Add\\Change channels',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='add_sys_ch'
+            ),
             style=discord.ButtonStyle.green,
             protection_service=buttons_protection
         )
@@ -64,9 +90,19 @@ class AddSystemChannelsButton(FirewallButton):
 class DeleteSystemChannelsButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SystemChannelsFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SystemChannelsFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='🗑️Delete system channels',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='delete_sys_ch'
+            ),
             style=discord.ButtonStyle.red,
             protection_service=buttons_protection
         )
@@ -80,9 +116,19 @@ class DeleteSystemChannelsButton(FirewallButton):
 class SystemChannelsListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SystemChannelsFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SystemChannelsFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📄System channels list',
+            label=translator.t(
+                guild_id=guild_id,
+                section='EDIT_SETTINGS',
+                key='add_hidden_roles'
+            ),
             style=discord.ButtonStyle.blurple,
             protection_service=buttons_protection
         )

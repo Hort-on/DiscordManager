@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
     from features.for_admins.edit_settings.services.main_settings.role_service import VerificationRoleService
     from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -34,7 +35,9 @@ class SettingsMenuView(discord.ui.View):
             hidden_ch_service: HiddenChannelsService,
             hidden_role_service: HiddenRolesService,
             service_for_role: VerificationRoleService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(timeout=60)
 
@@ -45,7 +48,9 @@ class SettingsMenuView(discord.ui.View):
                 main_settings_service=main_settings_service,
                 formatter=settings_formatter,
                 buttons_protection=buttons_protection,
-                service_for_role=service_for_role
+                service_for_role=service_for_role,
+                translator=translator,
+                guild_id=guild_id
             )
         )
 
@@ -55,6 +60,8 @@ class SettingsMenuView(discord.ui.View):
                 context=context,
                 buttons_protection=buttons_protection,
                 formatter=settings_formatter,
+                translator=translator,
+                guild_id=guild_id
             )
         )
 
@@ -65,7 +72,9 @@ class SettingsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 formatter=settings_formatter,
                 hidden_ch_service=hidden_ch_service,
-                cleanup_service=cleanup_service
+                cleanup_service=cleanup_service,
+                translator=translator,
+                guild_id=guild_id
             )
         )
 
@@ -76,7 +85,9 @@ class SettingsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 formatter=settings_formatter,
                 hidden_roles_service=hidden_role_service,
-                cleanup_service=cleanup_service
+                cleanup_service=cleanup_service,
+                translator=translator,
+                guild_id=guild_id
             )
         )
 

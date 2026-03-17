@@ -7,6 +7,11 @@ class AdminMenuParams:
 
 
 @dataclass(slots=True)
+class GeneralParams:
+    guild_id: int
+
+
+@dataclass(slots=True)
 class MainMenuParams:
     guild_id: int
     user_id: int

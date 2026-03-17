@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
     from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class HiddenChannelsMenuView(discord.ui.View):
@@ -35,22 +36,36 @@ class HiddenChannelsMenuView(discord.ui.View):
             self,
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
-            flow: HiddenChannelsFlow
+            flow: HiddenChannelsFlow,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(timeout=60)
 
-        self.add_item(AddHiddenChannelButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
-        self.add_item(DeleteHiddenChannelButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
-        self.add_item(HiddenChannelsListButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            AddHiddenChannelButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
+        self.add_item(
+            DeleteHiddenChannelButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
+        self.add_item(
+            HiddenChannelsListButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
         self.add_item(BackButton(navigator=navigator))
 
 
@@ -59,24 +74,38 @@ class HiddenRolesMenuView(discord.ui.View):
             self,
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
-            flow: HiddenRolesFlow
+            flow: HiddenRolesFlow,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(timeout=60)
 
-        self.add_item(AddHiddenRoleButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            AddHiddenRoleButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
-        self.add_item(DeleteHiddenRoleButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            DeleteHiddenRoleButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
-        self.add_item(HiddenRolesListButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            HiddenRolesListButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
         self.add_item(BackButton(navigator=navigator))
 
@@ -86,23 +115,37 @@ class SystemChannelsMenuView(discord.ui.View):
             self,
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
-            flow: SystemChannelsFlow
+            flow: SystemChannelsFlow,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(timeout=60)
 
-        self.add_item(AddSystemChannelsButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            AddSystemChannelsButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
-        self.add_item(DeleteSystemChannelsButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            DeleteSystemChannelsButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
-        self.add_item(SystemChannelsListButton(
-            buttons_protection=buttons_protection,
-            flow=flow
-        ))
+        self.add_item(
+            SystemChannelsListButton(
+                buttons_protection=buttons_protection,
+                flow=flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
         self.add_item(BackButton(navigator=navigator))

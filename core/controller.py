@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.verification.view_service import VerificationViewService
     from features.for_admins.send_messages.services.send_rules_service import RulesService
     from features.auto_moderation.message_moderation.module import AutoModModule
+    from general_services.translator.translator import Translator
 
 
 class Controller:
@@ -26,7 +27,8 @@ class Controller:
             verification_service: VerificationService,
             verification_view_service: VerificationViewService,
             rules_service: RulesService,
-            moderation_service: AutoModModule
+            moderation_service: AutoModModule,
+            translator: Translator
     ):
         self.bot = bot
         self.settings = settings
@@ -36,6 +38,7 @@ class Controller:
         self.verification_view_service = verification_view_service
         self.rules_service = rules_service
         self.moderation_service = moderation_service
+        self.translator = translator
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -67,7 +70,11 @@ class Controller:
         await self.moderation_service.moderation_service.process_message(message=message)
 
     async def on_member_remove(self, member) -> None:
-        await MemberLeftNotification(bot=self.bot, settings=self.settings).check_if_notification(member)
+        await MemberLeftNotification(
+            bot=self.bot,
+            settings=self.settings,
+            translator=self.translator
+        ).check_if_notification(member)
 
     async def on_guild_remove(self, guild: discord.Guild) -> None:
         print(f'Бот від\'єднався від {guild.name}')

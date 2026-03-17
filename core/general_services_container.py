@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from database.data_base_model import DB
     from general_services.logger.logger import Logger
     from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
@@ -19,5 +20,6 @@ class GeneralContainer:
     db_connect: DB
     db_factory: DBFactory
     settings: SettingsStorage
+    translator: Translator
     cleanup_service: CleanUpService
     button_protection: ButtonProtectionService
