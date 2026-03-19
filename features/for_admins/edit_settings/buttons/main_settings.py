@@ -48,6 +48,7 @@ class MainSettingsButton(FirewallButton):
         self.main_settings_service = main_settings_service
         self.formatter = formatter
         self.service_for_role = service_for_role
+        self.translator = translator
 
     async def on_click(self, interaction: discord.Interaction) -> None:
         flow = MainSettingsFlow(
@@ -55,7 +56,8 @@ class MainSettingsButton(FirewallButton):
             formatter=self.formatter,
             navigator=self.navigator,
             context=self.context,
-            service_for_role=self.service_for_role
+            service_for_role=self.service_for_role,
+            translator=self.translator
         )
 
         await flow.start_for_main(interaction=interaction)

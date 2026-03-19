@@ -15,6 +15,7 @@ from features.for_admins.edit_settings.services.settings_formatter import Settin
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
+    from general_services.translator.translator import Translator
 
 
 class SystemChannelsFlow:
@@ -23,13 +24,15 @@ class SystemChannelsFlow:
             navigator: Navigator,
             context: NavigationContext,
             sys_channels_service: SystemChannelsService,
-            formatter: SettingsFormatter
+            formatter: SettingsFormatter,
+            translator: Translator
     ):
 
         self.navigator = navigator
         self.context = context
         self.service = sys_channels_service
         self.formatter = formatter
+        self.translator = translator
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -38,16 +41,24 @@ class SystemChannelsFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available channels found.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_available_ch'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select a system channel you want to change:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_sys_ch'
+            ),
             callback=self._select_new_sys_channel
         )
 
@@ -69,7 +80,11 @@ class SystemChannelsFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Select new channel',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_new_sys_ch'
+            ),
             callback=lambda i, v: self._save_new_sys_channel(
                 interaction=i,
                 channel_key=channel_key,
@@ -98,7 +113,11 @@ class SystemChannelsFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
@@ -118,7 +137,13 @@ class SystemChannelsFlow:
         channel = interaction.guild.get_channel(channel_id)
 
         success_embed = SuccessEmbed(
-            description=f'For {channel_key} successfully assigned the channel {channel.name}'
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='sys_ch_success',
+                channel_key=channel_key,
+                channel_name=channel.name
+            ),
         )
 
         current_channels = await self.formatter.format_current_system_channels(
@@ -136,16 +161,24 @@ class SystemChannelsFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available channels found.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_available_ch'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select a system channel you want to delete:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_sys_ch_to_delete'
+            ),
             callback=self.delete_sys_channel
         )
 
@@ -162,27 +195,25 @@ class SystemChannelsFlow:
         )
 
         if not result:
-            embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
-        await self._send_result_for_delete(
-            interaction=interaction,
-            values=values
-        )
+        await self._send_result_for_delete(interaction=interaction)
 
-    async def _send_result_for_delete(self, interaction: discord.Interaction, values) -> None:
-        is_plural = len(values) != 1
-
-        word_1 = 'Channels' if is_plural else 'Channel'
-        word_2 = 'have' if is_plural else 'has'
-
-        msg = f'{word_1} {word_2} been successfully deleted.'
-
+    async def _send_result_for_delete(self, interaction: discord.Interaction) -> None:
         success_embed = SuccessEmbed(
-            description=msg
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='success_sys_ch_deletion'
+            )
         )
 
         current_channels = await self.formatter.format_current_system_channels(guild=interaction.guild)

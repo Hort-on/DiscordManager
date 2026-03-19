@@ -172,7 +172,8 @@ class Navigator:
             context=context,
             formatter=edit_settings_container.formatter,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
-            cleanup_service=self.general_container.cleanup_service
+            cleanup_service=self.general_container.cleanup_service,
+            translator=self.general_container.translator
         )
 
         return HiddenChannelsMenuView(
@@ -194,7 +195,8 @@ class Navigator:
             context=context,
             formatter=edit_settings_container.formatter,
             hidden_roles_service=edit_settings_container.hidden_roles_service,
-            cleanup_service=self.general_container.cleanup_service
+            cleanup_service=self.general_container.cleanup_service,
+            translator=self.general_container.translator
         )
 
         return HiddenRolesMenuView(
@@ -215,7 +217,8 @@ class Navigator:
             navigator=self,
             context=context,
             sys_channels_service=edit_settings_container.system_channels_service,
-            formatter=edit_settings_container.formatter
+            formatter=edit_settings_container.formatter,
+            translator=self.general_container.translator
         )
 
         return SystemChannelsMenuView(

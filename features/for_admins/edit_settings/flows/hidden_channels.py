@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.hidden_channels import HiddenChannelsService
 
     from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
 
 
 class HiddenChannelsFlow:
@@ -28,7 +29,8 @@ class HiddenChannelsFlow:
             context: NavigationContext,
             formatter: SettingsFormatter,
             hidden_ch_service: HiddenChannelsService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            translator: Translator
     ):
 
         self.navigator = navigator
@@ -36,6 +38,7 @@ class HiddenChannelsFlow:
         self.formatter = formatter
         self.hidden_ch_service = hidden_ch_service
         self.cleanup = cleanup_service
+        self.translator = translator
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -49,10 +52,14 @@ class HiddenChannelsFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available channels to be add.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_ch_to_add'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
@@ -97,7 +104,11 @@ class HiddenChannelsFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
@@ -119,16 +130,24 @@ class HiddenChannelsFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available channels to be deleted.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_ch_to_delete'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the channel you want to delete:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_ch_for_deletion'
+            ),
             callback=self._delete_channels_procedure,
             max_values=min(25, len(options))
         )
@@ -185,7 +204,11 @@ class HiddenChannelsFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_ch_to_delete'
+                )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
@@ -199,7 +222,13 @@ class HiddenChannelsFlow:
     async def _send_result(self, interaction: discord.Interaction, values: list[str]) -> None:
         ch_ids = set(int(i) for i in values)
 
-        ch_names: list[str] = ['These channels have been successfully added to hidden']
+        success_msg = self.translator.t(
+            guild_id=interaction.guild_id,
+            section='EDIT_SETTINGS',
+            key='success_ch_addition'
+        )
+
+        ch_names: list[str] = [success_msg]
 
         for ch_id in ch_ids:
             channel = interaction.guild.get_channel(ch_id)

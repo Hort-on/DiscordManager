@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator_context import NavigationContext
     from features.for_admins.edit_settings.services.main_settings.role_service import VerificationRoleService
     from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
+    from general_services.translator.translator import Translator
 
 
 class VerificationRoleFlow:
@@ -23,13 +24,15 @@ class VerificationRoleFlow:
             navigator: Navigator,
             context: NavigationContext,
             formatter: SettingsFormatter,
-            verification_role_service: VerificationRoleService
+            verification_role_service: VerificationRoleService,
+            translator: Translator
     ):
 
         self.context = context
         self.navigator = navigator
         self.formatter = formatter
         self.service = verification_role_service
+        self.translator = translator
 
     async def show_available_roles(self, interaction: discord.Interaction) -> None:
         options = self._get_available_roles(guild=interaction.guild)
@@ -37,7 +40,11 @@ class VerificationRoleFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the role:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_ver_role'
+            ),
             callback=self._save_verification_role
         )
 
@@ -70,16 +77,25 @@ class VerificationRoleFlow:
         )
 
         if not result:
-            embed = ErrorEmbed(
-                description='Somethings went wrong, please try again later'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         role = interaction.guild.get_role(int(value[0]))
 
         success_embed = SuccessEmbed(
-            description=f'Verification role is successfully assigned to: {role.name}'
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ver_role_success',
+                role_name=role.name
+            )
         )
 
         settings_embed = self.formatter.format_current_main_settings(interaction)

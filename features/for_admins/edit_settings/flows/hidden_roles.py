@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
 
     from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
 
 
 class HiddenRolesFlow:
@@ -27,7 +28,8 @@ class HiddenRolesFlow:
             context: NavigationContext,
             formatter: SettingsFormatter,
             hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            translator: Translator
     ):
 
         self.navigator = navigator
@@ -35,6 +37,7 @@ class HiddenRolesFlow:
         self.formatter = formatter
         self.hidden_roles_service = hidden_roles_service
         self.cleanup = cleanup_service
+        self.translator = translator
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
@@ -43,16 +46,24 @@ class HiddenRolesFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available roles to be add.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_roles_to_add'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the role you want to add to hidden:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_role_placeholder'
+            ),
             callback=self._save_role_to_hidden,
             max_values=min(25, len(options))
         )
@@ -71,15 +82,25 @@ class HiddenRolesFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
 
+        success_msg = self.translator.t(
+            guild_id=interaction.guild_id,
+            section='EDIT_SETTINGS',
+            key='success_role_addition'
+        )
+
         await self._send_result(
             interaction=interaction,
             values=values,
-            first_line='These roles have been successfully added to hidden:'
+            first_line=success_msg
         )
 
     # ================================= METHODS FOR DELETE BUTTON =================================
@@ -94,16 +115,24 @@ class HiddenRolesFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available channels to be deleted.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='EDIT_SETTINGS',
+                    key='no_roles_to_delete'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the role you want to delete:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ask_role_to_delete'
+            ),
             callback=self._delete_role_procedure,
             max_values=min(25, len(options))
         )
@@ -125,14 +154,24 @@ class HiddenRolesFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
             await interaction.response.edit_message(embed=error_embed)
+
+        success_msg = self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='success_role_deletion'
+            )
 
         await self._send_result(
             interaction=interaction,
             values=values,
-            first_line='These roles have been successfully deleted from hidden:'
+            first_line=success_msg
         )
 
     # ================================= METHODS FOR BOTH =================================

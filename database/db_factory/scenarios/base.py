@@ -14,8 +14,7 @@ class DataBaseScenario:
         'roles': "HiddenRoles",
         'temp_channels': "TempChannels",
         'groups': "Groups",
-        'group_members': "GroupMembers",
-        'bad_words': "BadWords"
+        'group_members': "GroupMembers"
     }
 
     USER_TABLES = [
@@ -49,5 +48,5 @@ class DataBaseScenario:
     def _get_table(self, table_name: str) -> str:
         table = self.table_map.get(table_name)
         if not table:
-            raise ValueError(f'Unknown table name: {table_name}')
+            raise ValueError(f'Не відома таблиця: {table_name}')
         return table

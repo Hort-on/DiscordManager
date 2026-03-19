@@ -17,5 +17,10 @@ SYSTEM_GENERAL = {
     'msg_not_found': {
         'en': "No messages were found in the selected channel or from the selected users.",
         'uk': "Не знайдено повідомлень в обраному каналі або від обраного користувача."
+    },
+
+    'error_msg': {
+        'en': "Something went wrong, please try again later.",
+        'uk': "Щось пішло не так, будь ласка спробуйте пізніше."
     }
 }

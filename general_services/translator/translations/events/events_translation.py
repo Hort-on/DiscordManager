@@ -1,7 +1,7 @@
 EVENTS = {
         'member_left_title': {
             'en': "Member left",
-            'uk': "Користувач вийшов"
+            'uk': "Користувач залишив сервер"
         },
 
         'member_left_msg': {
