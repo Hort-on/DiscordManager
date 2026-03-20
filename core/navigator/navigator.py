@@ -229,7 +229,7 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def send_message_menu(self):
+    def send_message_menu(self, guild_id: int):
         from features.for_admins.send_messages.flows.send_message_flow import SendMessageFlow
         from features.for_admins.send_messages.flows.send_rules_flow import SendRulesFlow
         from features.for_admins.send_messages.view import SendMessageMenuView
@@ -238,17 +238,21 @@ class Navigator:
 
         message_flow = SendMessageFlow(
             navigator=self,
-            message_service=message_module.send_message_service
+            message_service=message_module.send_message_service,
+            translator=self.general_container.translator
         )
 
         rules_fow = SendRulesFlow(
             navigator=self,
-            rules_service=message_module.rules_service
+            rules_service=message_module.rules_service,
+            translator=self.general_container.translator
         )
 
         return SendMessageMenuView(
             navigator=self,
             buttons_protection=self.general_container.button_protection,
             messages_flow=message_flow,
-            rules_flow=rules_fow
+            rules_flow=rules_fow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )

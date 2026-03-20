@@ -13,8 +13,10 @@ from core.navigator.navigator import Navigator
 from database.data_base_model import DB
 from database.settings_storage.settings import SettingsStorage
 from database.db_factory.db_scenario_factory import DBFactory
-from features.auto_moderation.message_moderation.module import build_automod_module
 
+from event_services.member_left import MemberLeftNotification
+
+from features.auto_moderation.message_moderation.module import build_automod_module
 from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
@@ -61,6 +63,12 @@ async def main():
     verification_service = VerificationService(bot=bot, settings=settings, db_factory=db_factory)
 
     rules_service = RulesService(bot=bot, settings=settings)
+
+    member_left_service = MemberLeftNotification(
+        bot=bot,
+        settings=settings,
+        translator=translator
+    )
 
     verification_view_service = VerificationViewService(
         bot=bot,
@@ -117,7 +125,8 @@ async def main():
         verification_view_service=verification_view_service,
         rules_service=rules_service,
         moderation_service=automod_module,
-        translator=translator
+        translator=translator,
+        member_left_service=member_left_service
     )
 
     await bot.start(TOKEN)

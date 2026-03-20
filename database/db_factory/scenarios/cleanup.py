@@ -17,11 +17,10 @@ class CleanupGuild(DataBaseScenario):
             guild_id=guild_id
         )
 
-    async def _execute(self) -> bool:
+    async def _execute(self) -> None:
         async with self.db_connect.connect_write() as cursor:
             query = f'DELETE FROM GuildSettings WHERE guild_id = ?'
             await cursor.execute(query, (self.guild_id,))
-            return cursor.total_changes > 0
 
 
 class CleanupUser(DataBaseScenario):

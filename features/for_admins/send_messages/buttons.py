@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator_context import NavigationContext
     from features.for_admins.send_messages.flows.send_rules_flow import SendRulesFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class SendMessageMenu(FirewallButton):
@@ -23,10 +24,16 @@ class SendMessageMenu(FirewallButton):
             self,
             navigator: Navigator,
             context: NavigationContext,
-            protection_service: ButtonProtectionService
+            protection_service: ButtonProtectionService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='📨Send message',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SEND_MSG',
+                key='send_msg_button'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=protection_service
         )
@@ -35,7 +42,7 @@ class SendMessageMenu(FirewallButton):
         self.context = context
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.send_message_menu()
+        view = self.navigator.send_message_menu(guild_id=interaction.guild_id)
 
         view.context = self.context
         self.context.push(
@@ -54,10 +61,16 @@ class SendMessageButton(FirewallButton):
     def __init__(
             self,
             protection_service: ButtonProtectionService,
-            flow: SendMessageFlow
+            flow: SendMessageFlow,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='Send message',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SEND_MSG',
+                key='send_msg_button'
+            ),
             style=discord.ButtonStyle.blurple,
             protection_service=protection_service
         )
@@ -70,9 +83,19 @@ class SendMessageButton(FirewallButton):
 class SendRulesButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, protection_service: ButtonProtectionService, flow: SendRulesFlow):
+    def __init__(
+            self,
+            protection_service: ButtonProtectionService,
+            flow: SendRulesFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='Send the rules',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SEND_MSG',
+                key='send_rules'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=protection_service
         )

@@ -164,7 +164,7 @@ class SystemChannelsFlow:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
                     guild_id=interaction.guild_id,
-                    section='EDIT_SETTINGS',
+                    section='SYSTEM_GENERAL',
                     key='no_available_ch'
                 )
             )

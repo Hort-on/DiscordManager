@@ -104,6 +104,11 @@ EDIT_SETTINGS = {
         'uk': "Verification role is successfully assigned to: {role_name}"
     },
 
+    'ch_to_change': {
+        'en': "Please select the channel you want to change:",
+        'uk': "Будь ласка оберіть канал який ви б хотіли змінити:"
+    },
+
     'no_ch_to_add': {
         'en': "No available channels to be add.",
         'uk': "Немає доступних каналів для додавання"
@@ -152,11 +157,6 @@ EDIT_SETTINGS = {
     'success_role_deletion': {
         'en': "These roles have been successfully deleted from hidden:",
         'uk': "Ці ролі були успішно видалені з прихованих:"
-    },
-
-    'no_available_ch': {
-        'en': "No available channels found.",
-        'uk': "Немає доступних каналів."
     },
 
     'ask_sys_ch': {

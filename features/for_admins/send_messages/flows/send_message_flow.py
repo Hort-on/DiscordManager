@@ -10,16 +10,19 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.send_messages.services.send_message_service import MessageService
+    from general_services.translator.translator import Translator
 
 
 class SendMessageFlow:
     def __init__(
             self,
             message_service: MessageService,
-            navigator: Navigator
+            navigator: Navigator,
+            translator: Translator
     ):
         self.service = message_service
         self.navigator = navigator
+        self.translator = translator
 
     async def start_for_send(self, interaction: discord.Interaction):
         options = self.service.get_channels(
@@ -27,16 +30,24 @@ class SendMessageFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available roles to be add.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='no_available_ch'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the channel you want to send messages:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='SEND_MSG',
+                key='ask_ch_to_send'
+            ),
             callback=self._handle_channel,
         )
 
@@ -56,7 +67,11 @@ class SendMessageFlow:
 
         if not result:
             error_embed = ErrorEmbed(
-                description='Something went wrong, please try again later.'
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
             )
             await interaction.response.edit_message(
                 embed=error_embed
@@ -64,8 +79,11 @@ class SendMessageFlow:
             return
 
         success_embed = SuccessEmbed(
-            description=f'Successful, now all you can send anon messages. Selected channel: {channel.name}. \n'
-                        f'To send messages just send it to the bot in DM.'
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='SEND_MSG',
+                key='success_ch_to_send'
+            )
         )
 
         await interaction.response.edit_message(

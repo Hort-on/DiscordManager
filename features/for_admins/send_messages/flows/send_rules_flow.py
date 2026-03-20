@@ -4,35 +4,51 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from ui.embed_constructor.embed_constructor import ErrorEmbed
+from ui.embed_constructor.embed_constructor import ErrorEmbed, InfoEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.send_messages.services.send_rules_service import RulesService
+    from general_services.translator.translator import Translator
 
 
 class SendRulesFlow:
-    def __init__(self, navigator: Navigator, rules_service: RulesService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            rules_service: RulesService,
+            translator: Translator
+    ):
         self.navigator = navigator
         self.service = rules_service
+        self.translator = translator
 
     async def start_for_rules(self, interaction: discord.Interaction):
-        channel = self.service.get_verification_channel(
+        channel_id = self.service.get_verification_channel(
             guild_id=interaction.guild_id
         )
-        if not channel:
-            embed = ErrorEmbed(
-                description='Please before sending rules, please assign verification channel.'
+        if not channel_id:
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='SEND_MSG',
+                    key='assure_ch'
+                )
             )
             await interaction.response.send_message(
-                embed=embed,
+                embed=error_embed,
                 ephemeral=True
             )
             return
 
         self.service.active_sessions[interaction.user.id] = interaction.guild_id
 
-        await interaction.response.send_message(
-            'Please send your rules to the bot`s DM.',
-            ephemeral=True
+        embed = InfoEmbed(
+            description=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='SEND_MSG',
+                key='ask_msg_dm'
+            )
         )
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)

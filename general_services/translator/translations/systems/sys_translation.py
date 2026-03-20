@@ -22,5 +22,10 @@ SYSTEM_GENERAL = {
     'error_msg': {
         'en': "Something went wrong, please try again later.",
         'uk': "Щось пішло не так, будь ласка спробуйте пізніше."
+    },
+
+    'no_available_ch': {
+        'en': "No available channels found.",
+        'uk': "Немає доступних каналів."
     }
 }

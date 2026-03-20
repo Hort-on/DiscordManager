@@ -65,7 +65,11 @@ class HiddenChannelsFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the channel you want to change:',
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='EDIT_SETTINGS',
+                key='ch_to_change'
+            ),
             callback=self._update_channels_procedure,
             max_values=min(25, len(options))
         )

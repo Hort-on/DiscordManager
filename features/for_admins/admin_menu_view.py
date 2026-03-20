@@ -77,7 +77,9 @@ class AdminMenuView(discord.ui.View):
                 SendMessageMenu(
                     navigator=navigator,
                     context=context,
-                    protection_service=protection_service
+                    protection_service=protection_service,
+                    translator=translator,
+                    guild_id=guild_id
                 )
             )
 

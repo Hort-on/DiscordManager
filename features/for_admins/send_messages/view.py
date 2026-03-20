@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.send_messages.flows.send_message_flow import SendMessageFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class SendMessageMenuView(discord.ui.View):
@@ -20,18 +21,28 @@ class SendMessageMenuView(discord.ui.View):
             navigator: Navigator,
             buttons_protection: ButtonProtectionService,
             messages_flow: SendMessageFlow,
-            rules_flow: SendRulesFlow
+            rules_flow: SendRulesFlow,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(timeout=60)
 
-        self.add_item(SendMessageButton(
-            protection_service=buttons_protection,
-            flow=messages_flow
-        ))
+        self.add_item(
+            SendMessageButton(
+                protection_service=buttons_protection,
+                flow=messages_flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
-        self.add_item(SendRulesButton(
-            protection_service=buttons_protection,
-            flow=rules_flow
-        ))
+        self.add_item(
+            SendRulesButton(
+                protection_service=buttons_protection,
+                flow=rules_flow,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
         self.add_item(BackButton(navigator=navigator))
