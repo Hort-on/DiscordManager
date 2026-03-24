@@ -109,7 +109,7 @@ class Navigator:
             flow=flow
         )
 
-    def superusers_menu(self, context: NavigationContext):
+    def superusers_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.superusers.flow import SuperusersFlow
         from features.for_admins.superusers.menu_view import SuperusersMenuView
 
@@ -119,13 +119,16 @@ class Navigator:
             navigator=self,
             context=context,
             superusers_service=superusers_module.superusers_service,
-            formatter=superusers_module.superusers_formatter
+            formatter=superusers_module.superusers_formatter,
+            translator=self.general_container.translator
         )
 
         return SuperusersMenuView(
             navigator=self,
             buttons_protection=self.general_container.button_protection,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def randomizer_menu(self):

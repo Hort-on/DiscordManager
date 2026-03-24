@@ -4,179 +4,202 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.routes import Route
+from .results import DeleteSuperusersResult, AddSuperusersResult
 
+from core.navigator.routes import Route
 from features.for_admins.superusers.modals import AddSuperusersModal
+from general_services.other_services.get_member_by_name import get_member_by_name
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
-from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed, WarningEmbed, InfoEmbed
+from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.formatter import SuperusersFormatter
+    from general_services.translator.translator import Translator
 
 
 class SuperusersFlow:
     def __init__(
-            self,
-            navigator: Navigator,
-            context: NavigationContext,
-            superusers_service: SuperusersService,
-            formatter: SuperusersFormatter
+        self,
+        navigator: Navigator,
+        context: NavigationContext,
+        superusers_service: SuperusersService,
+        formatter: SuperusersFormatter,
+        translator: Translator
     ):
-
         self.navigator = navigator
         self.context = context
         self.superusers_service = superusers_service
         self.formatter = formatter
+        self.translator = translator
 
-    # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_modal(AddSuperusersModal(
-            flow=self
-        ))
+        await interaction.response.send_modal(
+            AddSuperusersModal(
+                flow=self,
+                translator=self.translator,
+                guild_id=interaction.guild_id
+            )
+        )
 
     async def save_members(self, interaction: discord.Interaction, user_names: str) -> None:
-        result = await self.superusers_service.prepare_users_for_addition(
+        usernames = self._parse_usernames(user_names=user_names)
+        current_superusers = self.superusers_service.get_current_superusers(guild_id=interaction.guild_id)
+
+        result = self._proceed_users(
             guild=interaction.guild,
-            user_names=user_names
+            usernames=usernames,
+            current_superusers=current_superusers
         )
 
-        error_embed = result.get('error_embed', None)
-        if error_embed:
-            embed = ErrorEmbed(
-                description=error_embed
+        if result.added_ids:
+            success = await self.superusers_service.add_superusers(
+                guild_id=interaction.guild_id,
+                user_ids=set(result.added_ids)
             )
-            await interaction.response.edit_message(
-                embed=embed
-            )
-            return
+            if not success:
+                await interaction.response.edit_message(
+                    embed=ErrorEmbed(
+                        description=self.translator.t(
+                            guild_id=interaction.guild_id,
+                            section='SYSTEM_GENERAL',
+                            key='error_msg'
+                        )
+                    )
+                )
+                return
 
-        embeds: list[discord.Embed] = []
-
-        success = result.get('success_embed', None)
-        if success:
-            success_embed = SuccessEmbed(
-                description=success
-            )
-            embeds.append(success_embed)
-
-        warning_e = result.get('warning_embed', None)
-        if warning_e:
-            warning_embed = WarningEmbed(
-                description=warning_e
-            )
-            embeds.append(warning_embed)
-
-        info = result.get('info_embed', None)
-        if info:
-            info_embed = InfoEmbed(
-                description=info
-            )
-            embeds.append(info_embed)
-
-        await interaction.response.edit_message(
-            embeds=embeds
+        embeds = self.formatter.build_add_result_embeds(
+            result=result,
+            guild_id=interaction.guild_id
         )
 
-    # ================================= METHODS FOR DELETE BUTTON =================================
-    async def start_for_delete(self, interaction: discord.Interaction):
-        options, not_found = await self._build_options(
+        await interaction.response.edit_message(embeds=embeds)
+
+    @staticmethod
+    def _parse_usernames(user_names: str) -> set[str]:
+        return {name.strip() for name in user_names.split(',') if name.strip()}
+
+    @staticmethod
+    def _proceed_users(
+            guild: discord.Guild,
+            usernames: set[str],
+            current_superusers: set[int]
+    ) -> AddSuperusersResult:
+
+        added_ids: set[int] = set()
+        added_names: set[str] = set()
+        not_found: set[str] = set()
+        already_super: set[str] = set()
+
+        for username in usernames:
+            member = get_member_by_name(guild=guild, username=username)
+
+            if not member:
+                not_found.add(username)
+                continue
+
+            name = member.display_name or member.name
+
+            if member.id in current_superusers:
+                already_super.add(name)
+                continue
+
+            added_ids.add(member.id)
+            added_names.add(name)
+
+        return AddSuperusersResult(
+            added_ids=added_ids,
+            added_names=added_names,
+            not_found=not_found,
+            already_super=already_super
+        )
+
+    async def start_for_delete(self, interaction: discord.Interaction) -> None:
+        users, not_found_msg = await self.superusers_service.get_superusers_for_deletion(
             guild=interaction.guild,
             client=interaction.client
         )
 
-        if not options:
-            embed = ErrorEmbed(
-                description='No superusers were found.'
+        if not users:
+            await interaction.response.edit_message(
+                embed=ErrorEmbed(
+                    description=self.translator.t(
+                        guild_id=interaction.guild_id,
+                        section='SUPERUSERS',
+                        key='no_superusers'
+                    )
+                )
             )
-            await interaction.response.edit_message(embed=embed)
             return
+
+        options = [
+            discord.SelectOption(label=name, value=str(user_id))
+            for user_id, name in users.items()
+        ]
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please select the users you want to delete:',
-            callback=lambda i, v: self._send_result(i, v, not_found),
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='SUPERUSERS',
+                key='ask_s_users_to_delete'
+            ),
+            callback=lambda i, v: self._handle_delete(i, v, not_found_msg),
             max_values=min(25, len(options))
         )
 
         view.context = self.context
-
         self.context.push(target=Route.SUPERUSERS_MENU)
 
-        info_embed = self.formatter.build_embed(guild=interaction.guild)
+        embed = self.formatter.build_embed(guild=interaction.guild)
 
-        await interaction.response.edit_message(
-            embed=info_embed,
-            view=view
-        )
+        await interaction.response.edit_message(embed=embed, view=view)
 
-    async def _send_result(
-            self,
-            interaction: discord.Interaction,
-            values: list[str],
-            not_found: str
-    ):
-        result = await self.superusers_service.delete_superusers(
+    async def _handle_delete(
+        self,
+        interaction: discord.Interaction,
+        values: list[str],
+        not_found_msg: str | bool
+    ) -> None:
+        success = await self.superusers_service.delete_superusers(
             guild_id=interaction.guild_id,
             values=values
         )
-        if not result:
-            warning_embed = WarningEmbed(
-                description='Something went wrong, please try again later.'
-            )
 
+        if not success:
             await interaction.response.edit_message(
-                embed=warning_embed
+                embed=ErrorEmbed(
+                    description=self.translator.t(
+                        guild_id=interaction.guild_id,
+                        section='SYSTEM_GENERAL',
+                        key='error_msg'
+                    )
+                )
             )
             return
 
-        embeds: list[discord.Embed] = []
-        deleted_usernames: list[str] = ['These users were not on this server and were deleted as well:',
-                                        f'{'-' * 40}']
+        deleted_names: set[str] = set()
 
         for user_id in values:
-            user = await interaction.guild.fetch_member(int(user_id))
-            deleted_usernames.append(f'🔸{user.display_name}')
+            member = await interaction.guild.fetch_member(int(user_id))
+            deleted_names.add(member.display_name)
 
-        success_embed = SuccessEmbed(
-            description='\n'.join(deleted_usernames)
+        result = DeleteSuperusersResult(
+            deleted=deleted_names,
+            not_found_message=not_found_msg if not_found_msg else None
         )
-        embeds.append(success_embed)
 
-        if not_found:
-            warning_embed = WarningEmbed(
-                description=not_found
-            )
-            embeds.append(warning_embed)
-
-        current_superusers = self.formatter.build_embed(
+        embeds = self.formatter.build_delete_result_embeds(
+            result=result,
             guild=interaction.guild
         )
-        embeds.append(current_superusers)
 
-        await interaction.response.edit_message(
-            embeds=embeds
-        )
-
-    async def _build_options(self, guild: discord.Guild, client: discord.Client) -> tuple:
-        users, not_found = await self.superusers_service.get_superusers_for_deletion(
-            guild=guild,
-            client=client
-        )
-
-        options = [
-            discord.SelectOption(
-                label=value,
-                value=str(key)
-            )
-            for key, value in users.items()
-        ]
-
-        return options, not_found
+        await interaction.response.edit_message(embeds=embeds)
 
     async def for_superusers_list(self, interaction: discord.Interaction) -> None:
         embed = self.formatter.build_embed(guild=interaction.guild)

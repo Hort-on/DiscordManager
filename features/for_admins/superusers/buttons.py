@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from features.for_admins.superusers.formatter import SuperusersFormatter
     from features.for_admins.superusers.flow import SuperusersFlow
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class SuperusersMenuButton(FirewallButton):
@@ -25,10 +26,16 @@ class SuperusersMenuButton(FirewallButton):
             navigator: Navigator,
             context: NavigationContext,
             formatter: SuperusersFormatter,
-            buttons_protection: ButtonProtectionService
+            buttons_protection: ButtonProtectionService,
+            translator: Translator,
+            guild_id: int
     ):
         super().__init__(
-            label='👮Superusers management',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SUPERUSERS',
+                key='superusers_menu'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )
@@ -38,7 +45,10 @@ class SuperusersMenuButton(FirewallButton):
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.superusers_menu(context=self.context)
+        view = self.navigator.superusers_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
 
         view.context = self.context
         self.context.push(
@@ -56,9 +66,19 @@ class SuperusersMenuButton(FirewallButton):
 class AddSuperuserButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SuperusersFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SuperusersFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📥Add super user',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SUPERUSERS',
+                key='add_superusers'
+            ),
             style=discord.ButtonStyle.green,
             protection_service=buttons_protection
         )
@@ -72,9 +92,19 @@ class AddSuperuserButton(FirewallButton):
 class DeleteSuperusersButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SuperusersFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SuperusersFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='🗑️Delete superusers',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SUPERUSERS',
+                key='delete_superusers'
+            ),
             style=discord.ButtonStyle.red,
             protection_service=buttons_protection
         )
@@ -88,9 +118,19 @@ class DeleteSuperusersButton(FirewallButton):
 class SuperusersListButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, buttons_protection: ButtonProtectionService, flow: SuperusersFlow):
+    def __init__(
+            self,
+            buttons_protection: ButtonProtectionService,
+            flow: SuperusersFlow,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='📑Show current superusers',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SUPERUSERS',
+                key='superusers_list'
+            ),
             style=discord.ButtonStyle.blurple,
             protection_service=buttons_protection
         )

@@ -47,7 +47,9 @@ class AdminMenuView(discord.ui.View):
                 navigator=navigator,
                 context=context,
                 formatter=superusers_formatter,
-                buttons_protection=protection_service
+                buttons_protection=protection_service,
+                translator=translator,
+                guild_id=guild_id
             )
         )
 

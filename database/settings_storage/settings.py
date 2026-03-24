@@ -105,10 +105,9 @@ class SettingsStorage:
         )
         superusers = await superuser_scenario.db_proceed()
 
-        if superusers:
-            self._guild_superusers[guild_id] = {
-                user['user_id'] for user in superusers
-            }
+        self._guild_superusers[guild_id] = {
+            user['user_id'] for user in superusers
+        }
 
         # -------------------------------- load guilds roles ---------------------------------- #
         role_scenario = self.db_factory.for_fetch_all(

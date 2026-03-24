@@ -15,7 +15,6 @@ class Translator:
         self.settings = settings
 
     def t(self, guild_id: int, section: str, key: str, **kwargs):
-        print(kwargs)
         lang_code = self.settings.dict_storage.get_value(
             key='language',
             target=StorageTarget.SETTINGS,

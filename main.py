@@ -84,7 +84,8 @@ async def main():
         cleanup_service=cleanup_service,
         verification_service=verification_service,
         verification_view_service=verification_view_service,
-        rules_service=rules_service
+        rules_service=rules_service,
+        translator=translator
     )
 
     everyone_module = build_everyone_module(

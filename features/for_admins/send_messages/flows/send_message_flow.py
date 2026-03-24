@@ -58,7 +58,6 @@ class SendMessageFlow:
     async def _handle_channel(self, interaction: discord.Interaction, value: list[str]):
         channel = interaction.guild.get_channel(int(value[0]))
 
-        print(channel.name, channel.id)
         result = await self.service.save_channel(
             guild_id=interaction.guild_id,
             user_id=interaction.user.id,

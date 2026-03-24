@@ -9,7 +9,6 @@ from features.for_admins.superusers.module import SuperusersModule, build_superu
 from features.for_admins.send_messages.module import SendMessageModule, build_messages_module
 from features.for_admins.edit_settings.module import EditSettingsModule, build_edit_settings_module
 
-
 if TYPE_CHECKING:
     from core.bot_config import Bot
     from database.db_factory.db_scenario_factory import DBFactory
@@ -18,6 +17,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.verification.view_service import VerificationViewService
     from features.for_admins.send_messages.services.send_rules_service import RulesService
     from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
 
 
 @dataclass
@@ -35,7 +35,8 @@ def build_admin_module(
         cleanup_service: CleanUpService,
         verification_service: VerificationService,
         verification_view_service: VerificationViewService,
-        rules_service: RulesService
+        rules_service: RulesService,
+        translator: Translator
 ) -> AdministrationModule:
 
     delete_msg_module = build_delete_msg_module(
@@ -60,7 +61,8 @@ def build_admin_module(
     superusers_module = build_superusers_module(
         settings=settings,
         db_factory=db_factory,
-        cleanup_service=cleanup_service
+        cleanup_service=cleanup_service,
+        translator=translator
     )
 
     return AdministrationModule(
