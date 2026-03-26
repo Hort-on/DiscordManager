@@ -13,21 +13,34 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.birthdays.service import BirthdayService
+    from general_services.translator.translator import Translator
 
 
 class BirthdayMenuButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, context: NavigationContext, service: BirthdayService):
+    def __init__(
+            self,
+            navigator: Navigator,
+            context: NavigationContext,
+            service: BirthdayService,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='🎂 Birthdays',
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='birthdays'
+            ),
             style=discord.ButtonStyle.secondary
         )
 
         self.navigator = navigator
         self.context = context
         self.service = service
+        self.translator = translator
 
     async def callback(self, interaction: discord.Interaction):
-        view = self.navigator.birthday_menu()
+        view = self.navigator.birthday_menu(guild_id=interaction.guild_id)
 
         view.context = self.context
 
@@ -40,16 +53,17 @@ class BirthdayMenuButton(discord.ui.Button):
                 )
         )
 
-        await interaction.response.edit_message(
-            content='🎂 Birthday management',
-            view=view
-        )
+        await interaction.response.edit_message(view=view)
 
 
 class AddBirthdayButton(discord.ui.Button):
-    def __init__(self, flow: BirthdayFlow):
+    def __init__(self, flow: BirthdayFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Add birthday',
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='add_birthday'
+            ),
             style=discord.ButtonStyle.blurple
         )
 
@@ -60,9 +74,13 @@ class AddBirthdayButton(discord.ui.Button):
 
 
 class DeleteBirthdayButton(discord.ui.Button):
-    def __init__(self, flow: BirthdayFlow):
+    def __init__(self, flow: BirthdayFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Delete birthday',
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='del_birthday'
+            ),
             style=discord.ButtonStyle.red
         )
 

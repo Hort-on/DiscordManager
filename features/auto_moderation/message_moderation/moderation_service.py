@@ -25,6 +25,9 @@ class ModerationService:
         self.translator = translator
 
     async def process_message(self, message: discord.Message) -> None:
+        if message.guild is None:
+            return
+
         data = self.settings.dict_storage.get_all(
             target=StorageTarget.SETTINGS,
             guild_id=message.guild.id,

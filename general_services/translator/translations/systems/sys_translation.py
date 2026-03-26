@@ -27,5 +27,10 @@ SYSTEM_GENERAL = {
     'no_available_ch': {
         'en': "No available channels found.",
         'uk': "Немає доступних каналів."
+    },
+
+    'admin_menu': {
+        'en': "🛠️Admin menu",
+        'uk': "🛠️Адмін меню"
     }
 }

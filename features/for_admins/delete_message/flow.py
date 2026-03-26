@@ -98,7 +98,7 @@ class DeleteMessageFlow:
             else:
                 embed = SuccessEmbed(description=result)
 
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, ephemeral=True)
             return
 
         len_result = await self._delete_any_message_process(
@@ -125,7 +125,7 @@ class DeleteMessageFlow:
                 )
             )
 
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def _send_modal(self, interaction: discord.Interaction, value: list[str]) -> None:
         channel_id = int(value[0])

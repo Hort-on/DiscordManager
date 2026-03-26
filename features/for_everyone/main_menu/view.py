@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from database.settings_storage.settings import SettingsStorage
     from features.for_everyone.birthdays.service import BirthdayService
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class MainMenuView(discord.ui.View):
@@ -27,6 +28,7 @@ class MainMenuView(discord.ui.View):
             buttons_protection: ButtonProtectionService,
             birthday_service: BirthdayService,
             context: NavigationContext,
+            translator: Translator,
             guild_id: int,
             user_id: int,
             owner_id: int
@@ -49,27 +51,41 @@ class MainMenuView(discord.ui.View):
             guild_id=guild_id
         )
 
-        self.add_item(RandomizerMenuButton(
-            navigator=navigator,
-            context=context
-        ))
+        self.add_item(
+            RandomizerMenuButton(
+                navigator=navigator,
+                context=context,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
         if role_manager:
-            self.add_item(RoleManagerMenuButton(
-                navigator=navigator,
-                context=context
-            ))
+            self.add_item(
+                RoleManagerMenuButton(
+                    navigator=navigator,
+                    context=context
+                )
+            )
 
         if config.get('birthday', False):
-            self.add_item(BirthdayMenuButton(
-                navigator=navigator,
-                context=context,
-                service=birthday_service
-            ))
+            self.add_item(
+                BirthdayMenuButton(
+                    navigator=navigator,
+                    context=context,
+                    service=birthday_service,
+                    translator=translator,
+                    guild_id=guild_id
+                )
+            )
 
         if user_id in superusers or user_id == owner_id:
-            self.add_item(AdminMenuButton(
-                navigator=navigator,
-                context=context,
-                buttons_protection=buttons_protection
-            ))
+            self.add_item(
+                AdminMenuButton(
+                    navigator=navigator,
+                    context=context,
+                    buttons_protection=buttons_protection,
+                    translator=translator,
+                    guild_id=guild_id
+                )
+            )

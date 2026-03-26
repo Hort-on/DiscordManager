@@ -13,14 +13,26 @@ from ui.button_protection.admin_buttons_protection import FirewallButton
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from ui.button_protection.button_protection_service import ButtonProtectionService
+    from general_services.translator.translator import Translator
 
 
 class AdminMenuButton(FirewallButton):
     scope = 'admin'
 
-    def __init__(self, navigator: Navigator, buttons_protection: ButtonProtectionService, context: NavigationContext):
+    def __init__(
+            self,
+            navigator: Navigator,
+            buttons_protection: ButtonProtectionService,
+            context: NavigationContext,
+            translator: Translator,
+            guild_id: int
+    ):
         super().__init__(
-            label='🛠️Admin menu',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SYSTEM_GENERAL',
+                key='admin_menu'
+            ),
             style=discord.ButtonStyle.secondary,
             protection_service=buttons_protection
         )

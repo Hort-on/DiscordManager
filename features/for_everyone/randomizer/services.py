@@ -34,7 +34,7 @@ class RandomizerService:
         teams = [[] for _ in range(teams_quantity)]
 
         for i, member in enumerate(members):
-            teams[i % teams_quantity].append(member)
+            teams[i % teams_quantity].append(member.display_name)
 
         return teams
 

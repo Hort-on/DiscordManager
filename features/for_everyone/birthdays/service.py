@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from core.bot_config import Bot
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
+    from general_services.translator.translator import Translator
 
 
 @dataclass
@@ -19,24 +20,34 @@ class BirthdayServiceReturn:
 
 
 class BirthdayService(DBBaseService):
-    def __init__(self, bot: Bot, settings: SettingsStorage, db_factory: DBFactory):
-        super().__init__(settings)
+    def __init__(
+            self,
+            bot: Bot,
+            settings: SettingsStorage,
+            db_factory: DBFactory,
+            translator: Translator
+    ):
+        super().__init__(settings=settings)
 
         self.bot = bot
         self.settings = settings
         self.db_factory = db_factory
+        self.translator = translator
 
     async def save_birthday(
             self,
             user_id: int,
             guild_id: int,
+            author_id: int,
             user_birthday: str
     ) -> BirthdayServiceReturn:
         if not self._is_valid_date(user_birthday):
-            return BirthdayServiceReturn(
-                value=False,
-                message='Invalid date format. Use DD.MM.'
+            message = self.translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='invalid_date'
             )
+            return BirthdayServiceReturn(value=False, message=message)
 
         exists_scenario = self.db_factory.for_exists_birthday_check(
             guild_id=guild_id,
@@ -44,10 +55,12 @@ class BirthdayService(DBBaseService):
 
         )
         if await exists_scenario.db_proceed():
-            return BirthdayServiceReturn(
-                value=False,
-                message='This user already has his birthday.'
+            message = self.translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='already_has_b_same_user' if user_id == author_id else 'already_has_b'
             )
+            return BirthdayServiceReturn(value=False, message=message)
 
         add_scenario = self.db_factory.for_add_birthday(
             guild_id=guild_id,
@@ -55,38 +68,38 @@ class BirthdayService(DBBaseService):
             user_birthday=user_birthday
         )
 
-        result = self.update_db_and_cache(
-            scenario=add_scenario,
-            guild_id=guild_id
-        )
+        result = self.update_db_and_cache(scenario=add_scenario, guild_id=guild_id)
 
         if not result:
-            return BirthdayServiceReturn(
-                value=False,
-                message='Something went wrong, please try again later.'
+            message = self.translator.t(
+                guild_id=guild_id,
+                section='SYSTEM_GENERAL',
+                key='error_msg'
             )
+            return BirthdayServiceReturn(value=False, message=message)
 
-        return BirthdayServiceReturn(
-            value=True,
-            message=f'The user is successfully saved with birthday date: {user_birthday}'
+        message = self.translator.t(
+            guild_id=guild_id,
+            section='BIRTHDAYS',
+            key='success_saved',
+            user_birthday=user_birthday
         )
 
-    async def delete_birthday(
-            self,
-            user_id: int,
-            guild_id: int
-    ) -> BirthdayServiceReturn:
+        return BirthdayServiceReturn(value=True, message=message)
 
+    async def delete_birthday(self, user_id: int, guild_id: int, author_id: int) -> BirthdayServiceReturn:
         exists_scenario = self.db_factory.for_exists_birthday_check(
             guild_id=guild_id,
             user_id=user_id
         )
 
         if not await exists_scenario.db_proceed():
-            return BirthdayServiceReturn(
-                value=False,
-                message='The user not found, please try again.'
+            message = self.translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='not_found_user'
             )
+            return BirthdayServiceReturn(value=False, message=message)
 
         delete_scenario = self.db_factory.for_delete_birthday(
             guild_id=guild_id,
@@ -96,15 +109,20 @@ class BirthdayService(DBBaseService):
         result = await delete_scenario.db_proceed()
 
         if not result:
-            return BirthdayServiceReturn(
-                value=False,
-                message='Something went wrong, please try again later.'
+            message = self.translator.t(
+                guild_id=guild_id,
+                section='SYSTEM_GENERAL',
+                key='error_msg'
             )
+            return BirthdayServiceReturn(value=False, message=message)
 
-        return BirthdayServiceReturn(
-            value=True,
-            message='Your birthday has been successfully deleted.'
+        message = self.translator.t(
+            guild_id=guild_id,
+            section='BIRTHDAYS',
+            key='success_del_same_user' if user_id == author_id else 'success_del'
         )
+
+        return BirthdayServiceReturn(value=True, message=message)
 
     @staticmethod
     def _is_valid_date(value: str) -> bool:

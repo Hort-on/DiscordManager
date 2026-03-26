@@ -54,6 +54,7 @@ class Navigator:
                 navigator=self,
                 buttons_protection=self.general_container.button_protection,
                 birthday_service=birthday_module.service,
+                translator=self.general_container.translator,
                 guild_id=guild_id,
                 user_id=user_id,
                 owner_id=owner_id,
@@ -95,18 +96,21 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def birthday_menu(self):
+    def birthday_menu(self, guild_id: int):
         from features.for_everyone.birthdays.flow import BirthdayFlow
         from features.for_everyone.birthdays.menu_view import BirthdayMenuView
 
         flow = BirthdayFlow(
             navigator=self,
-            service=self.everyone_module.birthday_module.service
+            service=self.everyone_module.birthday_module.service,
+            translator=self.general_container.translator
         )
 
         return BirthdayMenuView(
             navigator=self,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def superusers_menu(self, context: NavigationContext, guild_id: int):
@@ -131,7 +135,7 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def randomizer_menu(self):
+    def randomizer_menu(self, guild_id: int):
         from features.for_everyone.randomizer.flow import RandomizerFlow
         from features.for_everyone.randomizer.menu_view import RandomModeView
 
@@ -139,12 +143,15 @@ class Navigator:
 
         flow = RandomizerFlow(
             navigator=self,
-            service=randomizer_module.service
+            service=randomizer_module.service,
+            translator=self.general_container.translator
         )
 
         return RandomModeView(
             navigator=self,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def role_manager_menu(self, context: NavigationContext):

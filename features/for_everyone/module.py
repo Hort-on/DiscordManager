@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from features.for_everyone.birthdays.module import BirthdayForUserModule
     from features.for_everyone.randomizer.module import RandomizerModule
     from features.for_everyone.role_manager.module import RoleManagerModule
+    from general_services.translator.translator import Translator
 
 
 @dataclass
@@ -27,12 +28,14 @@ class EveryoneModule:
 def build_everyone_module(
         bot: Bot,
         settings: SettingsStorage,
-        db_factory: DBFactory
+        db_factory: DBFactory,
+        translator: Translator
 ) -> EveryoneModule:
     birthday_module = build_birthday_module(
         bot=bot,
         settings=settings,
-        db_factory=db_factory
+        db_factory=db_factory,
+        translator=translator
     )
 
     randomizer_module = build_randomizer_module(

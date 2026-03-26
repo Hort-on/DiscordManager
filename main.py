@@ -91,7 +91,8 @@ async def main():
     everyone_module = build_everyone_module(
         bot=bot,
         settings=settings,
-        db_factory=db_factory
+        db_factory=db_factory,
+        translator=translator
     )
 
     automod_module = build_automod_module(

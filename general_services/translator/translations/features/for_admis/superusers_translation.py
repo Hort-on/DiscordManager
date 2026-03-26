@@ -1,27 +1,27 @@
 SUPERUSERS = {
     'superusers_menu': {
-        'en': "👮Superusers management",
-        'uk': "👮Менеджмент суперкористувачів"
+        'en': "👮Trusted users menu",
+        'uk': "👮Меню довірених користувачів"
     },
 
     'add_superusers': {
-        'en': "📥Add superusers",
-        'uk': "📥Додати суперкористувачів"
+        'en': "📥Add users",
+        'uk': "📥Додати користувачів"
     },
 
     'delete_superusers': {
-        'en': "🗑️Delete superusers",
-        'uk': "🗑️Видалити суперкористувачів"
+        'en': "🗑️Delete users from trusted",
+        'uk': "🗑️Видалити користувачів з довірених"
     },
 
     'superusers_list': {
-        'en': "📑Superusers list",
-        'uk': "📑Список суперкористувачів"
+        'en': "📑Trusted users list",
+        'uk': "📑Список довірених користувачів"
     },
 
     'no_superusers': {
-        'en': "No superusers were found.",
-        'uk': "Жодного суперкористувача не було знайдено."
+        'en': "No trusted users were found.",
+        'uk': "Жодного довіреного користувача не було знайдено."
     },
 
     'ask_s_users_to_delete': {
@@ -35,23 +35,23 @@ SUPERUSERS = {
     },
 
     'current_superusers': {
-        'en': "Current Superusers:",
-        'uk': "Поточні суперкористувачі:"
+        'en': "Current trusted users:",
+        'uk': "Поточні довірені користувачі:"
     },
 
     'superuser_names': {
-        'en': "Superuser names",
-        'uk': "Імена суперкористувачів"
+        'en': "Trusted user names",
+        'uk': "Імена довірених користувачів"
     },
 
     'ask_s_users_names': {
-        'en': "Please type superuser names",
-        'uk': "Будь ласка напишіть імена суперкористувачів"
+        'en': "Please type user names",
+        'uk': "Будь ласка напишіть імена користувачів"
     },
 
     'added_superusers': {
-        'en': "Added superusers",
-        'uk': "Додані суперкористувачі"
+        'en': "Added users",
+        'uk': "Додані користувачі"
     },
 
     'not_found_for_addition': {
@@ -60,12 +60,12 @@ SUPERUSERS = {
     },
 
     'already_superusers': {
-        'en': "Already superusers",
-        'uk': "Уже є суперкористувачами"
+        'en': "Already trusted users",
+        'uk': "Уже є довіреними користувачами"
     },
 
     'deleted_superusers': {
-        'en': "Deleted superusers",
-        'uk': "Видалені суперкористувачі"
+        'en': "Deleted users",
+        'uk': "Видалені користувачі"
     }
 }

@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from features.for_everyone.birthdays.modals import AddBirthdayModal
+from features.for_everyone.birthdays.modal import AddBirthdayModal
+from general_services.translator.translator import Translator
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
@@ -14,17 +15,26 @@ if TYPE_CHECKING:
 
 
 class BirthdayFlow:
-    def __init__(self, navigator: Navigator, service: BirthdayService):
+    def __init__(self, navigator: Navigator, service: BirthdayService, translator: Translator):
         self.navigator = navigator
         self.service = service
+        self.translator = translator
 
     async def for_add_button(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(AddBirthdayModal(flow=self))
+        await interaction.response.send_modal(
+            AddBirthdayModal(
+                flow=self,
+                translator=self.translator,
+                guild_id=interaction.guild_id
+            )
+        )
 
+    # TODO: зробити функціонал для додавання з адмінів
     async def for_delete_button(self, interaction: discord.Interaction):
         result = await self.service.delete_birthday(
             user_id=interaction.user.id,
-            guild_id=interaction.guild_id
+            guild_id=interaction.guild_id,
+            author_id=interaction.user.id
         )
 
         if not result.value:
@@ -44,6 +54,7 @@ class BirthdayFlow:
         result = await self.service.save_birthday(
             user_id=interaction.user.id,
             guild_id=interaction.guild_id,
+            author_id=interaction.user.id,
             user_birthday=user_birthday
         )
 

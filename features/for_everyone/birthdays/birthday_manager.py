@@ -34,7 +34,7 @@ class BirthdayManager(DBBaseService):
                 guild_id=guild.id
             )
 
-            if not bool(is_enabled):
+            if not is_enabled:
                 continue
 
             # TODO: зробити точну часову зону для кожної гільдії

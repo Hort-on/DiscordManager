@@ -11,12 +11,17 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.randomizer.flow import RandomizerFlow
+    from general_services.translator.translator import Translator
 
 
 class RandomizerMenuButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, context: NavigationContext):
+    def __init__(self, navigator: Navigator, context: NavigationContext, translator: Translator, guild_id: int):
         super().__init__(
-            label='🎲 Randomizer',
+            label=translator.t(
+                guild_id=guild_id,
+                section='RANDOMIZER',
+                key='randomizer_menu'
+            ),
             style=discord.ButtonStyle.blurple
         )
 
@@ -24,7 +29,7 @@ class RandomizerMenuButton(discord.ui.Button):
         self.context = context
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.randomizer_menu()
+        view = self.navigator.randomizer_menu(guild_id=interaction.guild_id)
 
         view.context = self.context
 
@@ -41,9 +46,13 @@ class RandomizerMenuButton(discord.ui.Button):
 
 
 class RandomNumButton(discord.ui.Button):
-    def __init__(self, flow: RandomizerFlow):
+    def __init__(self, flow: RandomizerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Random number',
+            label=translator.t(
+                guild_id=guild_id,
+                section='RANDOMIZER',
+                key='random_number'
+            ),
             style=discord.ButtonStyle.secondary
         )
 
@@ -54,9 +63,13 @@ class RandomNumButton(discord.ui.Button):
 
 
 class RandomWordButton(discord.ui.Button):
-    def __init__(self, flow: RandomizerFlow):
+    def __init__(self, flow: RandomizerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Random word',
+            label=translator.t(
+                guild_id=guild_id,
+                section='RANDOMIZER',
+                key='random_word'
+            ),
             style=discord.ButtonStyle.secondary
         )
 
@@ -67,9 +80,13 @@ class RandomWordButton(discord.ui.Button):
 
 
 class RandomTeamByText(discord.ui.Button):
-    def __init__(self, flow: RandomizerFlow):
+    def __init__(self, flow: RandomizerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Random team by message',
+            label=translator.t(
+                guild_id=guild_id,
+                section='RANDOMIZER',
+                key='random_team_msg'
+            ),
             style=discord.ButtonStyle.secondary
         )
 
@@ -80,9 +97,13 @@ class RandomTeamByText(discord.ui.Button):
 
 
 class RandomTeamByChannel(discord.ui.Button):
-    def __init__(self, navigator: Navigator, flow: RandomizerFlow):
+    def __init__(self, navigator: Navigator, flow: RandomizerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Random team by channel',
+            label=translator.t(
+                guild_id=guild_id,
+                section='RANDOMIZER',
+                key='random_team_сh'
+            ),
             style=discord.ButtonStyle.secondary
         )
 

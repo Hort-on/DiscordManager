@@ -7,7 +7,7 @@ import discord
 from .results import DeleteSuperusersResult, AddSuperusersResult
 
 from core.navigator.routes import Route
-from features.for_admins.superusers.modals import AddSuperusersModal
+from features.for_admins.superusers.modal import AddSuperusersModal
 from general_services.other_services.get_member_by_name import get_member_by_name
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
