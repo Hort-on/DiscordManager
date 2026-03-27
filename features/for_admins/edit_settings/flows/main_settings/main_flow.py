@@ -134,9 +134,9 @@ class MainSettingsFlow:
 
         current_value = self.service.is_setting_enabled(
             guild_id=interaction.guild_id,
-            config_key=value[0]
+            config_key=value
         )
-        formatted = value[0].replace('_', ' ').title()
+        formatted = value.replace('_', ' ').title()
 
         status = self.translator.t(
             guild_id=interaction.guild_id,
