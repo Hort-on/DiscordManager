@@ -1,4 +1,9 @@
 SYSTEM_GENERAL = {
+    'back_button': {
+        'en': "↩️ Back",
+        'uk': "↩️ Назад"
+    },
+
     'user': {
         'en': "User",
         'uk': "Користувач"

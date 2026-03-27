@@ -2,16 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import discord
+
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
-
-import discord
+    from general_services.translator.translator import Translator
 
 
 class BackButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator):
+    def __init__(self, navigator: Navigator, translator: Translator, guild_id: int):
         super().__init__(
-            label='↩️ Back',
+            label=translator.t(
+                guild_id=guild_id,
+                section='SYSTEM_GENERAL',
+                key='back_button'
+            ),
             style=discord.ButtonStyle.secondary
         )
         self.navigator = navigator
@@ -19,7 +24,6 @@ class BackButton(discord.ui.Button):
     async def callback(self, interaction: discord.Interaction):
         context = self.view.context
         if not context:
-            print('Контекст не передано у BackButton')
             return
 
         prev = context.pop()

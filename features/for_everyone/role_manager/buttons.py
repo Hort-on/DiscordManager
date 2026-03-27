@@ -7,17 +7,21 @@ import discord.ui
 from core.navigator.params_containers import MainMenuParams
 from core.navigator.routes import Route
 
-
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.role_manager.flow import RoleManagerFlow
+    from general_services.translator.translator import Translator
 
 
 class RoleManagerMenuButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, context: NavigationContext):
+    def __init__(self, navigator: Navigator, context: NavigationContext, translator: Translator, guild_id: int):
         super().__init__(
-            label='Role manager',
+            label=translator.t(
+                guild_id=guild_id,
+                section='ROLE_MANAGER',
+                key='role_manager'
+            ),
             style=discord.ButtonStyle.secondary
         )
 
@@ -25,7 +29,10 @@ class RoleManagerMenuButton(discord.ui.Button):
         self.context = context
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.role_manager_menu(context=self.context)
+        view = self.navigator.role_manager_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
 
         view.context = self.context
 
@@ -42,9 +49,13 @@ class RoleManagerMenuButton(discord.ui.Button):
 
 
 class AddRoleButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, flow: RoleManagerFlow):
+    def __init__(self, navigator: Navigator, flow: RoleManagerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Add role',
+            label=translator.t(
+                guild_id=guild_id,
+                section='ROLE_MANAGER',
+                key='add_role'
+            ),
             style=discord.ButtonStyle.green
         )
         self.navigator = navigator
@@ -55,9 +66,13 @@ class AddRoleButton(discord.ui.Button):
 
 
 class RemoveRoleButton(discord.ui.Button):
-    def __init__(self, navigator: Navigator, flow: RoleManagerFlow):
+    def __init__(self, navigator: Navigator, flow: RoleManagerFlow, translator: Translator, guild_id: int):
         super().__init__(
-            label='Remove role',
+            label=translator.t(
+                guild_id=guild_id,
+                section='ROLE_MANAGER',
+                key='remove_role'
+            ),
             style=discord.ButtonStyle.red
         )
         self.navigator = navigator

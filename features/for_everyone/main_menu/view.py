@@ -64,7 +64,9 @@ class MainMenuView(discord.ui.View):
             self.add_item(
                 RoleManagerMenuButton(
                     navigator=navigator,
-                    context=context
+                    context=context,
+                    translator=translator,
+                    guild_id=guild_id
                 )
             )
 

@@ -144,6 +144,8 @@ class SuperusersFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
+            translator=self.translator,
+            guild_id=interaction.guild_id,
             placeholder=self.translator.t(
                 guild_id=interaction.guild_id,
                 section='SUPERUSERS',

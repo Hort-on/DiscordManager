@@ -59,7 +59,13 @@ class RandomizerFlow:
             return
 
         result = random.randint(first_num, second_num)
-        view = ReshuffleView(first_num, second_num, callback=self.for_number_proceed)
+        view = ReshuffleView(
+            first_num,
+            second_num,
+            callback=self.for_number_proceed,
+            translator=self.translator,
+            guild_id=interaction.guild_id
+        )
 
         result_msg = self.translator.t(
             guild_id=interaction.guild_id,
@@ -105,7 +111,12 @@ class RandomizerFlow:
             return
 
         chosen_word = random.choice(words)
-        view = ReshuffleView(words_list, callback=self.for_word_proceed)
+        view = ReshuffleView(
+            words_list,
+            callback=self.for_word_proceed,
+            translator=self.translator,
+            guild_id=interaction.guild_id
+        )
 
         result_msg = self.translator.t(
             guild_id=interaction.guild_id,
@@ -154,7 +165,13 @@ class RandomizerFlow:
 
         embed = self._build_embed(teams=teams, guild_id=interaction.guild_id)
 
-        view = ReshuffleView(users_list, teams_quantity, callback=self.team_by_text_proceed)
+        view = ReshuffleView(
+            users_list,
+            teams_quantity,
+            callback=self.team_by_text_proceed,
+            translator=self.translator,
+            guild_id=interaction.guild_id
+        )
 
         if edit_mode:
             await interaction.edit_original_response(embed=embed, view=view)
@@ -179,6 +196,8 @@ class RandomizerFlow:
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
+            translator=self.translator,
+            guild_id=interaction.guild_id,
             placeholder=self.translator.t(
                 guild_id=interaction.guild_id,
                 section='SYSTEM_GENERAL',
@@ -228,7 +247,13 @@ class RandomizerFlow:
 
         embed = self._build_embed(teams=teams, guild_id=interaction.guild_id)
 
-        view = ReshuffleView(channel, teams_quantity, callback=self.team_by_channel_proceed)
+        view = ReshuffleView(
+            channel,
+            teams_quantity,
+            callback=self.team_by_channel_proceed,
+            translator=self.translator,
+            guild_id=interaction.guild_id
+        )
 
         if edit_mode:
             await interaction.edit_original_response(embed=embed, view=view)

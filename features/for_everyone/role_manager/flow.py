@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.role_manager.services import RoleManagerService
+    from general_services.translator.translator import Translator
 
 
 class RoleManagerFlow:
@@ -20,12 +21,14 @@ class RoleManagerFlow:
             self,
             navigator: Navigator,
             context: NavigationContext,
-            service: RoleManagerService
+            service: RoleManagerService,
+            translator: Translator
     ):
 
         self.navigator = navigator
         self.context = context
         self.service = service
+        self.translator = translator
 
     async def start_for_add(self, interaction: discord.Interaction) -> None:
         options = await self._get_available_guild_roles(
@@ -33,16 +36,26 @@ class RoleManagerFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available roles were found.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='ROLE_MANAGER',
+                    key='no_role_found'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please choose the roles you want to add:',
+            translator=self.translator,
+            guild_id=interaction.guild_id,
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='ask_r_to_add'
+            ),
             callback=self._add_roles_to_user,
             max_values=min(25, len(options))
         )
@@ -59,16 +72,26 @@ class RoleManagerFlow:
         )
 
         if not options:
-            embed = ErrorEmbed(
-                description='No available roles were found.'
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=interaction.guild_id,
+                    section='ROLE_MANAGER',
+                    key='no_role_found'
+                )
             )
-            await interaction.response.edit_message(embed=embed)
+            await interaction.response.edit_message(embed=error_embed)
             return
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
-            placeholder='Please choose the roles you want to remove:',
+            translator=self.translator,
+            guild_id=interaction.guild_id,
+            placeholder=self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='ask_r_to_remove'
+            ),
             callback=self._remove_roles_from_user,
             max_values=min(25, len(options))
         )
@@ -90,14 +113,24 @@ class RoleManagerFlow:
         failure_embed = None
 
         if result.added_roles:
-            success_message = ['The following roles have been successfully added:']
+            msg = self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='success_addition'
+            )
+            success_message = [msg]
             success_message.extend(f'🔸 {role.name}' for role in result.added_roles)
             success_embed = SuccessEmbed(
                 description='\n'.join(success_message)
             )
 
         if result.not_added_roles:
-            failure_message = ['Some of the roles were not added']
+            msg = self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='failed_addition'
+            )
+            failure_message = [msg]
             failure_message.extend(f'🔸 {role.name}' for role in result.not_added_roles)
             failure_embed = WarningEmbed(
                 description='\n'.join(failure_message)
@@ -118,14 +151,24 @@ class RoleManagerFlow:
         failure_embed = None
 
         if result.removed_roles:
-            success_message = ['The following roles have been successfully removed:']
+            msg = self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='success_removal'
+            )
+            success_message = [msg]
             success_message.extend(f'🔸 {role.name}' for role in result.removed_roles)
             success_embed = SuccessEmbed(
                 description='\n'.join(success_message)
             )
 
         if result.not_removed_roles:
-            failure_message = ['Some of the roles were not removed']
+            msg = self.translator.t(
+                guild_id=interaction.guild_id,
+                section='ROLE_MANAGER',
+                key='failed_removal'
+            )
+            failure_message = [msg]
             failure_message.extend(f'🔸 {role.name}' for role in result.not_removed_roles)
             failure_embed = WarningEmbed(
                 description='\n'.join(failure_message)
@@ -147,9 +190,9 @@ class RoleManagerFlow:
             role.id: role.name
             for role in guild_roles
             if (
-                    role.id not in hidden_roles
-                    and role.id not in member_role_ids
-                    and role.is_assignable()
+                role.id not in hidden_roles
+                and role.id not in member_role_ids
+                and role.is_assignable()
             )
         }
 
@@ -176,24 +219,3 @@ class RoleManagerFlow:
             )
             for role in sorted(interaction.user.roles) if role.id not in hidden_roles
         ]
-
-    @staticmethod
-    async def _build_and_send_result(
-            interaction: discord.Interaction,
-            role_ids: set[int],
-            addition: bool
-    ) -> None:
-        added_roles_message = 'The following roles have been successfully added:'
-        removed_roles_message = 'The following roles have been successfully removed:'
-
-        embed = None
-        role_names: list[str] = [added_roles_message if addition else removed_roles_message]
-        for role_id in role_ids:
-            role = interaction.guild.get_role(role_id)
-            role_names.append(f'🔸{role.name}')
-
-            embed = SuccessEmbed(
-                description='\n'.join(role_names)
-            )
-
-        await interaction.response.edit_message(embed=embed)

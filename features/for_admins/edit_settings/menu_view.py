@@ -91,4 +91,10 @@ class SettingsMenuView(discord.ui.View):
             )
         )
 
-        self.add_item(BackButton(navigator=navigator))
+        self.add_item(
+            BackButton(
+                navigator=navigator,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )

@@ -154,7 +154,7 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def role_manager_menu(self, context: NavigationContext):
+    def role_manager_menu(self, context: NavigationContext, guild_id: int):
         from features.for_everyone.role_manager.flow import RoleManagerFlow
         from features.for_everyone.role_manager.menu_view import RoleManagerView
 
@@ -163,12 +163,15 @@ class Navigator:
         flow = RoleManagerFlow(
             navigator=self,
             context=context,
-            service=role_manager_module.service
+            service=role_manager_module.service,
+            translator=self.general_container.translator
         )
 
         return RoleManagerView(
             navigator=self,
-            flow=flow
+            flow=flow,
+            translator=self.general_container.translator,
+            guild_id=guild_id
         )
 
     def hidden_channels_menu(self, context: NavigationContext, guild_id: int):

@@ -66,7 +66,13 @@ class HiddenChannelsMenuView(discord.ui.View):
                 guild_id=guild_id
             )
         )
-        self.add_item(BackButton(navigator=navigator))
+        self.add_item(
+            BackButton(
+                navigator=navigator,
+                translator=translator,
+                guild_id=guild_id,
+            )
+        )
 
 
 class HiddenRolesMenuView(discord.ui.View):
@@ -107,7 +113,13 @@ class HiddenRolesMenuView(discord.ui.View):
             )
         )
 
-        self.add_item(BackButton(navigator=navigator))
+        self.add_item(
+            BackButton(
+                navigator=navigator,
+                translator=translator,
+                guild_id=guild_id,
+            )
+        )
 
 
 class SystemChannelsMenuView(discord.ui.View):
@@ -148,4 +160,10 @@ class SystemChannelsMenuView(discord.ui.View):
             )
         )
 
-        self.add_item(BackButton(navigator=navigator))
+        self.add_item(
+            BackButton(
+                navigator=navigator,
+                translator=translator,
+                guild_id=guild_id,
+            )
+        )

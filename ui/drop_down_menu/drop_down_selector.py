@@ -10,12 +10,15 @@ from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from general_services.translator.translator import Translator
 
 
 class DropMenuView(ui.View):
     def __init__(
             self,
             navigator: Navigator,
+            translator: Translator,
+            guild_id: int,
             options: list,
             placeholder: str,
             callback,
@@ -23,7 +26,6 @@ class DropMenuView(ui.View):
             max_values=1
     ):
         super().__init__(timeout=180)
-        self.navigator = navigator
         self._callback = callback
         self.options = options
         self.page = 0
@@ -33,7 +35,13 @@ class DropMenuView(ui.View):
 
         self.update_view()
 
-        self.add_item(BackButton(navigator=self.navigator))
+        self.add_item(
+            BackButton(
+                navigator=navigator,
+                translator=translator,
+                guild_id=guild_id
+            )
+        )
 
     def update_view(self):
         self.clear_items()
