@@ -42,7 +42,7 @@ class RoleManagerMenuButton(discord.ui.Button):
                 guild_id=interaction.guild_id,
                 user_id=interaction.user.id,
                 owner_id=interaction.guild.owner_id
-                )
+            )
         )
 
         await interaction.response.edit_message(view=view)

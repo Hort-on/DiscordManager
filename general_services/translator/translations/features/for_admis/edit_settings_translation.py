@@ -182,6 +182,36 @@ EDIT_SETTINGS = {
     'success_sys_ch_deletion': {
         'en': "These channels were successfully deleted from system`s:",
         'uk': "Ці канали успішно були видалені з системних"
+    },
+
+    'status_enabled': {
+        'en': "✅ Enabled",
+        'uk': "✅ Ввімкнено"
+    },
+
+    'status_disabled': {
+        'en': "❌ Disabled",
+        'uk': "❌ Вимкнено"
+    },
+
+    'assigned': {
+        'en': "✅ Assigned",
+        'uk': "✅ Призначено"
+    },
+
+    'not_assigned': {
+        'en': "❌ Not assigned",
+        'uk': "❌ Не призначено"
+    },
+
+    'language_en': {
+        'en': "English",
+        'uk': "Англійська"
+    },
+
+    'language_uk': {
+        'en': "Ukrainian",
+        'uk': "Українська"
     }
 
 }

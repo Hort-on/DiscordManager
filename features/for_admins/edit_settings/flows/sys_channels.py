@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -98,7 +99,10 @@ class SystemChannelsFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.SETTINGS_MENU)
+        self.context.push(
+            target=Route.SETTINGS_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 
@@ -190,7 +194,10 @@ class SystemChannelsFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.SETTINGS_MENU)
+        self.context.push(
+            target=Route.SETTINGS_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 

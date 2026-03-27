@@ -53,9 +53,7 @@ class SystemChannelsMenuButton(FirewallButton):
         view.context = self.context
         self.context.push(
             target=Route.SETTINGS_MENU,
-            params=GeneralParams(
-                guild_id=interaction.guild_id
-            )
+            params=GeneralParams(guild_id=interaction.guild_id)
         )
 
         await interaction.response.edit_message(view=view)

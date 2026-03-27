@@ -50,9 +50,7 @@ class EditSettingsMenuButton(FirewallButton):
         view.context = self.context
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(
-                guild_id=interaction.guild_id
-            )
+            params=AdminMenuParams(guild_id=interaction.guild_id)
         )
 
         await interaction.response.edit_message(view=view)

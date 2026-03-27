@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 from features.for_admins.edit_settings.flows.main_settings.verification_role_flow import VerificationRoleFlow
 
@@ -54,7 +55,10 @@ class MainSettingsFlow:
         )
 
         view.context = self.context
-        self.context.push(target=Route.SETTINGS_MENU)
+        self.context.push(
+            target=Route.SETTINGS_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         embed = self.formatter.format_current_main_settings(interaction)
 

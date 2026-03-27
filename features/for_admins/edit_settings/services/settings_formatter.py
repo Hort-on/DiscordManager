@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from database.db_factory.db_scenario_factory import DBFactory
-    from database.settings_storage.settings import SettingsStorage
-    from general_services.other_services.cleanup_service import CleanUpService
-
 import discord
 
 from database.settings_storage.settings_manager import StorageTarget
 
 from ui.embed_constructor.embed_constructor import InfoEmbed
+
+if TYPE_CHECKING:
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
+    from general_services.other_services.cleanup_service import CleanUpService
+    from general_services.translator.translator import Translator
 
 
 class SettingsFormatter:
@@ -19,11 +20,13 @@ class SettingsFormatter:
             self,
             settings: SettingsStorage,
             db_factory: DBFactory,
-            cleanup_service: CleanUpService
+            cleanup_service: CleanUpService,
+            translator: Translator
     ):
         self.settings = settings
         self.db_factory = db_factory
         self.service = cleanup_service
+        self.translator = translator
 
     def format_current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
         settings = self.settings.dict_storage.get_all(
@@ -31,31 +34,51 @@ class SettingsFormatter:
             guild_id=interaction.guild_id
         )
 
-        lines: list[str] = [f'Setting{" " * 14}Status', f'{"-" * 23}  {"-" * 12}']
+        lines: list[str] = [f'Setting{" " * 14} Status', f'{"-" * 23}  {"-" * 12}']
 
         for key, value in sorted(settings.items()):
             if key == 'guild_id':
                 continue
 
             config_name = key.removesuffix('_id').replace('_', ' ')
-            status = self._format_status(interaction=interaction, key=key, value=value)
+            status = self._format_status(guild=interaction.guild, key=key, value=value)
             lines.append(f'🔸{config_name:<20}: {status}')
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
 
-    @staticmethod
-    def _format_status(interaction: discord.Interaction, key: str, value) -> str:
+    def _format_status(self, guild: discord.Guild, key: str, value) -> str:
         if key == 'verification_role_id':
-            role = interaction.guild.get_role(value)
-            return role.name if value else '❌ not assigned'
+            status = self.translator.t(
+                guild_id=guild.id,
+                section='EDIT_SETTINGS',
+                key='not_assigned'
+            )
+            role = guild.get_role(value)
+            return role.name if value else status
 
         if key == 'verification_message_id':
-            return '✅ assigned' if value else '❌ not assigned'
+            status = self.translator.t(
+                guild_id=guild.id,
+                section='EDIT_SETTINGS',
+                key='assigned' if value else 'not_assigned'
+            )
+            return status
 
         if key == 'language':
-            return 'ukrainian' if value == 'uk' else 'english'
+            language = self.translator.t(
+                guild_id=guild.id,
+                section='EDIT_SETTINGS',
+                key='language_uk' if value == 'uk' else 'language_en'
+            )
+            return language
 
-        return '✅ Enabled' if value else '❌ Disabled'
+        status = self.translator.t(
+            guild_id=guild.id,
+            section='EDIT_SETTINGS',
+            key='status_enabled' if value else 'status_disabled'
+        )
+
+        return status
 
     async def format_current_system_channels(self, guild: discord.Guild) -> discord.Embed:
         not_found_ch: list[str] = []
