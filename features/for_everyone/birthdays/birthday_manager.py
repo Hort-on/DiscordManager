@@ -9,22 +9,30 @@ from datetime import datetime
 from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
-from general_services.utils.messages import BIRTHDAY_MSGS
-
 if TYPE_CHECKING:
     from core.bot_config import Bot
     from database.settings_storage.settings import SettingsStorage
     from database.db_factory.db_scenario_factory import DBFactory
+    from general_services.translator.translator import Translator
 
 
 # TODO: зробити завантаження у кеш
 class BirthdayManager(DBBaseService):
-    def __init__(self, bot: Bot, settings: SettingsStorage, db_factory: DBFactory):
-        super().__init__(settings)
+    def __init__(
+            self,
+            bot: Bot,
+            settings: SettingsStorage,
+            db_factory: DBFactory,
+            translator: Translator,
+            guild_id: int
+    ):
+        super().__init__(settings=settings)
         self.bot = bot
 
         self.settings = settings
         self.db_factory = db_factory
+        self.translator = translator
+        self.guild_id = guild_id
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
@@ -113,7 +121,14 @@ class BirthdayManager(DBBaseService):
                 await delete_scenario.db_proceed()
                 continue
 
-            message = await channel.send(BIRTHDAY_MSGS.get('congrats_msg') + member.mention)
+            congrats_msg = self.translator.t(
+                guild_id=self.guild_id,
+                section='BIRTHDAYS',
+                key='congrats',
+                name=member.display_name
+            )
+
+            message = await channel.send(congrats_msg + member.mention)
 
             await message.add_reaction('🎂')
             await self.update_congrats(guild.id, user_id, today_str)

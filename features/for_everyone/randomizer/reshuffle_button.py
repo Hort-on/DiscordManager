@@ -11,24 +11,20 @@ if TYPE_CHECKING:
 class ReshuffleView(discord.ui.View):
     def __init__(self, *args, callback, translator: Translator, guild_id: int, **kwargs):
         super().__init__(timeout=None)
-        self.callback = callback
-        self.args = args
-        self.kwargs = kwargs
-        self.translator = translator
 
         @discord.ui.button(
-            label=self.translator.t(
+            label=translator.t(
                 guild_id=guild_id,
                 section='RANDOMIZER',
                 key='reshuffle'
             )
         )
-        async def reshuffle(self, interaction: discord.Interaction, _):
-            await self.callback(
+        async def reshuffle(interaction: discord.Interaction, _):
+            await callback(
                 interaction,
-                *self.args,
+                *args,
                 edit_mode=True,
-                **self.kwargs
+                **kwargs
             )
 
         self.add_item(reshuffle)

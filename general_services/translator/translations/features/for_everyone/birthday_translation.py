@@ -57,6 +57,11 @@ BIRTHDAYS = {
     'modal_label': {
         'en': "Birthday (DD.MM)",
         'uk': "День народження (ДД.ММ)"
+    },
+
+    'congrats': {
+        'en': "Today we wish {name} a happy birthday.",
+        'uk': "Сьогодні ми вітаємо {name} з днем народження."
     }
 
 }
