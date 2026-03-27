@@ -6,12 +6,16 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
+from core.navigator.routes import Route
+
 from features.for_everyone.randomizer.modals import (
     RandomNumModal,
     RandomWordModal,
     RandomTeamByTextModal,
     RandomTeamByChannelModal
 )
+
 from features.for_everyone.randomizer.reshuffle_button import ReshuffleView
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -19,15 +23,23 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
+    from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.randomizer.services import RandomizerService
     from general_services.translator.translator import Translator
 
 
 class RandomizerFlow:
-    def __init__(self, navigator: Navigator, service: RandomizerService, translator: Translator):
+    def __init__(
+            self,
+            navigator: Navigator,
+            service: RandomizerService,
+            translator: Translator,
+            context: NavigationContext
+    ):
         self.navigator = navigator
         self.service = service
         self.translator = translator
+        self.context = context
 
     async def for_number_start(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_modal(
@@ -150,7 +162,7 @@ class RandomizerFlow:
 
         members = [m.strip() for m in users_list.split(',')]
 
-        if teams_quantity > len(members):
+        if teams_quantity > len(members) or teams_quantity <= 1:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
                     guild_id=interaction.guild_id,
@@ -158,7 +170,7 @@ class RandomizerFlow:
                     key='wrong_team_count'
                 )
             )
-            await interaction.followup.send(embed=error_embed)
+            await interaction.followup.send(embed=error_embed, ephemeral=True)
             return
 
         teams = self.service.build_teams_by_text(members=members, teams_quantity=teams_quantity)
@@ -171,6 +183,12 @@ class RandomizerFlow:
             callback=self.team_by_text_proceed,
             translator=self.translator,
             guild_id=interaction.guild_id
+        )
+
+        view.context = self.context
+        self.context.push(
+            target=Route.RANDOMIZER_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
         )
 
         if edit_mode:
@@ -206,6 +224,12 @@ class RandomizerFlow:
             callback=self._proceed_channel
         )
 
+        view.context = self.context
+        self.context.push(
+            target=Route.RANDOMIZER_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
+
         await interaction.response.edit_message(view=view)
 
     async def _proceed_channel(self, interaction: discord.Interaction, value: list[str]) -> None:
@@ -232,15 +256,15 @@ class RandomizerFlow:
 
         members = [m for m in channel.members if not m.bot]
 
-        if teams_quantity > len(members):
+        if teams_quantity > len(members) or teams_quantity <= 1:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
                     guild_id=interaction.guild_id,
                     section='RANDOMIZER',
-                    key='wrong_team_count_txt'
+                    key='wrong_team_count'
                 )
             )
-            await interaction.followup.send(embed=error_embed)
+            await interaction.followup.send(embed=error_embed, ephemeral=True)
             return
 
         teams = self.service.team_by_channel_proceed(members=members, teams_quantity=teams_quantity)

@@ -45,8 +45,8 @@ RANDOMIZER = {
     },
 
     'wrong_team_count': {
-        'en': "Teams count cannot be greater than users count.",
-        'uk': "Кількість команд не повинна перевищувати кількість користувачів."
+        'en': "Teams count cannot be greater than users count or teams number less than 2.",
+        'uk': "Кількість команд не повинна перевищувати кількість користувачів або кількість команд менше 2."
     },
 
     'no_v_channels_found': {
@@ -55,11 +55,6 @@ RANDOMIZER = {
               " or the server has no voice channels.",
         'uk': "Не знайдено жодного доступного голосового каналу, скоріш за все це через те,"
               " що жоден голосовий канал не має більше 2-х учасників, або сервер ще не має голосових каналів."
-    },
-
-    'wrong_team_count_txt': {
-        'en': "Teams count cannot be greater than users count.",
-        'uk': "Кількість команд не може бути більшою за кількість учасників."
     },
 
     'team_distribution': {

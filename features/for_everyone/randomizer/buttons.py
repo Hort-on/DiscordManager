@@ -29,7 +29,10 @@ class RandomizerMenuButton(discord.ui.Button):
         self.context = context
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.randomizer_menu(guild_id=interaction.guild_id)
+        view = self.navigator.randomizer_menu(
+            context=self.context,
+            guild_id=interaction.guild_id
+        )
 
         view.context = self.context
 
