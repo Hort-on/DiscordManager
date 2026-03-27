@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from database.settings_storage.settings_manager import StorageTarget

@@ -49,7 +49,8 @@ def build_admin_module(
         settings=settings,
         verification_service=verification_service,
         verification_view_service=verification_view_service,
-        cleanup_service=cleanup_service
+        cleanup_service=cleanup_service,
+        translator=translator
     )
 
     message_module = build_messages_module(
