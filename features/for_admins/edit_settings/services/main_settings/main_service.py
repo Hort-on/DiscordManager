@@ -41,7 +41,7 @@ class MainSettingsService(DBBaseService):
 
     def is_setting_enabled(self, guild_id: int, config_key: str) -> bool:
         result = self.settings.dict_storage.get_value(
-            config_key,
+            key=config_key,
             target=StorageTarget.SETTINGS,
             guild_id=guild_id,
         )
@@ -50,7 +50,7 @@ class MainSettingsService(DBBaseService):
 
     async def save_new_value(self, guild: discord.Guild, config_key: str) -> bool:
         current_value = self.settings.dict_storage.get_value(
-            config_key,
+            key=config_key,
             target=StorageTarget.SETTINGS,
             guild_id=guild.id,
         )
@@ -82,7 +82,7 @@ class MainSettingsService(DBBaseService):
 
     async def _cleanup_verification_message(self, guild) -> None:
         channel_id = self.settings.dict_storage.get_value(
-            'verification_channel_id',
+            key='verification_channel_id',
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=guild.id
         )
@@ -95,7 +95,7 @@ class MainSettingsService(DBBaseService):
             return
 
         msg_id = self.settings.dict_storage.get_value(
-            'verification_message_id',
+            key='verification_message_id',
             target=StorageTarget.SETTINGS,
             guild_id=guild.id
         )

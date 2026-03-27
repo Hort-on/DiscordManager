@@ -114,7 +114,7 @@ class MainSettingsFlow:
     async def _others_handler(self, interaction: discord.Interaction, value: str) -> None:
         result = await self.service.save_new_value(
             guild=interaction.guild,
-            config_key=value[0]
+            config_key=value
         )
 
         if not result:
