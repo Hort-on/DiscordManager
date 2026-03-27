@@ -6,7 +6,6 @@ import aiosqlite
 from contextlib import asynccontextmanager
 
 from general_services.logger.logger import Logger
-from general_services.utils.messages import DB_MSGS as DM
 
 
 class DB:
@@ -171,7 +170,7 @@ class DB:
 
             await temp_conn.commit()
         except Exception as e:
-            await self.logger.error(DM.get('failure_create_table_msg'), exc=e)
+            await self.logger.error('Не вдалося створити таблицю', exc=e)
         finally:
             await temp_conn.close()
 
