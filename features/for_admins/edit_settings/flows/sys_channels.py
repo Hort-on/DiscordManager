@@ -67,7 +67,10 @@ class SystemChannelsFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.SYSTEM_CHANNELS_MENU)
+        self.context.push(
+            target=Route.SYSTEM_CHANNELS_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 

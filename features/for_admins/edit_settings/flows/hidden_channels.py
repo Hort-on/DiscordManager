@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from database.settings_storage.settings_manager import StorageTarget
@@ -78,7 +79,10 @@ class HiddenChannelsFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.HIDDEN_CHANNELS_MENU)
+        self.context.push(
+            target=Route.HIDDEN_CHANNELS_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id),
+        )
 
         await interaction.response.edit_message(
             view=view,

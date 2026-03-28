@@ -4,7 +4,9 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
+
 from database.settings_storage.settings_manager import StorageTarget
 
 from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
@@ -72,7 +74,10 @@ class HiddenRolesFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.HIDDEN_ROLES_MENU)
+        self.context.push(
+            target=Route.HIDDEN_ROLES_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 
