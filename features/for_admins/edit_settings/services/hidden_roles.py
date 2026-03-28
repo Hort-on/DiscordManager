@@ -28,7 +28,7 @@ class HiddenRolesService(DBBaseService):
             key='role_id'
         )
 
-        result = self.update_db_and_cache(
+        result = await self.update_db_and_cache(
             scenario=write_scenario,
             guild_id=guild_id
         )
@@ -48,7 +48,7 @@ class HiddenRolesService(DBBaseService):
             key='role_id'
         )
 
-        result = self.update_db_and_cache(
+        result = await self.update_db_and_cache(
             scenario=write_scenario,
             guild_id=guild_id
         )

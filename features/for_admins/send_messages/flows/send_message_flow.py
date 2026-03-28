@@ -83,7 +83,8 @@ class SendMessageFlow:
             description=self.translator.t(
                 guild_id=interaction.guild_id,
                 section='SEND_MSG',
-                key='success_ch_to_send'
+                key='success_ch_to_send',
+                channel_name=channel.name
             )
         )
 

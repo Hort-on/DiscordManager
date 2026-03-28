@@ -68,7 +68,7 @@ class BirthdayService(DBBaseService):
             user_birthday=user_birthday
         )
 
-        result = self.update_db_and_cache(scenario=add_scenario, guild_id=guild_id)
+        result = await self.update_db_and_cache(scenario=add_scenario, guild_id=guild_id)
 
         if not result:
             message = self.translator.t(

@@ -103,7 +103,7 @@ class HiddenChannelsFlow:
             interaction: discord.Interaction,
             values: list[str],
     ):
-        result = self.hidden_ch_service.update_channels_values(
+        result = await self.hidden_ch_service.update_channels_values(
             guild_id=interaction.guild_id,
             values=values,
         )
