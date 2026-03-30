@@ -63,18 +63,16 @@ class MemberLeftNotification:
                 guild_id=guild_id,
                 section='EVENTS',
                 key='member_left_msg',
-                member=member.mention
+                member=member.display_name or member.global_name
             ),
             color=discord.Color.blue(),
             timestamp=now
         )
 
-        embed.set_thumbnail(url=member.display_avatar.url)
-
         embed.add_field(
             name=self.translator.t(
                 guild_id=guild_id,
-                section='GENERAL',
+                section='SYSTEM_GENERAL',
                 key='user'
             ),
             value=f'{member.display_name if member.display_name else member.global_name}',

@@ -5,8 +5,8 @@ SYSTEM_GENERAL = {
     },
 
     'user': {
-        'en': "User",
-        'uk': "Користувач"
+        'en': "User:",
+        'uk': "Користувач:"
     },
 
     'not_found_text_channels': {

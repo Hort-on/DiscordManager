@@ -135,7 +135,7 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def randomizer_menu(self, guild_id: int):
+    def randomizer_menu(self, context: NavigationContext, guild_id: int):
         from features.for_everyone.randomizer.flow import RandomizerFlow
         from features.for_everyone.randomizer.menu_view import RandomModeView
 
@@ -144,7 +144,8 @@ class Navigator:
         flow = RandomizerFlow(
             navigator=self,
             service=randomizer_module.service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
+            context=context
         )
 
         return RandomModeView(
