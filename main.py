@@ -136,6 +136,7 @@ async def main():
         rules_service=rules_service,
         moderation_service=automod_module,
         translator=translator,
+        send_message_service=send_message_service,
         member_left_service=member_left_service
     )
 
