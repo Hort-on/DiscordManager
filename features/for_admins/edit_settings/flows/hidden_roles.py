@@ -148,7 +148,10 @@ class HiddenRolesFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.HIDDEN_ROLES_MENU)
+        self.context.push(
+            target=Route.HIDDEN_ROLES_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(
             view=view,
@@ -170,6 +173,7 @@ class HiddenRolesFlow:
                 )
             )
             await interaction.response.edit_message(embed=error_embed)
+            return
 
         success_msg = self.translator.t(
                 guild_id=interaction.guild_id,

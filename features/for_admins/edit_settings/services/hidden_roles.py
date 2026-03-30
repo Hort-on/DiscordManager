@@ -28,15 +28,10 @@ class HiddenRolesService(DBBaseService):
             key='role_id'
         )
 
-        result = await self.update_db_and_cache(
+        return await self.update_db_and_cache(
             scenario=write_scenario,
             guild_id=guild_id
         )
-
-        if not result:
-            return False
-
-        return True
 
     async def delete_roles(self, guild_id: int, values: list[str]) -> bool:
         role_ids: set[int] = set(int(i) for i in values)
@@ -48,15 +43,10 @@ class HiddenRolesService(DBBaseService):
             key='role_id'
         )
 
-        result = await self.update_db_and_cache(
+        return await self.update_db_and_cache(
             scenario=write_scenario,
             guild_id=guild_id
         )
-
-        if not result:
-            return False
-
-        return True
 
     def get_hidden_roles(self, guild_id: int) -> set[int]:
         return self.settings.set_storage.for_set_get(

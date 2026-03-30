@@ -212,6 +212,16 @@ EDIT_SETTINGS = {
     'language_uk': {
         'en': "Ukrainian",
         'uk': "Українська"
+    },
+
+    'not_hidden_ch': {
+        'en': "❌ HIDDEN CHANNELS NOT FOUND",
+        'uk': "❌ ПРИХОВАНИХ КАНАЛІВ НЕ ЗНАЙДЕНО"
+    },
+
+    'not_hidden_roles': {
+        'en': "❌ HIDDEN ROLES NOT FOUND",
+        'uk': "❌ ПРИХОВАНИХ РОЛЕЙ НЕ ЗНАЙДЕНО"
     }
 
 }

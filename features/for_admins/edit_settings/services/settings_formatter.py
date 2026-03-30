@@ -121,7 +121,11 @@ class SettingsFormatter:
         guild = interaction.guild
 
         title = 'Hidden channels:' if is_channel else 'Hidden roles:'
-        not_found_label = '❌ HIDDEN CHANNELS NOT FOUND' if is_channel else '❌ HIDDEN ROLES NOT FOUND'
+        not_found_label = self.translator.t(
+            guild_id=interaction.guild_id,
+            section='EDIT_SETTINGS',
+            key='not_hidden_ch' if is_channel else 'not_hidden_roles'
+        )
 
         lines: list[str] = [title, '-' * 16]
         not_found: set[int] = set()
