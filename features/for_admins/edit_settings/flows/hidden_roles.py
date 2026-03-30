@@ -189,12 +189,17 @@ class HiddenRolesFlow:
             guild_id=interaction.guild_id
         )
 
+        sorted_roles = sorted(interaction.user.roles, key=lambda role: role.name.lower())
+
         return [
             discord.SelectOption(
                 label=role.name,
                 value=str(role.id)
             )
-            for role in sorted(interaction.user.roles) if role.id not in hidden_roles
+            for role in sorted_roles if (
+                    role.id not in hidden_roles
+                    and role < interaction.guild.me.top_role
+            )
         ]
 
     def _get_deletable_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:

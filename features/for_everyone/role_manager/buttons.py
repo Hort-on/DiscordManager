@@ -78,5 +78,5 @@ class RemoveRoleButton(discord.ui.Button):
         self.navigator = navigator
         self.flow = flow
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
+    async def callback(self, interaction: discord.Interaction) -> None:
         await self.flow.start_for_remove(interaction=interaction)

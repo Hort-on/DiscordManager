@@ -102,7 +102,10 @@ class RoleManagerFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.ROLE_MANAGER_MENU)
+        self.context.push(
+            target=Route.ROLE_MANAGER_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 
@@ -197,6 +200,7 @@ class RoleManagerFlow:
                 role.id not in hidden_roles
                 and role.id not in member_role_ids
                 and role.is_assignable()
+                and role < interaction.guild.me.top_role
             )
         }
 
@@ -207,7 +211,7 @@ class RoleManagerFlow:
             )
             for role_id, name in sorted(
                 available_roles.items(),
-                key=lambda item: item[1].lower()
+                key=lambda item: (item[1]).strip().lower()
             )
         ]
 
@@ -216,10 +220,15 @@ class RoleManagerFlow:
             guild_id=interaction.guild_id
         )
 
+        sorted_roles = sorted(interaction.user.roles, key=lambda role: role.name.lower())
+
         return [
             discord.SelectOption(
                 label=role.name,
                 value=str(role.id)
             )
-            for role in sorted(interaction.user.roles) if role.id not in hidden_roles
+            for role in sorted_roles if (
+                    role.id not in hidden_roles
+                    and role < interaction.guild.me.top_role
+            )
         ]
