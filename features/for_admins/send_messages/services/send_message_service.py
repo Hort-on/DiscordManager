@@ -8,14 +8,16 @@ from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
+    from core.bot_config import Bot
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
     from general_services.translator.translator import Translator
 
 
 class MessageService(DBBaseService):
-    def __init__(self, db_factory: DBFactory, settings: SettingsStorage, translator: Translator):
+    def __init__(self, bot: Bot, db_factory: DBFactory, settings: SettingsStorage, translator: Translator):
         super().__init__(settings=settings)
+        self.bot = bot
         self.db_factory = db_factory
         self.settings = settings
         self.translator = translator
@@ -53,35 +55,38 @@ class MessageService(DBBaseService):
 
         return result
 
-    async def send_message(self, member: discord.Member, message: str) -> None:
-        channel_id = self.settings.dict_storage.get_value(
-            key=member.id,
-            guild_id=member.guild.id,
-            target=StorageTarget.CHANNELS_TO_SEND
-        )
+    async def send_message(self, user: discord.User, message: str):
+        for guild in self.bot.guilds:
+            member = guild.get_member(user.id)
+            if not member:
+                continue
 
-        if not channel_id:
-            return
-
-        channel = member.guild.get_channel(channel_id)
-        if not isinstance(channel, discord.TextChannel):
-            return
-
-        try:
-            await channel.send(message)
-        except discord.Forbidden:
-            msg = self.translator.t(
-                guild_id=member.guild.id,
-                section='SEND_MSG',
-                key='no_perm_to_send',
-                channel_name=channel.name
+            channel_id = self.settings.dict_storage.get_value(
+                key=user.id,
+                guild_id=guild.id,
+                target=StorageTarget.CHANNELS_TO_SEND
             )
-            await member.send(msg)
-        except discord.HTTPException:
-            msg = self.translator.t(
-                guild_id=member.guild.id,
-                section='SEND_MSG',
-                key='failed_to_sent',
-                channel_name=channel.name
-            )
-            await member.send(msg)
+
+            if not channel_id:
+                continue
+
+            channel = self.bot.get_channel(channel_id)
+            if channel:
+                try:
+                    await channel.send(message)
+                except discord.Forbidden:
+                    msg = self.translator.t(
+                        guild_id=member.guild.id,
+                        section='SEND_MSG',
+                        key='no_perm_to_send',
+                        channel_name=channel.name
+                    )
+                    await member.send(msg)
+                except discord.HTTPException:
+                    msg = self.translator.t(
+                        guild_id=member.guild.id,
+                        section='SEND_MSG',
+                        key='failed_to_sent',
+                        channel_name=channel.name
+                    )
+                    await member.send(msg)

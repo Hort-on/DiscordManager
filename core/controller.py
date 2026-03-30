@@ -72,7 +72,7 @@ class Controller:
             )
 
             await self.send_message_service.send_message(
-                member=message.author,
+                user=message.author,
                 message=message.content
             )
 

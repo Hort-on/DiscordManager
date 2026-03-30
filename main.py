@@ -66,6 +66,7 @@ async def main():
     rules_service = RulesService(bot=bot, settings=settings)
 
     send_message_service = MessageService(
+        bot=bot,
         db_factory=db_factory,
         settings=settings,
         translator=translator
