@@ -185,7 +185,7 @@ class HiddenRolesFlow:
 
     # ================================= METHODS FOR BOTH =================================
     def _get_available_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:
-        hidden_channels = self.hidden_roles_service.get_hidden_roles(
+        hidden_roles = self.hidden_roles_service.get_hidden_roles(
             guild_id=interaction.guild_id
         )
 
@@ -194,7 +194,7 @@ class HiddenRolesFlow:
                 label=role.name,
                 value=str(role.id)
             )
-            for role in interaction.guild.roles if role.id not in hidden_channels
+            for role in sorted(interaction.user.roles) if role.id not in hidden_roles
         ]
 
     def _get_deletable_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:

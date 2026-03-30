@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
 
 from ui.drop_down_menu.drop_down_selector import DropMenuView
@@ -62,7 +63,10 @@ class RoleManagerFlow:
 
         view.context = self.context
 
-        self.context.push(target=Route.ROLE_MANAGER_MENU)
+        self.context.push(
+            target=Route.ROLE_MANAGER_MENU,
+            params=GeneralParams(guild_id=interaction.guild_id)
+        )
 
         await interaction.response.edit_message(view=view)
 
