@@ -63,7 +63,7 @@ class MemberLeftNotification:
                 guild_id=guild_id,
                 section='EVENTS',
                 key='member_left_msg',
-                member=member.mention
+                member=member.display_name or member.global_name
             ),
             color=discord.Color.blue(),
             timestamp=now
@@ -75,7 +75,7 @@ class MemberLeftNotification:
                 section='SYSTEM_GENERAL',
                 key='user'
             ),
-            value=f'{member.display_name or member.global_name}',
+            value=f'{member.mention}',
             inline=False
         )
 
