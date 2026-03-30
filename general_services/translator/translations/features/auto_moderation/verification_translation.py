@@ -57,8 +57,9 @@ VERIFICATION = {
     },
 
     'welcome_msg': {
-        'en': "Congratulations! Welcome to our community. Also you may use so of the bot`s features: '/mg'",
-        'uk': "Вітаємо! Ласкаво просимо до нашого серверу. також вам може стати в нагоді одна з фішок бота: '/mg'"
+        'en': "Congratulations! Welcome to our community. Also you may use so of the bot`s features just type: '/mg'",
+        'uk': "Вітаємо! Ласкаво просимо до нашого серверу. також вам може стати в нагоді одна з фішок бота"
+              " просто введіть: '/mg'"
     },
 
     'not_passed': {
