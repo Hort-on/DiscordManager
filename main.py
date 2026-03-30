@@ -20,6 +20,7 @@ from features.auto_moderation.message_moderation.module import build_automod_mod
 from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
 from features.for_admins.module import build_admin_module
+from features.for_admins.send_messages.services.send_message_service import MessageService
 from features.for_admins.send_messages.services.send_rules_service import RulesService
 from features.for_everyone.module import build_everyone_module
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
@@ -64,6 +65,12 @@ async def main():
 
     rules_service = RulesService(bot=bot, settings=settings)
 
+    send_message_service = MessageService(
+        db_factory=db_factory,
+        settings=settings,
+        translator=translator
+    )
+
     member_left_service = MemberLeftNotification(
         bot=bot,
         settings=settings,
@@ -85,6 +92,7 @@ async def main():
         verification_service=verification_service,
         verification_view_service=verification_view_service,
         rules_service=rules_service,
+        send_message_service=send_message_service,
         translator=translator
     )
 

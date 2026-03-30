@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import discord
 
-
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.verification.view_service import VerificationViewService
     from features.for_admins.send_messages.services.send_rules_service import RulesService
     from features.auto_moderation.message_moderation.module import AutoModModule
+    from features.for_admins.send_messages.services.send_message_service import MessageService
     from general_services.translator.translator import Translator
     from event_services.member_left import MemberLeftNotification
 
@@ -29,6 +29,7 @@ class Controller:
             rules_service: RulesService,
             moderation_service: AutoModModule,
             member_left_service: MemberLeftNotification,
+            send_message_service: MessageService,
             translator: Translator
     ):
         self.bot = bot
@@ -40,6 +41,7 @@ class Controller:
         self.rules_service = rules_service
         self.moderation_service = moderation_service
         self.member_left = member_left_service
+        self.send_message_service = send_message_service
         self.translator = translator
 
         bot.add_listener(self.on_ready)
@@ -67,6 +69,11 @@ class Controller:
             await self.rules_service.send_message(
                 message=message.content,
                 user_id=message.author.id
+            )
+
+            await self.send_message_service.send_message(
+                member=message.author,
+                message=message.content
             )
 
         await self.moderation_service.moderation_service.process_message(message=message)

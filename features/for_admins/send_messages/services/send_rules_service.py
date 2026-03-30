@@ -28,7 +28,7 @@ class RulesService:
 
         return channel_id
 
-    async def send_message(self, message: str, user_id: int):
+    async def send_message(self, message: str, user_id: int) -> None:
         if user_id not in self.active_sessions:
             return
 

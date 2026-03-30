@@ -29,5 +29,15 @@ SEND_MSG = {
     'ask_msg_dm': {
         'en': "Please send your rules to the bot`s DM.",
         'uk': "Будь ласка відправте ваші правила боту в приватні повідомлення."
+    },
+
+    'no_perm_to_send': {
+        'en': "No permission to send in: {channel_name}",
+        'uk': "Не дозволено надсилати повідомлення у канал: {channel_name}"
+    },
+
+    'failed_to_sent': {
+        'en': "Failed to send message in the channel: {channel_name}",
+        'uk': "Не вдалося відправити повідомлення у канал: {channel_name}"
     }
 }

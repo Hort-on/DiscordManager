@@ -29,6 +29,6 @@ class DictStorageManager:
     def get_all(self, target: StorageTarget, guild_id: int) -> dict:
         return self._map.get(target, {}).get(guild_id, {})
 
-    def get_value(self, key: str, target: StorageTarget, guild_id: int):
+    def get_value(self, key: str | int, target: StorageTarget, guild_id: int):
         guild_data = self.get_all(target, guild_id)
         return guild_data.get(key)

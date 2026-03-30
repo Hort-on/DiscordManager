@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.verification.service import VerificationService
     from features.auto_moderation.verification.view_service import VerificationViewService
     from features.for_admins.send_messages.services.send_rules_service import RulesService
+    from features.for_admins.send_messages.services.send_message_service import MessageService
     from general_services.other_services.cleanup_service import CleanUpService
     from general_services.translator.translator import Translator
 
@@ -36,6 +37,7 @@ def build_admin_module(
         verification_service: VerificationService,
         verification_view_service: VerificationViewService,
         rules_service: RulesService,
+        send_message_service: MessageService,
         translator: Translator
 ) -> AdministrationModule:
 
@@ -54,9 +56,8 @@ def build_admin_module(
     )
 
     message_module = build_messages_module(
-        db_factory=db_factory,
-        settings=settings,
-        rules_service=rules_service
+        rules_service=rules_service,
+        send_message_service=send_message_service
     )
 
     superusers_module = build_superusers_module(
