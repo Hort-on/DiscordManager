@@ -198,7 +198,7 @@ class HiddenRolesFlow:
             )
             for role in sorted_roles if (
                     role.id not in hidden_roles
-                    and role < interaction.guild.me.top_role
+                    and not role.is_default()
             )
         ]
 
