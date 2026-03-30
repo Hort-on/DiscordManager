@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import discord
 
@@ -48,7 +48,7 @@ class MemberLeftNotification:
 
         guild_id = member.guild.id
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         duration = now - member.joined_at
 
         days = duration.days
