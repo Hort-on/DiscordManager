@@ -59,12 +59,6 @@ class MemberLeftNotification:
                 section='EVENTS',
                 key='member_left_title'
             ),
-            description=self.translator.t(
-                guild_id=guild_id,
-                section='EVENTS',
-                key='member_left_msg',
-                member=member.display_name or member.global_name
-            ),
             color=discord.Color.blue(),
             timestamp=now
         )
@@ -75,7 +69,7 @@ class MemberLeftNotification:
                 section='SYSTEM_GENERAL',
                 key='user'
             ),
-            value=f'{member.display_name if member.display_name else member.global_name}',
+            value=f'{member.display_name or member.global_name}',
             inline=False
         )
 
