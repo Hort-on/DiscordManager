@@ -59,6 +59,12 @@ class MemberLeftNotification:
                 section='EVENTS',
                 key='member_left_title'
             ),
+            description=self.translator.t(
+                guild_id=guild_id,
+                section='EVENTS',
+                key='member_left_msg',
+                member=member.mention
+            ),
             color=discord.Color.blue(),
             timestamp=now
         )

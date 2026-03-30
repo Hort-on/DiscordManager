@@ -4,6 +4,11 @@ EVENTS = {
             'uk': "Користувач залишив сервер"
         },
 
+        'member_left_msg': {
+            'en': "{member} left the server",
+            'uk': "{member} залишив сервер"
+        },
+
         'member_joined': {
             'en': "Joined at:",
             'uk': "Приєднався:"
@@ -15,7 +20,7 @@ EVENTS = {
         },
 
         'days_on_server': {
-            'en': "📅 {days} days:",
-            'uk': "📅 {days} днів:"
+            'en': "📅 {days} days",
+            'uk': "📅 {days} днів"
         }
 }
