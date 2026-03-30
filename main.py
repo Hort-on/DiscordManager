@@ -32,8 +32,8 @@ from ui.button_protection.button_protection_service import ButtonProtectionServi
 
 
 # Logging
-logging.basicConfig(level=logging.WARNING)
-logging.getLogger('discord.http').setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('discord.http').setLevel(logging.WARNING)
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
