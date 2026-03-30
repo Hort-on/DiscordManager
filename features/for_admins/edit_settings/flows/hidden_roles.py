@@ -159,7 +159,7 @@ class HiddenRolesFlow:
         )
 
     async def _delete_role_procedure(self, interaction: discord.Interaction, values: list[str]):
-        result = self.hidden_roles_service.delete_roles(
+        result = await self.hidden_roles_service.delete_roles(
             guild_id=interaction.guild_id,
             values=values,
         )
