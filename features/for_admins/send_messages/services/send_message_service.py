@@ -55,7 +55,7 @@ class MessageService(DBBaseService):
 
         return result
 
-    async def send_message(self, user: discord.User, message: str):
+    async def send_message(self, user: discord.User | discord.Member, message: str):
         for guild in self.bot.guilds:
             member = guild.get_member(user.id)
             if not member:

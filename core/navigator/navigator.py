@@ -46,7 +46,7 @@ class Navigator:
 
         return factory(context=context)
 
-    def main_menu(self, guild_id: int, user_id: int, owner_id: int, context: NavigationContext):
+    def main_menu(self, guild_id: int, user_id: int, owner_id: int | None, context: NavigationContext):
         from features.for_everyone.main_menu.view import MainMenuView
         birthday_module = self.everyone_module.birthday_module
         return MainMenuView(

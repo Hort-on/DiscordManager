@@ -42,15 +42,18 @@ class EditSettingsMenuButton(FirewallButton):
         self.translator = translator
 
     async def on_click(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        assert guild is not None
+
         view = self.navigator.settings_menu(
             context=self.context,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         view.context = self.context
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(guild_id=interaction.guild_id)
+            params=AdminMenuParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)

@@ -43,19 +43,20 @@ class HiddenChannelsFlow:
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         embed = await self.formatter.format_current_hidden(
             interaction=interaction,
             target=StorageTarget.HIDDEN_CHANNELS
         )
 
-        options = self._get_available_channels(
-            guild=interaction.guild
-        )
+        options = self._get_available_channels(guild=guild)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='EDIT_SETTINGS',
                     key='no_ch_to_add'
                 )
@@ -67,9 +68,9 @@ class HiddenChannelsFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ch_to_change'
             ),
@@ -81,7 +82,7 @@ class HiddenChannelsFlow:
 
         self.context.push(
             target=Route.HIDDEN_CHANNELS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id),
+            params=GeneralParams(guild_id=guild.id),
         )
 
         await interaction.response.edit_message(
@@ -107,15 +108,18 @@ class HiddenChannelsFlow:
             interaction: discord.Interaction,
             values: list[str],
     ):
+        guild = interaction.guild
+        assert guild is not None
+
         result = await self.hidden_ch_service.update_channels_values(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             values=values,
         )
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -130,19 +134,20 @@ class HiddenChannelsFlow:
 
     # ================================= METHODS FOR DELETE BUTTON =================================
     async def start_for_delete(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         embed = await self.formatter.format_current_hidden(
             interaction=interaction,
             target=StorageTarget.HIDDEN_CHANNELS
         )
 
-        options = self._get_deletable_channels(
-            guild=interaction.guild,
-        )
+        options = self._get_deletable_channels(guild=guild)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='EDIT_SETTINGS',
                     key='no_ch_to_delete'
                 )
@@ -154,9 +159,9 @@ class HiddenChannelsFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ask_ch_for_deletion'
             ),
@@ -209,15 +214,15 @@ class HiddenChannelsFlow:
             interaction: discord.Interaction,
             values: list[str],
     ) -> None:
-        result = self.hidden_ch_service.delete_channels(
-            guild_id=interaction.guild_id,
-            values=values,
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        result = await self.hidden_ch_service.delete_channels(guild_id=guild.id, values=values)
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='EDIT_SETTINGS',
                     key='no_ch_to_delete'
                 )
@@ -232,10 +237,12 @@ class HiddenChannelsFlow:
 
     # ================================= METHOD FOR SENDING RESULT =================================
     async def _send_result(self, interaction: discord.Interaction, values: list[str]) -> None:
+        guild = interaction.guild
+        assert guild is not None
         ch_ids = set(int(i) for i in values)
 
         success_msg = self.translator.t(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             section='EDIT_SETTINGS',
             key='success_ch_addition'
         )
@@ -243,8 +250,9 @@ class HiddenChannelsFlow:
         ch_names: list[str] = [success_msg]
 
         for ch_id in ch_ids:
-            channel = interaction.guild.get_channel(ch_id)
-            ch_names.append(f'🔸 {channel.name}')
+            channel = guild.get_channel(ch_id)
+            if channel:
+                ch_names.append(f'🔸 {channel.name}')
 
         result_msg = '\n'.join(ch_names)
 

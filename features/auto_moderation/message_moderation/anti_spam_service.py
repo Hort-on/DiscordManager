@@ -74,6 +74,9 @@ class AntiSpamService:
 
     def check_link_spam(self, message: discord.Message, timestamp: float) -> SpamResult:
         """Detect repeated links from the same domain. Checks all links in the message."""
+        if not message.guild:
+            return SpamResult(value=False)
+
         if 'http' not in message.content:
             return SpamResult(value=False)
 
@@ -104,20 +107,21 @@ class AntiSpamService:
 
         return SpamResult(value=False)
 
-    async def check_attachment_spam(
-            self, message: discord.Message, timestamp: float
-    ) -> SpamResult:
+    async def check_attachment_spam(self, message: discord.Message, timestamp: float) -> SpamResult:
         """Detect visually similar images sent in quick succession."""
+        if not message.guild:
+            return SpamResult(value=False)
+
         if not message.attachments:
             return SpamResult(value=False)
 
         guild_id = message.guild.id
 
         for attachment in message.attachments:
-            if not self._is_valid_image(attachment):
+            if not self._is_valid_image(attachment=attachment):
                 continue
 
-            img_hash = await self.image_dhash(attachment)
+            img_hash = await self.image_dhash(attachment=attachment)
 
             self._cleanup(
                 guild_id=guild_id,
@@ -130,16 +134,23 @@ class AntiSpamService:
 
             history.append((timestamp, message))
 
-            if self._is_spam_image(img_hash, guild_id, timestamp):
+            if self._is_spam_image(
+                    img_hash=img_hash,
+                    guild_id=guild_id,
+                    timestamp=timestamp
+            ):
                 messages = self._get_messages(guild_id, img_hash)
                 return SpamResult(value=True, messages=messages)
 
         return SpamResult(value=False)
 
     def _is_valid_image(self, attachment: discord.Attachment) -> bool:
+        content_type = attachment.content_type
+
         return (
             attachment.size <= 2_000_000
-            and attachment.content_type.startswith('image')
+            and content_type is not None
+            and content_type.startswith('image')
             and attachment.filename.lower().endswith(self.SUPPORTED_EXTENSIONS)
         )
 
@@ -183,7 +194,7 @@ class AntiSpamService:
         """Compute a 64-bit perceptual dHash for a Discord image attachment."""
         data = await attachment.read()
         image = Image.open(io.BytesIO(data)).convert('L').resize((9, 8))
-        pixels = list(iter(image.getdata()))
+        pixels = list(image.getdata())
 
         hash_value = 0
         for row in range(8):

@@ -52,15 +52,15 @@ class HiddenRolesMenuButton(FirewallButton):
         self.cleanup_service = cleanup_service
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.hidden_roles_menu(
-            context=self.context,
-            guild_id=interaction.guild_id
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        view = self.navigator.hidden_roles_menu(context=self.context, guild_id=guild.id)
 
         view.context = self.context
         self.context.push(
             target=Route.SETTINGS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)

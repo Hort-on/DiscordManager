@@ -22,7 +22,7 @@ class MemberLeftNotification:
 
     async def check_if_notification(self, member: discord.Member):
         result = self.settings.dict_storage.get_value(
-            'member_left',
+            key='member_left',
             target=StorageTarget.SETTINGS,
             guild_id=member.guild.id
         )
@@ -30,7 +30,7 @@ class MemberLeftNotification:
             return
 
         channel_id = self.settings.dict_storage.get_value(
-            'notification_channel_id',
+            key='notification_channel_id',
             target=StorageTarget.SYSTEM_CHANNELS,
             guild_id=member.guild.id
         )
@@ -43,15 +43,20 @@ class MemberLeftNotification:
     async def send_notification(self, member: discord.Member, channel_id: int):
         channel = self.bot.get_channel(channel_id)
 
-        if not channel:
+        if not isinstance(channel, discord.TextChannel):
             return
 
         guild_id = member.guild.id
 
         now = datetime.now(timezone.utc)
-        duration = now - member.joined_at
 
-        days = duration.days
+        joined_at = member.joined_at
+
+        days = None
+
+        if joined_at:
+            duration = now - member.joined_at
+            days = duration.days
 
         embed = discord.Embed(
             title=self.translator.t(

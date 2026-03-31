@@ -25,14 +25,15 @@ class SendMessageFlow:
         self.translator = translator
 
     async def start_for_send(self, interaction: discord.Interaction):
-        options = self.service.get_channels(
-            guild=interaction.guild
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self.service.get_channels(guild=guild)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='no_available_ch'
                 )
@@ -44,9 +45,9 @@ class SendMessageFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='SEND_MSG',
                 key='ask_ch_to_send'
             ),
@@ -58,10 +59,25 @@ class SendMessageFlow:
         )
 
     async def _handle_channel(self, interaction: discord.Interaction, value: list[str]):
-        channel = interaction.guild.get_channel(int(value[0]))
+        guild = interaction.guild
+        assert guild is not None
+
+        channel = guild.get_channel(int(value[0]))
+        if not channel:
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=guild.id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
+            )
+            await interaction.response.edit_message(
+                embed=error_embed
+            )
+            return
 
         result = await self.service.save_channel(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             user_id=interaction.user.id,
             channel_id=channel.id
         )
@@ -69,7 +85,7 @@ class SendMessageFlow:
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -81,7 +97,7 @@ class SendMessageFlow:
 
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='SEND_MSG',
                 key='success_ch_to_send',
                 channel_name=channel.name

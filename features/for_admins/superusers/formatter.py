@@ -45,7 +45,7 @@ class SuperusersFormatter:
         else:
             for user_id in users:
                 member = guild.get_member(user_id)
-                name = member.display_name if member.display_name else member.global_name
+                name = member.display_name or member.global_name
                 lines.append(f'🔸 {name}')
 
             return InfoEmbed(

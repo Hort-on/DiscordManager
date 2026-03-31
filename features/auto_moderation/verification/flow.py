@@ -40,10 +40,13 @@ class VerificationFlow:
         self.users_count: dict[tuple[int, int], int] = {}
 
     async def agreement_start(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        assert guild is not None
+
         anti_bot = self.settings.dict_storage.get_value(
-            'anti_bot',
+            key='anti_bot',
             target=StorageTarget.SETTINGS,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         if bool(anti_bot):
@@ -51,13 +54,13 @@ class VerificationFlow:
                 AntiBotModal(
                     flow=self,
                     translator=self.translator,
-                    guild_id=interaction.guild_id
+                    guild_id=guild.id
                 )
             )
             return
 
         result = await self._assign_role(
-            guild=interaction.guild,
+            guild=guild,
             member=interaction.user
         )
 
@@ -77,8 +80,11 @@ class VerificationFlow:
     async def word_verification(self, interaction: discord.Interaction, word: str) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         result_word = await self._check_the_word(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             member=interaction.user,
             word=word
         )
@@ -86,7 +92,7 @@ class VerificationFlow:
         if not result_word:
             fail_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='VERIFICATION',
                     key='wrong_word'
                 )
@@ -96,7 +102,7 @@ class VerificationFlow:
             return
 
         result = await self._assign_role(
-            guild=interaction.guild,
+            guild=guild,
             member=interaction.user
         )
 
@@ -112,9 +118,12 @@ class VerificationFlow:
         await interaction.followup.send(embed=embed)
 
     async def disagreement_start(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        assert guild is not None
+
         info_embed = InfoEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='VERIFICATION',
                 key='declined'
             )
@@ -127,9 +136,10 @@ class VerificationFlow:
     async def _check_the_word(
             self,
             guild_id: int,
-            member: discord.Member,
+            member: discord.User | discord.Member,
             word: str
     ) -> bool:
+
         if word.lower() != 'hello':
             key = (member.id, guild_id)
 
@@ -153,7 +163,12 @@ class VerificationFlow:
 
         return True
 
-    async def _assign_role(self, guild: discord.Guild, member: discord.Member) -> AssignVerificationRoleResult:
+    async def _assign_role(
+            self,
+            guild: discord.Guild,
+            member: discord.User | discord.Member
+    ) -> AssignVerificationRoleResult:
+
         verification_role = self.settings.dict_storage.get_value(
             key='verification_role_id',
             target=StorageTarget.SETTINGS,

@@ -35,15 +35,18 @@ class VerificationRoleFlow:
         self.translator = translator
 
     async def show_available_roles(self, interaction: discord.Interaction) -> None:
-        options = self._get_available_roles(guild=interaction.guild)
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._get_available_roles(guild=guild)
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ask_ver_role'
             ),
@@ -54,7 +57,7 @@ class VerificationRoleFlow:
 
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(guild_id=interaction.guild_id)
+            params=AdminMenuParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
@@ -71,15 +74,15 @@ class VerificationRoleFlow:
         ]
 
     async def _save_verification_role(self, interaction: discord.Interaction, value: list[str]) -> None:
-        result = await self.service.save_role(
-            guild_id=interaction.guild_id,
-            role_id=int(value[0])
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        result = await self.service.save_role(guild_id=guild.id, role_id=int(value[0]))
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -87,11 +90,21 @@ class VerificationRoleFlow:
             await interaction.response.edit_message(embed=error_embed)
             return
 
-        role = interaction.guild.get_role(int(value[0]))
+        role = guild.get_role(int(value[0]))
+        if not role:
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=guild.id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
+            )
+            await interaction.response.edit_message(embed=error_embed)
+            return
 
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ver_role_success',
                 role_name=role.name

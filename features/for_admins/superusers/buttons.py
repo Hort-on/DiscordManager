@@ -45,18 +45,21 @@ class SuperusersMenuButton(FirewallButton):
         self.formatter = formatter
 
     async def on_click(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         view = self.navigator.superusers_menu(
             context=self.context,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         view.context = self.context
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(guild_id=interaction.guild_id)
+            params=AdminMenuParams(guild_id=guild.id)
         )
 
-        embed = self.formatter.build_embed(guild=interaction.guild)
+        embed = self.formatter.build_embed(guild=guild)
 
         await interaction.response.edit_message(view=view, embed=embed)
 

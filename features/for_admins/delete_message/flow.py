@@ -34,12 +34,15 @@ class DeleteMessageFlow:
         self.translator = translator
 
     async def delete_message_start(self, interaction: discord.Interaction) -> None:
-        options = self._build_options(guild=interaction.guild)
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._build_options(guild=guild)
 
         if not options:
             embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='not_found_channels'
                 )
@@ -51,9 +54,9 @@ class DeleteMessageFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='SYSTEM_GENERAL',
                 key='ask_for_channel'
             ),
@@ -63,7 +66,7 @@ class DeleteMessageFlow:
         view.context = self.context
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(guild_id=interaction.guild_id)
+            params=AdminMenuParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
@@ -77,20 +80,23 @@ class DeleteMessageFlow:
     ) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         users_names = users.strip() if users else None
 
         if users_names:
             result = await self._delete_message_from_users(
-                guild=interaction.guild,
+                guild=guild,
                 channel=channel,
                 amount=amount,
-                users=users_names
+                users_list=users_names
             )
 
             if not result:
                 embed = ErrorEmbed(
                     description=self.translator.t(
-                        guild_id=interaction.guild_id,
+                        guild_id=guild.id,
                         section='SYSTEM_GENERAL',
                         key='msg_not_found'
                     )
@@ -109,7 +115,7 @@ class DeleteMessageFlow:
         if len_result == 0:
             embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='msg_not_found'
                 )
@@ -117,7 +123,7 @@ class DeleteMessageFlow:
         else:
             embed = SuccessEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='DELETE_MESSAGES',
                     key='success_msg_deletion',
                     len_result=len_result,
@@ -128,15 +134,21 @@ class DeleteMessageFlow:
         await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def _send_modal(self, interaction: discord.Interaction, value: list[str]) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         channel_id = int(value[0])
         channel = interaction.client.get_channel(channel_id)
+
+        if not isinstance(channel, discord.TextChannel):
+            return
 
         await interaction.response.send_modal(
             DeleteMessagesModal(
                 channel=channel,
                 flow=self,
                 translator=self.translator,
-                guild_id=interaction.guild_id
+                guild_id=guild.id
             )
         )
 
@@ -156,11 +168,11 @@ class DeleteMessageFlow:
             guild: discord.Guild,
             channel: discord.TextChannel,
             amount: int,
-            users: str
-    ) -> str | bool:
+            users_list: str
+    ) -> str | None:
         user_names = self.service.get_users(
             guild=guild,
-            users=users
+            users=users_list
         )
 
         result_msg = []
@@ -176,7 +188,7 @@ class DeleteMessageFlow:
         )
 
         if not deleted:
-            return False
+            return None
 
         counter = Counter(msg.author.display_name for msg in deleted)
         for user_name, count in counter.items():

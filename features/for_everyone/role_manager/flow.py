@@ -32,6 +32,9 @@ class RoleManagerFlow:
         self.translator = translator
 
     async def start_for_add(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         options = await self._get_available_guild_roles(
             interaction=interaction
         )
@@ -39,7 +42,7 @@ class RoleManagerFlow:
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='ROLE_MANAGER',
                     key='no_role_found'
                 )
@@ -51,9 +54,9 @@ class RoleManagerFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='ask_r_to_add'
             ),
@@ -65,12 +68,15 @@ class RoleManagerFlow:
 
         self.context.push(
             target=Route.ROLE_MANAGER_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
 
     async def start_for_remove(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         options = await self._get_user_roles(
             interaction=interaction
         )
@@ -78,7 +84,7 @@ class RoleManagerFlow:
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='ROLE_MANAGER',
                     key='no_role_found'
                 )
@@ -90,9 +96,9 @@ class RoleManagerFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='ask_r_to_remove'
             ),
@@ -104,15 +110,18 @@ class RoleManagerFlow:
 
         self.context.push(
             target=Route.ROLE_MANAGER_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
 
     async def _add_roles_to_user(self, interaction: discord.Interaction, roles: list[str]):
+        guild = interaction.guild
+        assert guild is not None
+
         result = await self.service.add_roles_to_user(
             member=interaction.user,
-            guild=interaction.guild,
+            guild=guild,
             roles=roles
         )
 
@@ -121,7 +130,7 @@ class RoleManagerFlow:
 
         if result.added_roles:
             msg = self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='success_addition'
             )
@@ -133,7 +142,7 @@ class RoleManagerFlow:
 
         if result.not_added_roles:
             msg = self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='failed_addition'
             )
@@ -148,9 +157,12 @@ class RoleManagerFlow:
         await interaction.response.edit_message(embeds=embeds)
 
     async def _remove_roles_from_user(self, interaction: discord.Interaction, roles: list[str]):
+        guild = interaction.guild
+        assert guild is not None
+
         result = await self.service.remove_roles_from_user(
             member=interaction.user,
-            guild=interaction.guild,
+            guild=guild,
             roles=roles
         )
 
@@ -159,7 +171,7 @@ class RoleManagerFlow:
 
         if result.removed_roles:
             msg = self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='success_removal'
             )
@@ -171,7 +183,7 @@ class RoleManagerFlow:
 
         if result.not_removed_roles:
             msg = self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='ROLE_MANAGER',
                 key='failed_removal'
             )
@@ -185,13 +197,17 @@ class RoleManagerFlow:
 
         await interaction.response.edit_message(embeds=embeds)
 
-    async def _get_available_guild_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:
-        hidden_roles: set[int] = self.service.get_hidden_roles(
-            guild_id=interaction.guild_id
-        )
+    async def _get_available_guild_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption] | None:
+        guild = interaction.guild
+        assert guild is not None
+
+        hidden_roles: set[int] = self.service.get_hidden_roles(guild_id=guild.id)
+
+        if not isinstance(interaction.user, discord.Member):
+            return None
 
         member_role_ids = {role.id for role in interaction.user.roles}
-        guild_roles = interaction.guild.roles
+        guild_roles = guild.roles
 
         available_roles = {
             role.id: role.name
@@ -215,10 +231,16 @@ class RoleManagerFlow:
             )
         ]
 
-    async def _get_user_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:
+    async def _get_user_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption] | None:
+        guild = interaction.guild
+        assert guild is not None
+
         hidden_roles: set[int] = self.service.get_hidden_roles(
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
+
+        if not isinstance(interaction.user, discord.Member):
+            return None
 
         sorted_roles = sorted(interaction.user.roles, key=lambda role: role.name.lower())
 

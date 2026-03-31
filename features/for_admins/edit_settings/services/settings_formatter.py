@@ -29,9 +29,12 @@ class SettingsFormatter:
         self.translator = translator
 
     def format_current_main_settings(self, interaction: discord.Interaction) -> discord.Embed:
+        guild = interaction.guild
+        assert guild is not None
+
         settings = self.settings.dict_storage.get_all(
             target=StorageTarget.SETTINGS,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         lines: list[str] = [f'Setting{" " * 14} Status', f'{"-" * 23}  {"-" * 12}']
@@ -41,7 +44,7 @@ class SettingsFormatter:
                 continue
 
             config_name = key.removesuffix('_id').replace('_', ' ')
-            status = self._format_status(guild=interaction.guild, key=key, value=value)
+            status = self._format_status(guild=guild, key=key, value=value)
             lines.append(f'🔸{config_name:<20}: {status}')
 
         return InfoEmbed(description='```text\n' + '\n'.join(lines) + '\n```')
@@ -116,13 +119,14 @@ class SettingsFormatter:
             interaction: discord.Interaction,
             target: StorageTarget,
     ) -> discord.Embed:
-        is_channel = target == StorageTarget.HIDDEN_CHANNELS
-
         guild = interaction.guild
+        assert guild is not None
+
+        is_channel = target == StorageTarget.HIDDEN_CHANNELS
 
         title = 'Hidden channels:' if is_channel else 'Hidden roles:'
         not_found_label = self.translator.t(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             section='EDIT_SETTINGS',
             key='not_hidden_ch' if is_channel else 'not_hidden_roles'
         )

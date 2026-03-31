@@ -87,7 +87,7 @@ class BirthdayManager(DBBaseService):
             return
 
         channel = self.bot.get_channel(settings.get('congrats_channel_id'))
-        if not channel:
+        if not isinstance(channel, (discord.TextChannel, discord.Thread)):
             return
 
         guild = self.bot.get_guild(guild_id)

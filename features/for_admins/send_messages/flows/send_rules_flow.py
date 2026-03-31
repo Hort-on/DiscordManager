@@ -24,13 +24,14 @@ class SendRulesFlow:
         self.translator = translator
 
     async def start_for_rules(self, interaction: discord.Interaction):
-        channel_id = self.service.get_verification_channel(
-            guild_id=interaction.guild_id
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        channel_id = self.service.get_verification_channel(guild_id=guild.id)
         if not channel_id:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SEND_MSG',
                     key='assure_ch'
                 )
@@ -41,11 +42,11 @@ class SendRulesFlow:
             )
             return
 
-        self.service.active_sessions[interaction.user.id] = interaction.guild_id
+        self.service.active_sessions[interaction.user.id] = guild.id
 
         embed = InfoEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='SEND_MSG',
                 key='ask_msg_dm'
             )

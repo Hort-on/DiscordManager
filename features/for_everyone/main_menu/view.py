@@ -31,7 +31,7 @@ class MainMenuView(discord.ui.View):
             translator: Translator,
             guild_id: int,
             user_id: int,
-            owner_id: int
+            owner_id: int | None
     ):
         super().__init__(timeout=60)
 

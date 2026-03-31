@@ -41,8 +41,11 @@ class AdminMenuButton(FirewallButton):
         self.context = context
 
     async def on_click(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        assert guild is not None
+
         view = self.navigator.admin_menu(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             context=self.context
         )
 
@@ -51,9 +54,9 @@ class AdminMenuButton(FirewallButton):
         self.context.push(
             target=Route.MAIN_MENU,
             params=MainMenuParams(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 user_id=interaction.user.id,
-                owner_id=interaction.guild.owner_id
+                owner_id=guild.owner_id
             )
         )
 

@@ -28,7 +28,12 @@ class RoleManagerService:
         self.settings = settings
 
     @staticmethod
-    async def add_roles_to_user(member: discord.Member, guild: discord.Guild, roles: list[str]) -> AddedRolesResult:
+    async def add_roles_to_user(
+            member: discord.Member | discord.User,
+            guild: discord.Guild,
+            roles: list[str]
+    ) -> AddedRolesResult:
+
         role_ids = {int(r_id) for r_id in roles}
 
         roles_to_add: set[discord.Role] = set()
@@ -63,7 +68,7 @@ class RoleManagerService:
     @staticmethod
     async def remove_roles_from_user(
             guild: discord.Guild,
-            member: discord.Member,
+            member: discord.Member | discord.User,
             roles: list[str]
     ) -> RemoveRolesResult:
         role_ids = {int(r_id) for r_id in roles}
@@ -72,7 +77,7 @@ class RoleManagerService:
 
         for role_id in role_ids:
             role = guild.get_role(role_id)
-            if role in member.roles:
+            if role is not None and role in member.roles:
                 roles_to_remove.add(role)
 
         try:

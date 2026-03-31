@@ -42,11 +42,14 @@ class RandomizerFlow:
         self.context = context
 
     async def for_number_start(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         await interaction.response.send_modal(
             RandomNumModal(
                 flow=self,
                 translator=self.translator,
-                guild_id=interaction.guild_id
+                guild_id=guild.id
             )
         )
 
@@ -59,10 +62,13 @@ class RandomizerFlow:
     ):
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         if first_num == second_num:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='different_numbers'
                 )
@@ -76,11 +82,11 @@ class RandomizerFlow:
             second_num,
             callback=self.for_number_proceed,
             translator=self.translator,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         result_msg = self.translator.t(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             section='RANDOMIZER',
             key='num_result_msg',
             result=result
@@ -92,11 +98,14 @@ class RandomizerFlow:
             await interaction.followup.send(content=result_msg, view=view, ephemeral=True)
 
     async def for_word_start(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         await interaction.response.send_modal(
             RandomWordModal(
                 flow=self,
                 translator=self.translator,
-                guild_id=interaction.guild_id
+                guild_id=guild.id
             )
         )
 
@@ -108,13 +117,16 @@ class RandomizerFlow:
     ) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         words = [w for w in words_list.split(',')]
         random.shuffle(words)
 
         if len(words) < 2:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='two_words',
                 )
@@ -127,11 +139,11 @@ class RandomizerFlow:
             words_list,
             callback=self.for_word_proceed,
             translator=self.translator,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         result_msg = self.translator.t(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             section='RANDOMIZER',
             key='word_result_msg',
             chosen_word=chosen_word
@@ -143,11 +155,14 @@ class RandomizerFlow:
             await interaction.followup.send(content=result_msg, view=view, ephemeral=True)
 
     async def for_teams_by_text_start(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         await interaction.response.send_modal(
             RandomTeamByTextModal(
                 flow=self,
                 translator=self.translator,
-                guild_id=interaction.guild_id
+                guild_id=guild.id
             )
         )
 
@@ -160,12 +175,15 @@ class RandomizerFlow:
     ) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         members = [m.strip() for m in users_list.split(',')]
 
         if teams_quantity > len(members) or teams_quantity <= 1:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='wrong_team_count'
                 )
@@ -175,20 +193,20 @@ class RandomizerFlow:
 
         teams = self.service.build_teams_by_text(members=members, teams_quantity=teams_quantity)
 
-        embed = self._build_embed(teams=teams, guild_id=interaction.guild_id)
+        embed = self._build_embed(teams=teams, guild_id=guild.id)
 
         view = ReshuffleView(
             users_list,
             teams_quantity,
             callback=self.team_by_text_proceed,
             translator=self.translator,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         view.context = self.context
         self.context.push(
             target=Route.RANDOMIZER_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         if edit_mode:
@@ -197,12 +215,15 @@ class RandomizerFlow:
             await interaction.followup.send(embed=embed, view=view, ephemeral=True)
 
     async def for_teams_by_channel_start(self, interaction: discord.Interaction) -> None:
-        options = self._get_channels(guild=interaction.guild)
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._get_channels(guild=guild)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='no_v_channels_found'
                 )
@@ -215,9 +236,9 @@ class RandomizerFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='SYSTEM_GENERAL',
                 key='ask_for_channel'
             ),
@@ -227,12 +248,15 @@ class RandomizerFlow:
         view.context = self.context
         self.context.push(
             target=Route.RANDOMIZER_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
 
     async def _proceed_channel(self, interaction: discord.Interaction, value: list[str]) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         channel_id = int(value[0])
         channel = interaction.client.get_channel(channel_id)
 
@@ -241,7 +265,7 @@ class RandomizerFlow:
                 channel=channel,
                 flow=self,
                 translator=self.translator,
-                guild_id=interaction.guild_id
+                guild_id=guild.id
             )
         )
 
@@ -254,12 +278,15 @@ class RandomizerFlow:
     ) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        guild = interaction.guild
+        assert guild is not None
+
         members = [m for m in channel.members if not m.bot]
 
         if teams_quantity > len(members) or teams_quantity <= 1:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='wrong_team_count'
                 )
@@ -269,14 +296,14 @@ class RandomizerFlow:
 
         teams = self.service.team_by_channel_proceed(members=members, teams_quantity=teams_quantity)
 
-        embed = self._build_embed(teams=teams, guild_id=interaction.guild_id)
+        embed = self._build_embed(teams=teams, guild_id=guild.id)
 
         view = ReshuffleView(
             channel,
             teams_quantity,
             callback=self.team_by_channel_proceed,
             translator=self.translator,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         if edit_mode:

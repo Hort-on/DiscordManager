@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
+from PIL.ImageCms import isIntentSupported
 
 from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
@@ -56,6 +57,9 @@ class SystemChannelsService(DBBaseService):
 
             if result:
                 channel = await self.service.get_verification_channel(guild=guild)
+                if not isinstance(channel, discord.TextChannel):
+                    return False
+
                 await self.view_service.ensure_single_message(
                     channel=channel,
                     guild_id=guild.id

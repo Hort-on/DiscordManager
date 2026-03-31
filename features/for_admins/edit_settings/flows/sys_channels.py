@@ -37,14 +37,15 @@ class SystemChannelsFlow:
 
     # ================================= METHODS FOR ADD BUTTON =================================
     async def start_for_add(self, interaction: discord.Interaction) -> None:
-        options = self._sys_channels_options(
-            guild_id=interaction.guild_id
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._sys_channels_options(guild_id=guild.id)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='EDIT_SETTINGS',
                     key='no_available_ch'
                 )
@@ -56,9 +57,9 @@ class SystemChannelsFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ask_sys_ch'
             ),
@@ -69,7 +70,7 @@ class SystemChannelsFlow:
 
         self.context.push(
             target=Route.SYSTEM_CHANNELS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
@@ -79,6 +80,9 @@ class SystemChannelsFlow:
             interaction: discord.Interaction,
             values: list[str]
     ) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         channel_key = values[0]
 
         options = self._guilds_text_channels_options(interaction=interaction)
@@ -87,9 +91,9 @@ class SystemChannelsFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ask_new_sys_ch'
             ),
@@ -104,7 +108,7 @@ class SystemChannelsFlow:
 
         self.context.push(
             target=Route.SETTINGS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
@@ -115,17 +119,17 @@ class SystemChannelsFlow:
             channel_key: str,
             values: list[str]
     ) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         channel_id = int(values[0])
 
-        result = await self.service.save_system_channel(
-            guild=interaction.guild,
-            channel_data={channel_key: channel_id}
-        )
+        result = await self.service.save_system_channel(guild=guild, channel_data={channel_key: channel_id})
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -145,11 +149,25 @@ class SystemChannelsFlow:
             channel_id: int,
             channel_key: str
     ) -> None:
-        channel = interaction.guild.get_channel(channel_id)
+        guild = interaction.guild
+        assert guild is not None
+
+        channel = guild.get_channel(channel_id)
+
+        if not channel:
+            error_embed = ErrorEmbed(
+                description=self.translator.t(
+                    guild_id=guild.id,
+                    section='SYSTEM_GENERAL',
+                    key='error_msg'
+                )
+            )
+            await interaction.response.edit_message(embed=error_embed)
+            return
 
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='sys_ch_success',
                 channel_key=channel_key,
@@ -157,24 +175,21 @@ class SystemChannelsFlow:
             ),
         )
 
-        current_channels = await self.formatter.format_current_system_channels(
-            guild=interaction.guild
-        )
+        current_channels = await self.formatter.format_current_system_channels(guild=guild)
 
-        await interaction.response.edit_message(
-            embeds=[success_embed, current_channels]
-        )
+        await interaction.response.edit_message(embeds=[success_embed, current_channels])
 
     # ================================= METHODS FOR DELETE BUTTON =================================
     async def start_for_delete(self, interaction: discord.Interaction) -> None:
-        options = self._sys_channels_options(
-            guild_id=interaction.guild_id
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._sys_channels_options(guild_id=guild.id)
 
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='no_available_ch'
                 )
@@ -186,9 +201,9 @@ class SystemChannelsFlow:
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='ask_sys_ch_to_delete'
             ),
@@ -199,21 +214,21 @@ class SystemChannelsFlow:
 
         self.context.push(
             target=Route.SETTINGS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
 
     async def delete_sys_channel(self, interaction: discord.Interaction, values: list[str]) -> None:
-        result = await self.service.delete_channels(
-            guild_id=interaction.guild_id,
-            values=values
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        result = await self.service.delete_channels(guild_id=guild.id, values=values)
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -224,15 +239,18 @@ class SystemChannelsFlow:
         await self._send_result_for_delete(interaction=interaction)
 
     async def _send_result_for_delete(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='success_sys_ch_deletion'
             )
         )
 
-        current_channels = await self.formatter.format_current_system_channels(guild=interaction.guild)
+        current_channels = await self.formatter.format_current_system_channels(guild=guild)
 
         await interaction.response.edit_message(embeds=[success_embed, current_channels])
 
@@ -250,17 +268,23 @@ class SystemChannelsFlow:
 
     @staticmethod
     def _guilds_text_channels_options(interaction: discord.Interaction) -> list[discord.SelectOption]:
+        guild = interaction.guild
+        assert guild is not None
+
         return [
             discord.SelectOption(
                 label=ch.name,
                 value=str(ch.id)
             )
             for ch in sorted(
-                interaction.guild.text_channels,
+                guild.text_channels,
                 key=lambda ch: ch.name.lower()
             )
         ]
 
     async def for_sys_channels_list(self, interaction: discord.Interaction) -> None:
-        embed = await self.formatter.format_current_system_channels(guild=interaction.guild)
+        guild = interaction.guild
+        assert guild is not None
+
+        embed = await self.formatter.format_current_system_channels(guild=guild)
         await interaction.response.edit_message(embed=embed)

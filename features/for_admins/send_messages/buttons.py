@@ -42,12 +42,15 @@ class SendMessageMenu(FirewallButton):
         self.context = context
 
     async def on_click(self, interaction: discord.Interaction) -> None:
-        view = self.navigator.send_message_menu(guild_id=interaction.guild_id)
+        guild = interaction.guild
+        assert guild is not None
+
+        view = self.navigator.send_message_menu(guild_id=guild.id)
 
         view.context = self.context
         self.context.push(
             target=Route.ADMIN_MENU,
-            params=AdminMenuParams(guild_id=interaction.guild_id)
+            params=AdminMenuParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)

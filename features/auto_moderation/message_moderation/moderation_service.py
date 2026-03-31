@@ -50,7 +50,8 @@ class ModerationService:
                     user_id=message.author.id,
                     timestamp=timestamp,
             ):
-                await self._timeout_for_flood(member=message.author)
+                if isinstance(message.author, discord.Member):
+                    await self._timeout_for_flood(member=message.author)
 
         if data.get('invitation_blocking', False):
             if 'discord.gg/' in content or 'discord.com/invite/' in content:
@@ -65,6 +66,9 @@ class ModerationService:
             timestamp: float,
             attachments: list[discord.Attachment],
     ) -> None:
+        if not message.guild:
+            return
+
         if message.mention_everyone and len(attachments) >= 3:
             await self._timeout_for_spam(messages=[message], guild=message.guild)
             return
@@ -92,11 +96,7 @@ class ModerationService:
             )
         )
 
-    async def _timeout_for_spam(
-            self,
-            messages: list[discord.Message],
-            guild: discord.Guild
-    ) -> None:
+    async def _timeout_for_spam(self, messages: list[discord.Message], guild: discord.Guild) -> None:
         if not messages:
             return
 
@@ -114,6 +114,9 @@ class ModerationService:
         not_banned: list[str] = []
 
         for user in users:
+            if not isinstance(user, discord.Member):
+                continue
+
             name = user.display_name or user.global_name
 
             if user.top_role >= guild.me.top_role:
@@ -189,6 +192,9 @@ class ModerationService:
         )
 
     async def _delete_invitation(self, message: discord.Message) -> None:
+        if not message.guild:
+            return
+
         name = message.author.display_name or message.author.global_name
 
         notification = self.translator.t(
@@ -210,8 +216,9 @@ class ModerationService:
         except discord.NotFound:
             return
 
-        await self._send_warning_message(channel=message.channel, message=warning)
-        await self._send_notification(guild=message.guild, message=notification)
+        if isinstance(message.channel, discord.TextChannel):
+            await self._send_warning_message(channel=message.channel, message=warning)
+            await self._send_notification(guild=message.guild, message=notification)
 
     async def _send_notification(self, guild: discord.Guild, message: str) -> None:
         channel_id = self.settings.dict_storage.get_value(
@@ -223,7 +230,7 @@ class ModerationService:
             return
 
         channel = guild.get_channel(channel_id)
-        if channel is None:
+        if not isinstance(channel, discord.TextChannel):
             return
 
         await channel.send(embed=WarningEmbed(description=message))
@@ -241,7 +248,8 @@ class ModerationService:
 
         channels: dict[discord.TextChannel, list[discord.Message]] = defaultdict(list)
         for message in messages:
-            channels[message.channel].append(message)
+            if isinstance(message.channel, discord.TextChannel):
+                channels[message.channel].append(message)
 
         for channel, msgs in channels.items():
             try:

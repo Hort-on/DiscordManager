@@ -55,13 +55,16 @@ class RandomNumModal(discord.ui.Modal):
         self.add_item(self.second_num)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         try:
             number_1 = int(self.first_num.value)
             number_2 = int(self.second_num.value)
         except ValueError:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='error_num'
                 )
@@ -156,12 +159,15 @@ class RandomTeamByTextModal(discord.ui.Modal):
         self.add_item(self.teams_quantity)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         try:
             quantity = int(self.teams_quantity.value)
         except ValueError:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='error_num'
                 )
@@ -208,12 +214,15 @@ class RandomTeamByChannelModal(discord.ui.Modal, title='Random teams automatical
         self.add_item(self.teams_quantity)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         try:
             quantity = int(self.teams_quantity.value)
         except ValueError:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='RANDOMIZER',
                     key='error_num'
                 )

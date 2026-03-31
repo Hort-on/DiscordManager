@@ -65,12 +65,15 @@ class DeleteMessagesModal(discord.ui.Modal):
         self.add_item(self.user_names)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         try:
             amount = int(self.amount.value)
         except ValueError:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='DELETE_MESSAGES',
                     key='error_number'
                 )
@@ -84,7 +87,7 @@ class DeleteMessagesModal(discord.ui.Modal):
         if not 1 <= amount <= 300:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='DELETE_MESSAGES',
                     key='wrong_amount'
                 )

@@ -38,16 +38,19 @@ class MainSettingsFlow:
         self.formatter = formatter
         self.translator = translator
 
-    async def start_for_main(self, interaction: discord.Interaction):
-        options = self._build_settings_options(guild_id=interaction.guild_id)
+    async def start_for_main(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
+        options = self._build_settings_options(guild_id=guild.id)
 
         view = DropMenuView(
             navigator=self.navigator,
             options=options,
             translator=self.translator,
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='main_start'
             ),
@@ -57,15 +60,12 @@ class MainSettingsFlow:
         view.context = self.context
         self.context.push(
             target=Route.SETTINGS_MENU,
-            params=GeneralParams(guild_id=interaction.guild_id)
+            params=GeneralParams(guild_id=guild.id)
         )
 
         embed = self.formatter.format_current_main_settings(interaction)
 
-        await interaction.response.edit_message(
-            view=view,
-            embed=embed
-        )
+        await interaction.response.edit_message(view=view, embed=embed)
 
     async def _proceed_value(self, interaction: discord.Interaction, value: list[str]) -> None:
         match value[0]:
@@ -89,11 +89,14 @@ class MainSettingsFlow:
                 await self._others_handler(interaction=interaction, value=value[0])
 
     async def _language_handler(self, interaction: discord.Interaction) -> None:
-        result = await self.service.save_new_language(guild_id=interaction.guild_id)
+        guild = interaction.guild
+        assert guild is not None
+
+        result = await self.service.save_new_language(guild_id=guild.id)
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -105,26 +108,24 @@ class MainSettingsFlow:
         settings_embed = self.formatter.format_current_main_settings(interaction)
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='lang_change_success'
             )
         )
 
-        await interaction.response.edit_message(
-            embeds=[settings_embed, success_embed]
-        )
+        await interaction.response.edit_message(embeds=[settings_embed, success_embed])
 
     async def _others_handler(self, interaction: discord.Interaction, value: str) -> None:
-        result = await self.service.save_new_value(
-            guild=interaction.guild,
-            config_key=value
-        )
+        guild = interaction.guild
+        assert guild is not None
+
+        result = await self.service.save_new_value(guild=guild, config_key=value)
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=interaction.guild_id,
+                    guild_id=guild.id,
                     section='SYSTEM_GENERAL',
                     key='error_msg'
                 )
@@ -132,21 +133,18 @@ class MainSettingsFlow:
             await interaction.response.edit_message(embed=error_embed)
             return
 
-        current_value = self.service.is_setting_enabled(
-            guild_id=interaction.guild_id,
-            config_key=value
-        )
+        current_value = self.service.is_setting_enabled(guild_id=guild.id, config_key=value)
         formatted = value.replace('_', ' ').title()
 
         status = self.translator.t(
-            guild_id=interaction.guild_id,
+            guild_id=guild.id,
             section='EDIT_SETTINGS',
             key='settings_enabled_status' if current_value else 'settings_disabled_status'
         )
 
         success_embed = SuccessEmbed(
             description=self.translator.t(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 section='EDIT_SETTINGS',
                 key='success_editing',
                 formatted=formatted,
@@ -156,14 +154,10 @@ class MainSettingsFlow:
 
         settings_embed = self.formatter.format_current_main_settings(interaction)
 
-        await interaction.response.edit_message(
-            embeds=[settings_embed, success_embed]
-        )
+        await interaction.response.edit_message(embeds=[settings_embed, success_embed])
 
     def _build_settings_options(self, guild_id: int) -> list[discord.SelectOption]:
-        current_settings = self.service.get_main_settings(
-            guild_id=guild_id
-        )
+        current_settings = self.service.get_main_settings(guild_id=guild_id)
 
         keys_to_skip = ['guild_id', 'verification_message_id']
 

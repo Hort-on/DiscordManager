@@ -70,12 +70,12 @@ class SuperusersService(DBBaseService):
         self,
         guild: discord.Guild,
         client: discord.Client
-    ) -> tuple[dict[int, str], str | bool]:
+    ) -> tuple[dict[int, str], str | None]:
 
         users = self._get_available_users(guild=guild)
 
         if not users.not_found_ids:
-            return users.available_users, False
+            return users.available_users, None
 
         cleaned = await self.cleanup_service.cleanup_superusers(
             guild_id=guild.id,

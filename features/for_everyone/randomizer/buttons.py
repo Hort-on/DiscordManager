@@ -29,9 +29,12 @@ class RandomizerMenuButton(discord.ui.Button):
         self.context = context
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        guild = interaction.guild
+        assert guild is not None
+
         view = self.navigator.randomizer_menu(
             context=self.context,
-            guild_id=interaction.guild_id
+            guild_id=guild.id
         )
 
         view.context = self.context
@@ -39,9 +42,9 @@ class RandomizerMenuButton(discord.ui.Button):
         self.context.push(
             target=Route.MAIN_MENU,
             params=MainMenuParams(
-                guild_id=interaction.guild_id,
+                guild_id=guild.id,
                 user_id=interaction.user.id,
-                owner_id=interaction.guild.owner_id
+                owner_id=guild.owner_id
             )
         )
 
