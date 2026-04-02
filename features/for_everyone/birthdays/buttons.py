@@ -9,11 +9,14 @@ from core.navigator.routes import Route
 
 from features.for_everyone.birthdays.flow import BirthdayFlow
 
+from ui.button_protection.admin_buttons_protection import FirewallButton
+
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from features.for_everyone.birthdays.service import BirthdayService
     from general_services.translator.translator import Translator
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class BirthdayMenuButton(discord.ui.Button):
@@ -39,7 +42,7 @@ class BirthdayMenuButton(discord.ui.Button):
         self.service = service
         self.translator = translator
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         guild = interaction.guild
         assert guild is not None
 
@@ -89,5 +92,57 @@ class DeleteBirthdayButton(discord.ui.Button):
 
         self.flow = flow
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         await self.flow.for_delete_button(interaction=interaction)
+
+
+class AddAnotherUser(FirewallButton):
+    scope = 'admin'
+
+    def __init__(
+            self,
+            flow: BirthdayFlow,
+            translator: Translator,
+            guild_id: int,
+            protection_service: ButtonProtectionService
+    ):
+        self.flow = flow
+
+        super().__init__(
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='for_admin_add'
+            ),
+            style=discord.ButtonStyle.blurple,
+            protection_service=protection_service
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        await self.flow.add_for_admin(interaction=interaction)
+
+
+class DeleteAnotherUser(FirewallButton):
+    scope = 'admin'
+
+    def __init__(
+            self,
+            flow: BirthdayFlow,
+            translator: Translator,
+            guild_id: int,
+            protection_service: ButtonProtectionService
+    ):
+        self.flow = flow
+
+        super().__init__(
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='for_admin_delete'
+            ),
+            style=discord.ButtonStyle.blurple,
+            protection_service=protection_service
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        await self.flow.delete_for_admin(interaction=interaction)

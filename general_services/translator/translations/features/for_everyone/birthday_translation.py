@@ -59,9 +59,23 @@ BIRTHDAYS = {
         'uk': "День народження (ДД.ММ)"
     },
 
+    'del_modal_label': {
+        'en': "Please type user`s global name",
+        'uk': "Будь ласка введіть глобальне ім'я користувача"
+    },
+
     'congrats': {
         'en': "Today we wish {name} a happy birthday.",
         'uk': "Сьогодні ми вітаємо {name} з днем народження."
-    }
+    },
 
+    'for_admin_add': {
+        'en': "📥Add for another user",
+        'uk': "📥Додати для іншого користувача"
+    },
+
+    'for_admin_delete': {
+        'en': "🗑️Delete for another user",
+        'uk': "🗑️Видалити для іншого користувача"
+    }
 }
