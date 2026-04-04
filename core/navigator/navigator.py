@@ -96,7 +96,7 @@ class Navigator:
             guild_id=guild_id
         )
 
-    def birthday_menu(self, guild_id: int):
+    def birthday_menu(self, guild_id: int, user_id: int, owner_id: int | None, admins: set[int]):
         from features.for_everyone.birthdays.flow import BirthdayFlow
         from features.for_everyone.birthdays.menu_view import BirthdayMenuView
 
@@ -110,7 +110,11 @@ class Navigator:
             navigator=self,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            protection_service=self.general_container.button_protection,
+            admins=admins,
+            guild_id=guild_id,
+            user_id=user_id,
+            owner_id=owner_id
         )
 
     def superusers_menu(self, context: NavigationContext, guild_id: int):

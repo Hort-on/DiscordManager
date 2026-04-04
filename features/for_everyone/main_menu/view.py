@@ -35,7 +35,7 @@ class MainMenuView(discord.ui.View):
     ):
         super().__init__(timeout=60)
 
-        superusers = settings.set_storage.for_set_get(
+        admins = settings.set_storage.for_set_get(
             target=StorageTarget.SUPERUSERS,
             guild_id=guild_id
         )
@@ -77,11 +77,12 @@ class MainMenuView(discord.ui.View):
                     context=context,
                     service=birthday_service,
                     translator=translator,
-                    guild_id=guild_id
+                    guild_id=guild_id,
+                    admins=admins
                 )
             )
 
-        if user_id in superusers or user_id == owner_id:
+        if user_id in admins or user_id == owner_id:
             self.add_item(
                 AdminMenuButton(
                     navigator=navigator,

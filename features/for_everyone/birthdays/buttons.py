@@ -26,6 +26,7 @@ class BirthdayMenuButton(discord.ui.Button):
             context: NavigationContext,
             service: BirthdayService,
             translator: Translator,
+            admins: set[int],
             guild_id: int
     ):
         super().__init__(
@@ -41,12 +42,18 @@ class BirthdayMenuButton(discord.ui.Button):
         self.context = context
         self.service = service
         self.translator = translator
+        self.admins = admins
 
     async def callback(self, interaction: discord.Interaction) -> None:
         guild = interaction.guild
         assert guild is not None
 
-        view = self.navigator.birthday_menu(guild_id=guild.id)
+        view = self.navigator.birthday_menu(
+            guild_id=guild.id,
+            user_id=interaction.user.id,
+            owner_id=guild.owner_id,
+            admins=self.admins
+        )
 
         view.context = self.context
 
@@ -96,7 +103,7 @@ class DeleteBirthdayButton(discord.ui.Button):
         await self.flow.for_delete_button(interaction=interaction)
 
 
-class AddAnotherUser(FirewallButton):
+class AddForAdmins(FirewallButton):
     scope = 'admin'
 
     def __init__(
@@ -122,7 +129,7 @@ class AddAnotherUser(FirewallButton):
         await self.flow.add_for_admin(interaction=interaction)
 
 
-class DeleteAnotherUser(FirewallButton):
+class DeleteForAdmins(FirewallButton):
     scope = 'admin'
 
     def __init__(

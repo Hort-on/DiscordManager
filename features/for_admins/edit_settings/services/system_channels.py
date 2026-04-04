@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from PIL.ImageCms import isIntentSupported
 
 from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
