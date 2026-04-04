@@ -182,7 +182,7 @@ class RandomTeamByTextModal(discord.ui.Modal):
         )
 
 
-class RandomTeamByChannelModal(discord.ui.Modal, title='Random teams automatically'):
+class RandomTeamByChannelModal(discord.ui.Modal):
     def __init__(self, channel, flow: RandomizerFlow, translator: Translator, guild_id: int):
         super().__init__(
             title=translator.t(

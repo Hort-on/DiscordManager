@@ -77,7 +77,7 @@ class AddBirthdayButton(discord.ui.Button):
                 section='BIRTHDAYS',
                 key='add_birthday'
             ),
-            style=discord.ButtonStyle.blurple
+            style=discord.ButtonStyle.green
         )
 
         self.flow = flow

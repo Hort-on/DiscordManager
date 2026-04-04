@@ -59,7 +59,7 @@ BIRTHDAYS = {
         'uk': "День народження (ДД.ММ)"
     },
 
-    'del_modal_label': {
+    'user_name_modal_label': {
         'en': "Please type user`s global name",
         'uk': "Будь ласка введіть глобальне ім'я користувача"
     },

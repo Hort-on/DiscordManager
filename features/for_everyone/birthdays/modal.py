@@ -53,6 +53,11 @@ class AddAdminBirthdayModal(discord.ui.Modal):
         self.flow = flow
 
         self.user_name = discord.ui.TextInput(
+            label=translator.t(
+                guild_id=guild_id,
+                section='BIRTHDAYS',
+                key='user_name_modal_label'
+            ),
             placeholder='user, user1, user123, etc.',
             required=True,
         )
@@ -86,7 +91,7 @@ class DeleteAdminBirthdayModal(discord.ui.Modal):
             title=translator.t(
                 guild_id=guild_id,
                 section='BIRTHDAYS',
-                key='del_modal_label'
+                key='user_name_modal_label'
             )
         )
         self.flow = flow
@@ -95,7 +100,7 @@ class DeleteAdminBirthdayModal(discord.ui.Modal):
             label=translator.t(
                 guild_id=guild_id,
                 section='BIRTHDAYS',
-                key='modal_label'
+                key='user_name_modal_label'
             ),
             placeholder='user, user1, user123, etc.',
             required=True,
