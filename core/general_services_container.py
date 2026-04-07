@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from dataclasses import dataclass
-
 if TYPE_CHECKING:
-    from database.settings_storage.settings import SettingsStorage
-    from database.db_factory.db_scenario_factory import DBFactory
     from database.data_base_model import DB
+    from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
     from general_services.logger.logger import Logger
     from general_services.other_services.cleanup_service import CleanUpService
     from general_services.translator.translator import Translator

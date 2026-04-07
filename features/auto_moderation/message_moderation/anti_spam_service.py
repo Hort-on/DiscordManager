@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+import io
+from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import discord
-import io
-
-from collections import defaultdict, deque
 from PIL import Image
 
 if TYPE_CHECKING:
@@ -20,16 +19,24 @@ class SpamResult:
 
 
 class AntiSpamService:
-    SUPPORTED_EXTENSIONS = ('png', 'jpg', 'jpeg', 'webp')
+    SUPPORTED_EXTENSIONS = ("png", "jpg", "jpeg", "webp")
 
     def __init__(self, settings: SettingsStorage):
         self.settings = settings
 
-        self.user_message_times: dict = defaultdict(lambda: defaultdict(lambda: deque(maxlen=5)))
-        self.user_attachment_times: dict = defaultdict(lambda: defaultdict(lambda: deque(maxlen=8)))
+        self.user_message_times: dict = defaultdict(
+            lambda: defaultdict(lambda: deque(maxlen=5))
+        )
+        self.user_attachment_times: dict = defaultdict(
+            lambda: defaultdict(lambda: deque(maxlen=8))
+        )
 
-        self.domain_cache: dict = defaultdict(lambda: defaultdict(lambda: deque(maxlen=5)))
-        self.attachment_hash_cache: dict = defaultdict(lambda: defaultdict(lambda: deque(maxlen=5)))
+        self.domain_cache: dict = defaultdict(
+            lambda: defaultdict(lambda: deque(maxlen=5))
+        )
+        self.attachment_hash_cache: dict = defaultdict(
+            lambda: defaultdict(lambda: deque(maxlen=5))
+        )
 
     def check_flood(self, guild_id: int, user_id: int, timestamp: float) -> bool:
         """Return True if the user sent FLOOD_LIMIT messages within 5 seconds."""
@@ -57,12 +64,7 @@ class AntiSpamService:
             return SpamResult(value=False)
 
         history = cache[guild_id][key]
-        self._cleanup(
-            guild_id=guild_id,
-            cache=cache,
-            key=key,
-            timestamp=timestamp
-        )
+        self._cleanup(guild_id=guild_id, cache=cache, key=key, timestamp=timestamp)
         history.append((timestamp, message))
 
         known: list[discord.Message] = [msg for _, msg in history]
@@ -77,17 +79,17 @@ class AntiSpamService:
         if not message.guild:
             return SpamResult(value=False)
 
-        if 'http' not in message.content:
+        if "http" not in message.content:
             return SpamResult(value=False)
 
         results: list[SpamResult] = []
 
         for part in message.content.split():
-            if 'http' not in part:
+            if "http" not in part:
                 continue
 
             try:
-                domain = part.split('/')[2].lower()
+                domain = part.split("/")[2].lower()
             except IndexError:
                 continue
 
@@ -107,7 +109,9 @@ class AntiSpamService:
 
         return SpamResult(value=False)
 
-    async def check_attachment_spam(self, message: discord.Message, timestamp: float) -> SpamResult:
+    async def check_attachment_spam(
+        self, message: discord.Message, timestamp: float
+    ) -> SpamResult:
         """Detect visually similar images sent in quick succession."""
         if not message.guild:
             return SpamResult(value=False)
@@ -127,7 +131,7 @@ class AntiSpamService:
                 guild_id=guild_id,
                 cache=self.attachment_hash_cache,
                 key=img_hash,
-                timestamp=timestamp
+                timestamp=timestamp,
             )
 
             history = self.attachment_hash_cache[guild_id][img_hash]
@@ -135,11 +139,9 @@ class AntiSpamService:
             history.append((timestamp, message))
 
             if self._is_spam_image(
-                    img_hash=img_hash,
-                    guild_id=guild_id,
-                    timestamp=timestamp
+                img_hash=img_hash, guild_id=guild_id, timestamp=timestamp
             ):
-                messages = self._get_messages(guild_id, img_hash)
+                messages = self._get_messages(guild_id=guild_id, img_hash=img_hash)
                 return SpamResult(value=True, messages=messages)
 
         return SpamResult(value=False)
@@ -150,34 +152,19 @@ class AntiSpamService:
         return (
             attachment.size <= 2_000_000
             and content_type is not None
-            and content_type.startswith('image')
+            and content_type.startswith("image")
             and attachment.filename.lower().endswith(self.SUPPORTED_EXTENSIONS)
         )
 
-    def _is_spam_image(
-            self,
-            img_hash: int,
-            guild_id: int,
-            timestamp: float
-    ) -> bool:
-
+    def _is_spam_image(self, img_hash: int, guild_id: int, timestamp: float) -> bool:
         history = self.attachment_hash_cache[guild_id][img_hash]
 
-        recent = [
-            (time, message) for time, message in history
-            if timestamp - time < 60
-        ]
+        recent = [(time, message) for time, message in history if timestamp - time < 60]
 
         return len(recent) >= 3
 
-    def _get_messages(
-            self,
-            guild_id: int,
-            img_hash: int
-    ) -> list[discord.Message]:
-
+    def _get_messages(self, guild_id: int, img_hash: int) -> list[discord.Message]:
         history = self.attachment_hash_cache[guild_id][img_hash]
-
         return [msg for _, msg in history]
 
     @staticmethod
@@ -193,7 +180,7 @@ class AntiSpamService:
     async def image_dhash(attachment: discord.Attachment) -> int:
         """Compute a 64-bit perceptual dHash for a Discord image attachment."""
         data = await attachment.read()
-        image = Image.open(io.BytesIO(data)).convert('L').resize((9, 8))
+        image = Image.open(io.BytesIO(data)).convert("L").resize((9, 8))
         pixels = list(image.getdata())
 
         hash_value = 0
@@ -238,7 +225,11 @@ class AntiSpamService:
         for img_hash in list(self.attachment_hash_cache[guild_id].keys()):
             items = self.attachment_hash_cache[guild_id][img_hash]
 
-            filtered = [(time, message) for time, message in items if message.author.id != user_id]
+            filtered = [
+                (time, message)
+                for time, message in items
+                if message.author.id != user_id
+            ]
 
             if filtered:
                 self.attachment_hash_cache[guild_id][img_hash] = filtered

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from features.for_everyone.role_manager.services import RoleManagerService
 
@@ -16,9 +15,5 @@ class RoleManagerModule:
 
 
 def build_role_manager_module(settings: SettingsStorage) -> RoleManagerModule:
-    service = RoleManagerService(
-        settings=settings
-    )
-    return RoleManagerModule(
-        service=service
-    )
+    service = RoleManagerService(settings=settings)
+    return RoleManagerModule(service=service)

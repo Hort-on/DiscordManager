@@ -19,20 +19,18 @@ class VerificationRoleService(DBBaseService):
 
     def get_hidden_roles(self, guild_id: int) -> set:
         return self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_ROLES,
-            guild_id=guild_id
+            target=StorageTarget.HIDDEN_ROLES, guild_id=guild_id
         )
 
     async def save_role(self, guild_id: int, role_id: int) -> bool:
         write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
-            table_name='settings',
-            data={'verification_role_id': role_id}
+            table_name="settings",
+            data={"verification_role_id": role_id},
         )
 
         result = await self.update_db_and_cache(
-            scenario=write_scenario,
-            guild_id=guild_id
+            scenario=write_scenario, guild_id=guild_id
         )
 
         return bool(result)

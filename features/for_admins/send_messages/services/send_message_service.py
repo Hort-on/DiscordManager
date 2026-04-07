@@ -15,7 +15,13 @@ if TYPE_CHECKING:
 
 
 class MessageService(DBBaseService):
-    def __init__(self, bot: Bot, db_factory: DBFactory, settings: SettingsStorage, translator: Translator):
+    def __init__(
+        self,
+        bot: Bot,
+        db_factory: DBFactory,
+        settings: SettingsStorage,
+        translator: Translator,
+    ):
         super().__init__(settings=settings)
         self.bot = bot
         self.db_factory = db_factory
@@ -26,31 +32,24 @@ class MessageService(DBBaseService):
         channels = guild.text_channels
 
         hidden_channels = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_CHANNELS,
-            guild_id=guild.id
+            target=StorageTarget.HIDDEN_CHANNELS, guild_id=guild.id
         )
 
-        return [discord.SelectOption(
-            label=channel.name,
-            value=str(channel.id)
-        )
-            for channel in channels if channel.id not in hidden_channels
+        return [
+            discord.SelectOption(label=channel.name, value=str(channel.id))
+            for channel in channels
+            if channel.id not in hidden_channels
         ]
 
     async def save_channel(self, guild_id: int, user_id: int, channel_id: int) -> bool:
         write_scenario = self.db_factory.for_write_data(
             guild_id=guild_id,
-            table_name='channels_to_send',
-            data={
-                'guild_id': guild_id,
-                'user_id': user_id,
-                'channel_id': channel_id
-            }
+            table_name="channels_to_send",
+            data={"guild_id": guild_id, "user_id": user_id, "channel_id": channel_id},
         )
 
         result = await self.update_db_and_cache(
-            scenario=write_scenario,
-            guild_id=guild_id
+            scenario=write_scenario, guild_id=guild_id
         )
 
         return result
@@ -62,9 +61,7 @@ class MessageService(DBBaseService):
                 continue
 
             channel_id = self.settings.dict_storage.get_value(
-                key=user.id,
-                guild_id=guild.id,
-                target=StorageTarget.CHANNELS_TO_SEND
+                key=user.id, guild_id=guild.id, target=StorageTarget.CHANNELS_TO_SEND
             )
 
             if not channel_id:
@@ -77,16 +74,16 @@ class MessageService(DBBaseService):
                 except discord.Forbidden:
                     msg = self.translator.t(
                         guild_id=member.guild.id,
-                        section='SEND_MSG',
-                        key='no_perm_to_send',
-                        channel_name=channel.name
+                        section="SEND_MSG",
+                        key="no_perm_to_send",
+                        channel_name=channel.name,
                     )
                     await member.send(msg)
                 except discord.HTTPException:
                     msg = self.translator.t(
                         guild_id=member.guild.id,
-                        section='SEND_MSG',
-                        key='failed_to_sent',
-                        channel_name=channel.name
+                        section="SEND_MSG",
+                        key="failed_to_sent",
+                        channel_name=channel.name,
                     )
                     await member.send(msg)

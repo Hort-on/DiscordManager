@@ -12,10 +12,7 @@ class StorageTarget(Enum):
 
 
 class SetStorageManager:
-    def __init__(
-            self,
-            mapping: dict[StorageTarget, dict[int, set[int]]]
-    ):
+    def __init__(self, mapping: dict[StorageTarget, dict[int, set[int]]]):
         self._map = mapping
 
     def for_set_get(self, target: StorageTarget, guild_id: int) -> set[int]:

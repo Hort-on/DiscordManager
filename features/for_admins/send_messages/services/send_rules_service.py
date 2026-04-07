@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import discord
 
 from core.bot_config import Bot
-
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
@@ -21,9 +20,9 @@ class RulesService:
 
     def get_verification_channel(self, guild_id: int) -> int | None:
         channel_id = self.settings.dict_storage.get_value(
-            key='verification_channel_id',
+            key="verification_channel_id",
             target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
         return channel_id
@@ -53,9 +52,7 @@ class RulesService:
                 return
 
         embed = discord.Embed(
-            title='📜 Server rules',
-            colour=discord.Colour.blue(),
-            description=message
+            title="📜 Server rules", colour=discord.Colour.blue(), description=message
         )
 
         await channel.send(embed=embed)

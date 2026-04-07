@@ -8,29 +8,35 @@ if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
     from database.settings_storage.settings import SettingsStorage
-    from features.auto_moderation.verification.service import VerificationService
-    from features.auto_moderation.verification.view_service import VerificationViewService
-    from features.for_admins.send_messages.services.send_rules_service import RulesService
-    from features.auto_moderation.message_moderation.module import AutoModModule
-    from features.for_admins.send_messages.services.send_message_service import MessageService
-    from general_services.translator.translator import Translator
     from event_services.member_left import MemberLeftNotification
+    from features.auto_moderation.message_moderation.module import AutoModModule
+    from features.auto_moderation.verification.service import VerificationService
+    from features.auto_moderation.verification.view_service import (
+        VerificationViewService,
+    )
+    from features.for_admins.send_messages.services.send_message_service import (
+        MessageService,
+    )
+    from features.for_admins.send_messages.services.send_rules_service import (
+        RulesService,
+    )
+    from general_services.translator.translator import Translator
 
 
 class Controller:
     def __init__(
-            self,
-            bot,
-            settings: SettingsStorage,
-            db_factory: DBFactory,
-            navigator: Navigator,
-            verification_service: VerificationService,
-            verification_view_service: VerificationViewService,
-            rules_service: RulesService,
-            moderation_service: AutoModModule,
-            member_left_service: MemberLeftNotification,
-            send_message_service: MessageService,
-            translator: Translator
+        self,
+        bot,
+        settings: SettingsStorage,
+        db_factory: DBFactory,
+        navigator: Navigator,
+        verification_service: VerificationService,
+        verification_view_service: VerificationViewService,
+        rules_service: RulesService,
+        moderation_service: AutoModModule,
+        member_left_service: MemberLeftNotification,
+        send_message_service: MessageService,
+        translator: Translator,
     ):
         self.bot = bot
         self.settings = settings
@@ -52,7 +58,7 @@ class Controller:
 
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:
-        print(f'Ми приєдналися як {self.bot.user.name}')
+        print(f"Ми приєдналися як {self.bot.user.name}")
 
         # if not self.daily_birthday_check.is_running():
         #     self.daily_birthday_check.start()
@@ -67,27 +73,26 @@ class Controller:
 
         if not message.guild:
             await self.rules_service.send_message(
-                message=message.content,
-                user_id=message.author.id
+                message=message.content, user_id=message.author.id
             )
-
             await self.send_message_service.send_message(
-                user=message.author,
-                message=message.content
+                user=message.author, message=message.content
             )
 
-        await self.moderation_service.moderation_service.process_message(message=message)
+        await self.moderation_service.moderation_service.process_message(
+            message=message
+        )
 
     async def on_member_remove(self, member) -> None:
         await self.member_left.check_if_notification(member=member)
 
     async def on_guild_remove(self, guild: discord.Guild) -> None:
-        print(f'Бот від\'єднався від {guild.name}')
+        print(f"Бот від'єднався від {guild.name}")
         delete_guild_scenario = self.db_factory.for_cleanup_guild(guild.id)
         await delete_guild_scenario.db_proceed()
 
     async def on_guild_join(self, guild: discord.Guild) -> None:
-        print(f'бот приєднався до {guild.name}')
+        print(f"бот приєднався до {guild.name}")
         scenario = self.db_factory.for_init_guild(guild.id)
         await scenario.db_proceed()
 

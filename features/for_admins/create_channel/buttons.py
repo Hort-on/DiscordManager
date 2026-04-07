@@ -11,14 +11,13 @@ if TYPE_CHECKING:
 
 
 class CreateChannelButton(FirewallButton):
-    scope = 'admin'
+    scope = "admin"
 
     def __init__(self, service: ButtonProtectionService):
         super().__init__(
-            label='Create a channel',
+            label="Create a channel",
             style=discord.ButtonStyle.blurple,
-            protection_service=service
+            protection_service=service,
         )
 
-    async def on_click(self, interaction: discord.Interaction) -> None:
-        ...
+    async def on_click(self, interaction: discord.Interaction) -> None: ...

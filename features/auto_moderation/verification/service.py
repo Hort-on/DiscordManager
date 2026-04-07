@@ -9,8 +9,8 @@ from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
-    from database.settings_storage.settings import SettingsStorage
     from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
 
 
 class VerificationService(DBBaseService):
@@ -24,20 +24,19 @@ class VerificationService(DBBaseService):
     async def save_message_id(self, message_id: int, guild_id: int) -> None:
         save_message = self.db_factory.for_write_data(
             guild_id=guild_id,
-            table_name='settings',
-            data={'verification_message_id': message_id}
+            table_name="settings",
+            data={"verification_message_id": message_id},
         )
 
-        await self.update_db_and_cache(
-            scenario=save_message,
-            guild_id=guild_id
-        )
+        await self.update_db_and_cache(scenario=save_message, guild_id=guild_id)
 
-    async def get_verification_channel(self, guild: discord.Guild) -> discord.TextChannel | None:
+    async def get_verification_channel(
+        self, guild: discord.Guild
+    ) -> discord.TextChannel | None:
         channel_id = self.settings.dict_storage.get_value(
-            'verification_channel_id',
+            key="verification_channel_id",
             target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=guild.id
+            guild_id=guild.id,
         )
 
         if not channel_id:

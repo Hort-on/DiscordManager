@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
 from typing import TYPE_CHECKING
 
 from .service import DeleteMessageService
@@ -16,10 +15,5 @@ class DeleteMessageModule:
 
 
 def build_delete_msg_module(settings: SettingsStorage) -> DeleteMessageModule:
-    delete_msg_service = DeleteMessageService(
-        settings=settings
-    )
-
-    return DeleteMessageModule(
-        delete_msg_service=delete_msg_service
-    )
+    delete_msg_service = DeleteMessageService(settings=settings)
+    return DeleteMessageModule(delete_msg_service=delete_msg_service)

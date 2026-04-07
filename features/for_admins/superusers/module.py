@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from dataclasses import dataclass
-
-from .services import SuperusersService
 from .formatter import SuperusersFormatter
+from .services import SuperusersService
 
 if TYPE_CHECKING:
     from database.db_factory.db_scenario_factory import DBFactory
@@ -21,24 +20,20 @@ class SuperusersModule:
 
 
 def build_superusers_module(
-        settings: SettingsStorage,
-        db_factory: DBFactory,
-        cleanup_service: CleanUpService,
-        translator: Translator
+    settings: SettingsStorage,
+    db_factory: DBFactory,
+    cleanup_service: CleanUpService,
+    translator: Translator,
 ) -> SuperusersModule:
     superusers_service = SuperusersService(
         settings=settings,
         db_factory=db_factory,
         cleanup_service=cleanup_service,
-        translator=translator
+        translator=translator,
     )
 
-    superusers_formatter = SuperusersFormatter(
-        settings=settings,
-        translator=translator
-    )
+    superusers_formatter = SuperusersFormatter(settings=settings, translator=translator)
 
     return SuperusersModule(
-        superusers_service=superusers_service,
-        superusers_formatter=superusers_formatter
+        superusers_service=superusers_service, superusers_formatter=superusers_formatter
     )

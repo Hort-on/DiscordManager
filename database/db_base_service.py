@@ -14,8 +14,6 @@ class DBBaseService:
         result = await scenario.db_proceed()
 
         if result:
-            await self.settings.reload_guild(
-                guild_id=guild_id
-            )
+            await self.settings.reload_guild(guild_id=guild_id)
 
         return bool(result)

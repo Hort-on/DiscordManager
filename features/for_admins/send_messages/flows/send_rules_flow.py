@@ -8,16 +8,15 @@ from ui.embed_constructor.embed_constructor import ErrorEmbed, InfoEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
-    from features.for_admins.send_messages.services.send_rules_service import RulesService
+    from features.for_admins.send_messages.services.send_rules_service import (
+        RulesService,
+    )
     from general_services.translator.translator import Translator
 
 
 class SendRulesFlow:
     def __init__(
-            self,
-            navigator: Navigator,
-            rules_service: RulesService,
-            translator: Translator
+        self, navigator: Navigator, rules_service: RulesService, translator: Translator
     ):
         self.navigator = navigator
         self.service = rules_service
@@ -31,24 +30,17 @@ class SendRulesFlow:
         if not channel_id:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=guild.id,
-                    section='SEND_MSG',
-                    key='assure_ch'
+                    guild_id=guild.id, section="SEND_MSG", key="assure_ch"
                 )
             )
-            await interaction.response.send_message(
-                embed=error_embed,
-                ephemeral=True
-            )
+            await interaction.response.send_message(embed=error_embed, ephemeral=True)
             return
 
         self.service.active_sessions[interaction.user.id] = guild.id
 
         embed = InfoEmbed(
             description=self.translator.t(
-                guild_id=guild.id,
-                section='SEND_MSG',
-                key='ask_msg_dm'
+                guild_id=guild.id, section="SEND_MSG", key="ask_msg_dm"
             )
         )
 

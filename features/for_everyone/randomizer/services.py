@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import random
+from typing import TYPE_CHECKING
 
 import discord
 
@@ -28,7 +27,9 @@ class RandomizerService:
         return teams
 
     @staticmethod
-    def team_by_channel_proceed(members: list[discord.Member], teams_quantity: int) -> list[list]:
+    def team_by_channel_proceed(
+        members: list[discord.Member], teams_quantity: int
+    ) -> list[list]:
         random.shuffle(members)
 
         teams = [[] for _ in range(teams_quantity)]
@@ -40,6 +41,5 @@ class RandomizerService:
 
     def get_hidden_channels(self, guild_id: int) -> set[int]:
         return self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_CHANNELS,
-            guild_id=guild_id
+            target=StorageTarget.HIDDEN_CHANNELS, guild_id=guild_id
         )

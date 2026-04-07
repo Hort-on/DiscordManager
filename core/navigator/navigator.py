@@ -1,24 +1,23 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from dataclasses import asdict
+from typing import TYPE_CHECKING
 
 from .routes import Route
 
 if TYPE_CHECKING:
     from core.general_services_container import GeneralContainer
+    from core.navigator.navigator_context import NavigationContext
     from features.for_admins.module import AdministrationModule
     from features.for_everyone.module import EveryoneModule
-    from core.navigator.navigator_context import NavigationContext
 
 
 class Navigator:
     def __init__(
-            self,
-            general_container: GeneralContainer,
-            admin_module: AdministrationModule,
-            everyone_module: EveryoneModule
+        self,
+        general_container: GeneralContainer,
+        admin_module: AdministrationModule,
+        everyone_module: EveryoneModule,
     ):
         self.general_container = general_container
         self.admin_module = admin_module
@@ -46,20 +45,27 @@ class Navigator:
 
         return factory(context=context)
 
-    def main_menu(self, guild_id: int, user_id: int, owner_id: int | None, context: NavigationContext):
+    def main_menu(
+        self,
+        guild_id: int,
+        user_id: int,
+        owner_id: int | None,
+        context: NavigationContext,
+    ):
         from features.for_everyone.main_menu.view import MainMenuView
+
         birthday_module = self.everyone_module.birthday_module
         return MainMenuView(
-                settings=self.general_container.settings,
-                navigator=self,
-                buttons_protection=self.general_container.button_protection,
-                birthday_service=birthday_module.service,
-                translator=self.general_container.translator,
-                guild_id=guild_id,
-                user_id=user_id,
-                owner_id=owner_id,
-                context=context
-            )
+            settings=self.general_container.settings,
+            navigator=self,
+            buttons_protection=self.general_container.button_protection,
+            birthday_service=birthday_module.service,
+            translator=self.general_container.translator,
+            guild_id=guild_id,
+            user_id=user_id,
+            owner_id=owner_id,
+            context=context,
+        )
 
     def admin_menu(self, guild_id: int, context: NavigationContext):
         from features.for_admins.admin_menu_view import AdminMenuView
@@ -75,11 +81,12 @@ class Navigator:
             superusers_formatter=superusers_module.superusers_formatter,
             delete_msg_service=delete_msg_module.delete_msg_service,
             protection_service=self.general_container.button_protection,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def settings_menu(self, context: NavigationContext, guild_id: int):
         from features.for_admins.edit_settings.menu_view import SettingsMenuView
+
         edit_settings_container = self.admin_module.edit_main_settings_module
 
         return SettingsMenuView(
@@ -93,17 +100,19 @@ class Navigator:
             cleanup_service=self.general_container.cleanup_service,
             service_for_role=self.admin_module.edit_main_settings_module.verification_role_service,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
-    def birthday_menu(self, guild_id: int, user_id: int, owner_id: int | None, admins: set[int]):
+    def birthday_menu(
+        self, guild_id: int, user_id: int, owner_id: int | None, admins: set[int]
+    ):
         from features.for_everyone.birthdays.flow import BirthdayFlow
         from features.for_everyone.birthdays.menu_view import BirthdayMenuView
 
         flow = BirthdayFlow(
             navigator=self,
             service=self.everyone_module.birthday_module.service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return BirthdayMenuView(
@@ -114,7 +123,7 @@ class Navigator:
             admins=admins,
             guild_id=guild_id,
             user_id=user_id,
-            owner_id=owner_id
+            owner_id=owner_id,
         )
 
     def superusers_menu(self, context: NavigationContext, guild_id: int):
@@ -128,7 +137,7 @@ class Navigator:
             context=context,
             superusers_service=superusers_module.superusers_service,
             formatter=superusers_module.superusers_formatter,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return SuperusersMenuView(
@@ -136,7 +145,7 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def randomizer_menu(self, context: NavigationContext, guild_id: int):
@@ -149,14 +158,14 @@ class Navigator:
             navigator=self,
             service=randomizer_module.service,
             translator=self.general_container.translator,
-            context=context
+            context=context,
         )
 
         return RandomModeView(
             navigator=self,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def role_manager_menu(self, context: NavigationContext, guild_id: int):
@@ -169,18 +178,20 @@ class Navigator:
             navigator=self,
             context=context,
             service=role_manager_module.service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return RoleManagerView(
             navigator=self,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def hidden_channels_menu(self, context: NavigationContext, guild_id: int):
-        from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
+        from features.for_admins.edit_settings.flows.hidden_channels import (
+            HiddenChannelsFlow,
+        )
         from features.for_admins.edit_settings.views import HiddenChannelsMenuView
 
         edit_settings_container = self.admin_module.edit_main_settings_module
@@ -191,7 +202,7 @@ class Navigator:
             formatter=edit_settings_container.formatter,
             hidden_ch_service=edit_settings_container.hidden_channel_service,
             cleanup_service=self.general_container.cleanup_service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return HiddenChannelsMenuView(
@@ -199,7 +210,7 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def hidden_roles_menu(self, context: NavigationContext, guild_id: int):
@@ -214,7 +225,7 @@ class Navigator:
             formatter=edit_settings_container.formatter,
             hidden_roles_service=edit_settings_container.hidden_roles_service,
             cleanup_service=self.general_container.cleanup_service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return HiddenRolesMenuView(
@@ -222,11 +233,13 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def system_channels_menu(self, context: NavigationContext, guild_id: int):
-        from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
+        from features.for_admins.edit_settings.flows.sys_channels import (
+            SystemChannelsFlow,
+        )
         from features.for_admins.edit_settings.views import SystemChannelsMenuView
 
         edit_settings_container = self.admin_module.edit_main_settings_module
@@ -236,7 +249,7 @@ class Navigator:
             context=context,
             sys_channels_service=edit_settings_container.system_channels_service,
             formatter=edit_settings_container.formatter,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return SystemChannelsMenuView(
@@ -244,12 +257,16 @@ class Navigator:
             buttons_protection=self.general_container.button_protection,
             flow=flow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )
 
     def send_message_menu(self, guild_id: int):
-        from features.for_admins.send_messages.flows.send_message_flow import SendMessageFlow
-        from features.for_admins.send_messages.flows.send_rules_flow import SendRulesFlow
+        from features.for_admins.send_messages.flows.send_message_flow import (
+            SendMessageFlow,
+        )
+        from features.for_admins.send_messages.flows.send_rules_flow import (
+            SendRulesFlow,
+        )
         from features.for_admins.send_messages.view import SendMessageMenuView
 
         message_module = self.admin_module.message_module
@@ -257,13 +274,13 @@ class Navigator:
         message_flow = SendMessageFlow(
             navigator=self,
             message_service=message_module.send_message_service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         rules_fow = SendRulesFlow(
             navigator=self,
             rules_service=message_module.rules_service,
-            translator=self.general_container.translator
+            translator=self.general_container.translator,
         )
 
         return SendMessageMenuView(
@@ -272,5 +289,5 @@ class Navigator:
             messages_flow=message_flow,
             rules_flow=rules_fow,
             translator=self.general_container.translator,
-            guild_id=guild_id
+            guild_id=guild_id,
         )

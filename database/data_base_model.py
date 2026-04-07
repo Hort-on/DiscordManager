@@ -1,9 +1,8 @@
 import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import aiosqlite
-
-from contextlib import asynccontextmanager
 
 from general_services.logger.logger import Logger
 
@@ -20,7 +19,7 @@ class DB:
         await temp_conn.execute("PRAGMA journal_mode = WAL")
         await temp_conn.execute("PRAGMA foreign_keys = ON")
         try:
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS GuildSettings (
                     guild_id INTEGER PRIMARY KEY,
                     language TEXT NOT NULL DEFAULT 'en',
@@ -43,9 +42,9 @@ class DB:
                     role_manager INTEGER NOT NULL DEFAULT 0,
                     anti_bot INTEGER NOT NULL DEFAULT 0
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS SystemChannels (
                     guild_id INTEGER PRIMARY KEY,
                     
@@ -57,9 +56,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS ChannelsToSend (
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
@@ -71,9 +70,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS SuperUsers (
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
@@ -84,9 +83,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS Birthdays (
                     guild_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
@@ -99,9 +98,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS HiddenRoles (
                     guild_id INTEGER NOT NULL,
                     role_id INTEGER NOT NULL,
@@ -112,9 +111,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS HiddenChannels (
                     guild_id INTEGER NOT NULL,
                     channel_id INTEGER NOT NULL,
@@ -125,9 +124,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS TempChannels (
                     guild_id INTEGER NOT NULL,
                     channel_id INTEGER NOT NULL,
@@ -138,9 +137,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS Groups (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     guild_id INTEGER NOT NULL,
@@ -153,9 +152,9 @@ class DB:
                         REFERENCES GuildSettings(guild_id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
-            await temp_conn.execute('''
+            await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS GroupMembers (
                     group_id INTEGER NOT NULL,
                     user_id INTEGER NOT NULL,
@@ -166,11 +165,11 @@ class DB:
                         REFERENCES Groups(id)
                         ON DELETE CASCADE
                 );
-            ''')
+            """)
 
             await temp_conn.commit()
         except Exception as e:
-            await self.logger.error('Не вдалося створити таблицю', exc=e)
+            await self.logger.error("Не вдалося створити таблицю", exc=e)
         finally:
             await temp_conn.close()
 

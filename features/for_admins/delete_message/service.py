@@ -19,13 +19,10 @@ class DeleteMessageService:
     def get_users(guild: discord.Guild, users: str) -> list[discord.Member]:
         user_list: list[discord.Member] = []
 
-        usernames = [name.strip() for name in users.split(',')]
+        usernames = [name.strip() for name in users.split(",")]
 
         for username in usernames:
-            member = get_member_by_name(
-                guild=guild,
-                username=username
-            )
+            member = get_member_by_name(guild=guild, username=username)
 
             if member:
                 user_list.append(member)
@@ -36,8 +33,7 @@ class DeleteMessageService:
         channels = guild.text_channels
 
         hidden_channels = self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_CHANNELS,
-            guild_id=guild.id
+            target=StorageTarget.HIDDEN_CHANNELS, guild_id=guild.id
         )
 
         return [channel for channel in channels if channel.id not in hidden_channels]

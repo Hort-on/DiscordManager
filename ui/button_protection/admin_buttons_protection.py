@@ -11,24 +11,23 @@ if TYPE_CHECKING:
 
 
 class FirewallButton(discord.ui.Button):
-    scope: str = 'user'
+    scope: str = "user"
 
-    def __init__(self, protection_service: ButtonProtectionService, label: str, style: discord.ButtonStyle):
-        super().__init__(
-            label=label,
-            style=style
-        )
+    def __init__(
+        self,
+        protection_service: ButtonProtectionService,
+        label: str,
+        style: discord.ButtonStyle,
+    ):
+        super().__init__(label=label, style=style)
 
         self.protection_service = protection_service
 
     async def callback(self, interaction: discord.Interaction) -> None:
         if not self.protection_service.has_access(
-            interaction=interaction,
-            scope=self.scope
+            interaction=interaction, scope=self.scope
         ):
-            error_embed = ErrorEmbed(
-                description='⛔ You do not have permission.'
-            )
+            error_embed = ErrorEmbed(description="⛔ You do not have permission.")
             await interaction.response.edit_message(embed=error_embed)
             return
 

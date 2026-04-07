@@ -13,11 +13,9 @@ class BackButton(discord.ui.Button):
     def __init__(self, navigator: Navigator, translator: Translator, guild_id: int):
         super().__init__(
             label=translator.t(
-                guild_id=guild_id,
-                section='SYSTEM_GENERAL',
-                key='back_button'
+                guild_id=guild_id, section="SYSTEM_GENERAL", key="back_button"
             ),
-            style=discord.ButtonStyle.secondary
+            style=discord.ButtonStyle.secondary,
         )
         self.navigator = navigator
 
@@ -32,16 +30,8 @@ class BackButton(discord.ui.Button):
 
         target, params = prev
 
-        view = self.navigator.go(
-            route=target,
-            params=params,
-            context=context
-        )
+        view = self.navigator.go(route=target, params=params, context=context)
 
         view.context = context
 
-        await interaction.response.edit_message(
-            content=None,
-            embeds=[],
-            view=view
-        )
+        await interaction.response.edit_message(content=None, embeds=[], view=view)

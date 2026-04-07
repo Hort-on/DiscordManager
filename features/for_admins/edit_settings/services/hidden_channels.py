@@ -23,13 +23,12 @@ class HiddenChannelsService(DBBaseService):
         write_scenario = self.db_factory.for_insert_set(
             guild_id=guild_id,
             values=channel_ids,
-            table_name='hidden_channels',
-            key='channel_id'
+            table_name="hidden_channels",
+            key="channel_id",
         )
 
         result = await self.update_db_and_cache(
-            scenario=write_scenario,
-            guild_id=guild_id
+            scenario=write_scenario, guild_id=guild_id
         )
 
         return result
@@ -40,19 +39,17 @@ class HiddenChannelsService(DBBaseService):
         delete_scenario = self.db_factory.for_delete_set(
             guild_id=guild_id,
             values=channel_ids,
-            table_name='hidden_channels',
-            key='channel_id'
+            table_name="hidden_channels",
+            key="channel_id",
         )
 
         result = await self.update_db_and_cache(
-            scenario=delete_scenario,
-            guild_id=guild_id
+            scenario=delete_scenario, guild_id=guild_id
         )
 
         return result
 
     def get_hidden_channels(self, guild_id: int) -> set[int]:
         return self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_CHANNELS,
-            guild_id=guild_id
+            target=StorageTarget.HIDDEN_CHANNELS, guild_id=guild_id
         )

@@ -1,30 +1,28 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 import discord
-
-from datetime import datetime
 
 from database.db_base_service import DBBaseService
 from database.settings_storage.settings_manager import StorageTarget
 
 if TYPE_CHECKING:
     from core.bot_config import Bot
-    from database.settings_storage.settings import SettingsStorage
     from database.db_factory.db_scenario_factory import DBFactory
+    from database.settings_storage.settings import SettingsStorage
     from general_services.translator.translator import Translator
 
 
 # TODO: зробити завантаження у кеш
 class BirthdayManager(DBBaseService):
     def __init__(
-            self,
-            bot: Bot,
-            settings: SettingsStorage,
-            db_factory: DBFactory,
-            translator: Translator,
-            guild_id: int
+        self,
+        bot: Bot,
+        settings: SettingsStorage,
+        db_factory: DBFactory,
+        translator: Translator,
     ):
         super().__init__(settings=settings)
         self.bot = bot
@@ -32,14 +30,11 @@ class BirthdayManager(DBBaseService):
         self.settings = settings
         self.db_factory = db_factory
         self.translator = translator
-        self.guild_id = guild_id
 
     async def check_daily_birthday(self) -> None:
         for guild in self.bot.guilds:
             is_enabled = self.settings.dict_storage.get_value(
-                'birthday',
-                target=StorageTarget.SETTINGS,
-                guild_id=guild.id
+                key="birthday", target=StorageTarget.SETTINGS, guild_id=guild.id
             )
 
             if not is_enabled:
@@ -47,15 +42,14 @@ class BirthdayManager(DBBaseService):
 
             # TODO: зробити точну часову зону для кожної гільдії
             today = datetime.now()
-            today_str = today.strftime('%d.%m')
+            today_str = today.strftime("%d.%m")
 
             if today.month == 1 and today.day == 1:
                 reset_scenario = self.db_factory.for_reset_congrats()
                 await reset_scenario.db_proceed()
 
             today_birthdays_scenario = self.db_factory.for_get_today_birthday(
-                guild_id=guild.id,
-                today=today_str
+                guild_id=guild.id, today=today_str
             )
 
             birthdays = await today_birthdays_scenario.db_proceed()
@@ -64,29 +58,21 @@ class BirthdayManager(DBBaseService):
                 continue
 
             await self.prepare_data(
-                guild_id=guild.id,
-                today_str=today_str,
-                birthdays=birthdays
+                guild_id=guild.id, today_str=today_str, birthdays=birthdays
             )
 
     async def prepare_data(
-            self,
-            guild_id: int,
-            today_str: str,
-            birthdays: list
+        self, guild_id: int, today_str: str, birthdays: list
     ) -> None:
-
         settings_scenario = self.db_factory.for_get_data(
-            guild_id=guild_id,
-            table_name='settings',
-            *'congrats_channel_id'
+            guild_id=guild_id, table_name="settings", *"congrats_channel_id"
         )
         settings = await settings_scenario.db_proceed()
 
         if not settings:
             return
 
-        channel = self.bot.get_channel(settings.get('congrats_channel_id'))
+        channel = self.bot.get_channel(settings.get("congrats_channel_id"))
         if not isinstance(channel, (discord.TextChannel, discord.Thread)):
             return
 
@@ -95,55 +81,50 @@ class BirthdayManager(DBBaseService):
             return
 
         await self.send_congrats(
-            guild=guild,
-            channel=channel,
-            birthdays=birthdays,
-            today_str=today_str
+            guild=guild, channel=channel, birthdays=birthdays, today_str=today_str
         )
 
     async def send_congrats(
-            self,
-            guild: discord.Guild,
-            channel,
-            birthdays: list,
-            today_str: str
+        self,
+        guild: discord.Guild,
+        channel: discord.TextChannel | discord.Thread,
+        birthdays: list,
+        today_str: str,
     ) -> None:
-
-        for user_id_tuple in birthdays:
-            user_id = user_id_tuple[0]
+        for user in birthdays:
+            user_id = user[0]
             member = guild.get_member(user_id)
 
+            # TODO: Оптимізувати
             if not member:
                 delete_scenario = self.db_factory.for_delete_birthday(
-                    guild.id,
-                    user_id
+                    guild_id=guild.id, user_id=user_id
                 )
                 await delete_scenario.db_proceed()
                 continue
 
             congrats_msg = self.translator.t(
-                guild_id=self.guild_id,
-                section='BIRTHDAYS',
-                key='congrats',
-                name=member.display_name
+                guild_id=guild.id,
+                section="BIRTHDAYS",
+                key="congrats",
+                name=member.display_name,
             )
 
-            message = await channel.send(congrats_msg + member.mention)
+            try:
+                message = await channel.send(congrats_msg + member.mention)
+            except (discord.NotFound, discord.HTTPException):
+                continue
 
-            await message.add_reaction('🎂')
-            await self.update_congrats(guild.id, user_id, today_str)
+            await message.add_reaction("🎂")
+            await self.update_congrats(
+                guild_id=guild.id, user_id=user_id, today_str=today_str
+            )
 
     async def update_congrats(
-            self,
-            guild_id: int,
-            user_id: int,
-            today_str: str
+        self, guild_id: int, user_id: int, today_str: str
     ) -> None:
-
         update_scenario = self.db_factory.for_update_last_congrats(
-            guild_id=guild_id,
-            user_id=user_id,
-            today_str=today_str
+            guild_id=guild_id, user_id=user_id, today_str=today_str
         )
 
         await update_scenario.db_proceed()

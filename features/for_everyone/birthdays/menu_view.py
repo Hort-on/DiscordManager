@@ -6,11 +6,10 @@ import discord
 
 from features.for_everyone.birthdays.buttons import (
     AddBirthdayButton,
-    DeleteBirthdayButton,
     AddForAdmins,
-    DeleteForAdmins
+    DeleteBirthdayButton,
+    DeleteForAdmins,
 )
-
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
@@ -22,38 +21,26 @@ if TYPE_CHECKING:
 
 class BirthdayMenuView(discord.ui.View):
     def __init__(
-            self,
-            navigator: Navigator,
-            flow: BirthdayFlow,
-            translator: Translator,
-            protection_service: ButtonProtectionService,
-            admins: set[int],
-            guild_id: int,
-            user_id: int,
-            owner_id: int | None
+        self,
+        navigator: Navigator,
+        flow: BirthdayFlow,
+        translator: Translator,
+        protection_service: ButtonProtectionService,
+        admins: set[int],
+        guild_id: int,
+        user_id: int,
+        owner_id: int | None,
     ):
         super().__init__(timeout=60)
 
         self.add_item(
-            AddBirthdayButton(
-                flow=flow,
-                translator=translator,
-                guild_id=guild_id
-            )
+            AddBirthdayButton(flow=flow, translator=translator, guild_id=guild_id)
         )
         self.add_item(
-            DeleteBirthdayButton(
-                flow=flow,
-                translator=translator,
-                guild_id=guild_id
-            )
+            DeleteBirthdayButton(flow=flow, translator=translator, guild_id=guild_id)
         )
         self.add_item(
-            BackButton(
-                navigator=navigator,
-                translator=translator,
-                guild_id=guild_id
-            )
+            BackButton(navigator=navigator, translator=translator, guild_id=guild_id)
         )
 
         if user_id in admins or user_id == owner_id:
@@ -62,7 +49,7 @@ class BirthdayMenuView(discord.ui.View):
                     flow=flow,
                     translator=translator,
                     guild_id=guild_id,
-                    protection_service=protection_service
+                    protection_service=protection_service,
                 )
             )
 
@@ -71,6 +58,6 @@ class BirthdayMenuView(discord.ui.View):
                     flow=flow,
                     translator=translator,
                     guild_id=guild_id,
-                    protection_service=protection_service
+                    protection_service=protection_service,
                 )
             )

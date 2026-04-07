@@ -11,11 +11,8 @@ if TYPE_CHECKING:
 class AgreeButton(discord.ui.Button):
     def __init__(self, flow: VerificationFlow):
         super().__init__(
-            label='Agree',
-            style=discord.ButtonStyle.green,
-            custom_id='verify_agree'
+            label="Agree", style=discord.ButtonStyle.green, custom_id="verify_agree"
         )
-
         self.flow = flow
 
     async def callback(self, interaction: discord.Interaction) -> None:
@@ -25,11 +22,8 @@ class AgreeButton(discord.ui.Button):
 class DisagreeButton(discord.ui.Button):
     def __init__(self, flow: VerificationFlow):
         super().__init__(
-            label='Disagree',
-            style=discord.ButtonStyle.red,
-            custom_id='verify_disagree'
+            label="Disagree", style=discord.ButtonStyle.red, custom_id="verify_disagree"
         )
-
         self.flow = flow
 
     async def callback(self, interaction: discord.Interaction):

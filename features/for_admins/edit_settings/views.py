@@ -7,38 +7,39 @@ import discord
 from features.for_admins.edit_settings.buttons.hidden_channels import (
     AddHiddenChannelButton,
     DeleteHiddenChannelButton,
-    HiddenChannelsListButton
+    HiddenChannelsListButton,
 )
 from features.for_admins.edit_settings.buttons.hidden_roles import (
     AddHiddenRoleButton,
     DeleteHiddenRoleButton,
-    HiddenRolesListButton
+    HiddenRolesListButton,
 )
 from features.for_admins.edit_settings.buttons.sys_channels import (
     AddSystemChannelsButton,
     DeleteSystemChannelsButton,
-    SystemChannelsListButton
+    SystemChannelsListButton,
 )
-
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
-    from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
-    from features.for_admins.edit_settings.flows.hidden_channels import HiddenChannelsFlow
+    from features.for_admins.edit_settings.flows.hidden_channels import (
+        HiddenChannelsFlow,
+    )
     from features.for_admins.edit_settings.flows.hidden_roles import HiddenRolesFlow
-    from ui.button_protection.button_protection_service import ButtonProtectionService
+    from features.for_admins.edit_settings.flows.sys_channels import SystemChannelsFlow
     from general_services.translator.translator import Translator
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class HiddenChannelsMenuView(discord.ui.View):
     def __init__(
-            self,
-            navigator: Navigator,
-            buttons_protection: ButtonProtectionService,
-            flow: HiddenChannelsFlow,
-            translator: Translator,
-            guild_id: int
+        self,
+        navigator: Navigator,
+        buttons_protection: ButtonProtectionService,
+        flow: HiddenChannelsFlow,
+        translator: Translator,
+        guild_id: int,
     ):
         super().__init__(timeout=60)
 
@@ -47,7 +48,7 @@ class HiddenChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
         self.add_item(
@@ -55,7 +56,7 @@ class HiddenChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
         self.add_item(
@@ -63,7 +64,7 @@ class HiddenChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
         self.add_item(
@@ -77,12 +78,12 @@ class HiddenChannelsMenuView(discord.ui.View):
 
 class HiddenRolesMenuView(discord.ui.View):
     def __init__(
-            self,
-            navigator: Navigator,
-            buttons_protection: ButtonProtectionService,
-            flow: HiddenRolesFlow,
-            translator: Translator,
-            guild_id: int
+        self,
+        navigator: Navigator,
+        buttons_protection: ButtonProtectionService,
+        flow: HiddenRolesFlow,
+        translator: Translator,
+        guild_id: int,
     ):
         super().__init__(timeout=60)
 
@@ -91,7 +92,7 @@ class HiddenRolesMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -100,7 +101,7 @@ class HiddenRolesMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -109,7 +110,7 @@ class HiddenRolesMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -124,12 +125,12 @@ class HiddenRolesMenuView(discord.ui.View):
 
 class SystemChannelsMenuView(discord.ui.View):
     def __init__(
-            self,
-            navigator: Navigator,
-            buttons_protection: ButtonProtectionService,
-            flow: SystemChannelsFlow,
-            translator: Translator,
-            guild_id: int
+        self,
+        navigator: Navigator,
+        buttons_protection: ButtonProtectionService,
+        flow: SystemChannelsFlow,
+        translator: Translator,
+        guild_id: int,
     ):
         super().__init__(timeout=60)
 
@@ -138,7 +139,7 @@ class SystemChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -147,7 +148,7 @@ class SystemChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -156,7 +157,7 @@ class SystemChannelsMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 

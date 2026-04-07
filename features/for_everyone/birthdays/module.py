@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
 from typing import TYPE_CHECKING
 
 from features.for_everyone.birthdays.service import BirthdayService
@@ -19,16 +18,10 @@ class BirthdayForUserModule:
 
 
 def build_birthday_module(
-        bot: Bot,
-        settings: SettingsStorage,
-        db_factory: DBFactory,
-        translator: Translator
+    bot: Bot, settings: SettingsStorage, db_factory: DBFactory, translator: Translator
 ) -> BirthdayForUserModule:
     service = BirthdayService(
-        bot=bot,
-        settings=settings,
-        db_factory=db_factory,
-        translator=translator
+        bot=bot, settings=settings, db_factory=db_factory, translator=translator
     )
 
     return BirthdayForUserModule(service=service)

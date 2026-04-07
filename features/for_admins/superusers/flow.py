@@ -4,20 +4,19 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from .results import DeleteSuperusersResult, AddSuperusersResult
-
 from core.navigator.routes import Route
 from features.for_admins.superusers.modal import AddSuperusersModal
 from general_services.other_services.get_member_by_name import get_member_by_name
-
 from ui.drop_down_menu.drop_down_selector import DropMenuView
 from ui.embed_constructor.embed_constructor import ErrorEmbed
+
+from .results import AddSuperusersResult, DeleteSuperusersResult
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
-    from features.for_admins.superusers.services import SuperusersService
     from features.for_admins.superusers.formatter import SuperusersFormatter
+    from features.for_admins.superusers.services import SuperusersService
     from general_services.translator.translator import Translator
 
 
@@ -28,7 +27,7 @@ class SuperusersFlow:
         context: NavigationContext,
         superusers_service: SuperusersService,
         formatter: SuperusersFormatter,
-        translator: Translator
+        translator: Translator,
     ):
         self.navigator = navigator
         self.context = context
@@ -41,59 +40,51 @@ class SuperusersFlow:
         assert guild is not None
 
         await interaction.response.send_modal(
-            AddSuperusersModal(
-                flow=self,
-                translator=self.translator,
-                guild_id=guild.id
-            )
+            AddSuperusersModal(flow=self, translator=self.translator, guild_id=guild.id)
         )
 
-    async def save_members(self, interaction: discord.Interaction, user_names: str) -> None:
+    async def save_members(
+        self, interaction: discord.Interaction, user_names: str
+    ) -> None:
         guild = interaction.guild
         assert guild is not None
 
         usernames = self._parse_usernames(user_names=user_names)
-        current_superusers = self.superusers_service.get_current_superusers(guild_id=guild.id)
+        current_superusers = self.superusers_service.get_current_superusers(
+            guild_id=guild.id
+        )
 
         result = self._proceed_users(
-            guild=guild,
-            usernames=usernames,
-            current_superusers=current_superusers
+            guild=guild, usernames=usernames, current_superusers=current_superusers
         )
 
         if result.added_ids:
             success = await self.superusers_service.add_superusers(
-                guild_id=guild.id,
-                user_ids=set(result.added_ids)
+                guild_id=guild.id, user_ids=set(result.added_ids)
             )
             if not success:
                 await interaction.response.edit_message(
                     embed=ErrorEmbed(
                         description=self.translator.t(
-                            guild_id=guild.id,
-                            section='SYSTEM_GENERAL',
-                            key='error_msg'
+                            guild_id=guild.id, section="SYSTEM_GENERAL", key="error_msg"
                         )
                     )
                 )
                 return
 
         embeds = self.formatter.build_add_result_embeds(
-            result=result,
-            guild_id=guild.id
+            result=result, guild_id=guild.id
         )
 
         await interaction.response.edit_message(embeds=embeds)
 
     @staticmethod
     def _parse_usernames(user_names: str) -> set[str]:
-        return {name.strip() for name in user_names.split(',') if name.strip()}
+        return {name.strip() for name in user_names.split(",") if name.strip()}
 
     @staticmethod
     def _proceed_users(
-            guild: discord.Guild,
-            usernames: set[str],
-            current_superusers: set[int]
+        guild: discord.Guild, usernames: set[str], current_superusers: set[int]
     ) -> AddSuperusersResult:
 
         added_ids: set[int] = set()
@@ -121,25 +112,25 @@ class SuperusersFlow:
             added_ids=added_ids,
             added_names=added_names,
             not_found=not_found,
-            already_super=already_super
+            already_super=already_super,
         )
 
     async def start_for_delete(self, interaction: discord.Interaction) -> None:
         guild = interaction.guild
         assert guild is not None
 
-        users, not_found_msg = await self.superusers_service.get_superusers_for_deletion(
-            guild=guild,
-            client=interaction.client
+        (
+            users,
+            not_found_msg,
+        ) = await self.superusers_service.get_superusers_for_deletion(
+            guild=guild, client=interaction.client
         )
 
         if not users:
             await interaction.response.edit_message(
                 embed=ErrorEmbed(
                     description=self.translator.t(
-                        guild_id=guild.id,
-                        section='SUPERUSERS',
-                        key='no_superusers'
+                        guild_id=guild.id, section="SUPERUSERS", key="no_superusers"
                     )
                 )
             )
@@ -156,16 +147,12 @@ class SuperusersFlow:
             translator=self.translator,
             guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=guild.id,
-                section='SUPERUSERS',
-                key='ask_s_users_to_delete'
+                guild_id=guild.id, section="SUPERUSERS", key="ask_s_users_to_delete"
             ),
             callback=lambda i, v: self._handle_delete(
-                interaction=i,
-                values=v,
-                not_found_msg=not_found_msg
+                interaction=i, values=v, not_found_msg=not_found_msg
             ),
-            max_values=min(25, len(options))
+            max_values=min(25, len(options)),
         )
 
         view.context = self.context
@@ -179,24 +166,21 @@ class SuperusersFlow:
         self,
         interaction: discord.Interaction,
         values: list[str],
-        not_found_msg: str | None
+        not_found_msg: str | None,
     ) -> None:
 
         guild = interaction.guild
         assert guild is not None
 
         success = await self.superusers_service.delete_superusers(
-            guild_id=guild.id,
-            values=values
+            guild_id=guild.id, values=values
         )
 
         if not success:
             await interaction.response.edit_message(
                 embed=ErrorEmbed(
                     description=self.translator.t(
-                        guild_id=guild.id,
-                        section='SYSTEM_GENERAL',
-                        key='error_msg'
+                        guild_id=guild.id, section="SYSTEM_GENERAL", key="error_msg"
                     )
                 )
             )
@@ -209,14 +193,10 @@ class SuperusersFlow:
             deleted_names.add(member.display_name)
 
         result = DeleteSuperusersResult(
-            deleted=deleted_names,
-            not_found_message=not_found_msg or None
+            deleted=deleted_names, not_found_message=not_found_msg or None
         )
 
-        embeds = self.formatter.build_delete_result_embeds(
-            result=result,
-            guild=guild
-        )
+        embeds = self.formatter.build_delete_result_embeds(result=result, guild=guild)
 
         await interaction.response.edit_message(embeds=embeds)
 

@@ -29,9 +29,7 @@ class RoleManagerService:
 
     @staticmethod
     async def add_roles_to_user(
-            member: discord.Member | discord.User,
-            guild: discord.Guild,
-            roles: list[str]
+        member: discord.Member | discord.User, guild: discord.Guild, roles: list[str]
     ) -> AddedRolesResult:
 
         role_ids = {int(r_id) for r_id in roles}
@@ -57,19 +55,14 @@ class RoleManagerService:
                     not_added_roles.add(role)
 
             return AddedRolesResult(
-                added_roles=added_roles,
-                not_added_roles=not_added_roles
+                added_roles=added_roles, not_added_roles=not_added_roles
             )
 
-        return AddedRolesResult(
-            added_roles=roles_to_add
-        )
+        return AddedRolesResult(added_roles=roles_to_add)
 
     @staticmethod
     async def remove_roles_from_user(
-            guild: discord.Guild,
-            member: discord.Member | discord.User,
-            roles: list[str]
+        guild: discord.Guild, member: discord.Member | discord.User, roles: list[str]
     ) -> RemoveRolesResult:
         role_ids = {int(r_id) for r_id in roles}
 
@@ -94,16 +87,12 @@ class RoleManagerService:
                     not_removed_roles.add(role)
 
             return RemoveRolesResult(
-                removed_roles=removed_roles,
-                not_removed_roles=not_removed_roles
+                removed_roles=removed_roles, not_removed_roles=not_removed_roles
             )
 
-        return RemoveRolesResult(
-            removed_roles=roles_to_remove
-        )
+        return RemoveRolesResult(removed_roles=roles_to_remove)
 
     def get_hidden_roles(self, guild_id: int) -> set[int]:
         return self.settings.set_storage.for_set_get(
-            target=StorageTarget.HIDDEN_ROLES,
-            guild_id=guild_id
+            target=StorageTarget.HIDDEN_ROLES, guild_id=guild_id
         )

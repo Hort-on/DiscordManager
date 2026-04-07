@@ -11,7 +11,10 @@ if TYPE_CHECKING:
 
 
 class VerificationView(discord.ui.View):
-    def __init__(self, flow: VerificationFlow,):
+    def __init__(
+        self,
+        flow: VerificationFlow,
+    ):
         super().__init__(timeout=None)
 
         self.add_item(AgreeButton(flow=flow))

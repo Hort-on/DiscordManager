@@ -1,8 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
-
-from datetime import datetime, timezone
 
 import discord
 
@@ -22,17 +21,15 @@ class MemberLeftNotification:
 
     async def check_if_notification(self, member: discord.Member):
         result = self.settings.dict_storage.get_value(
-            key='member_left',
-            target=StorageTarget.SETTINGS,
-            guild_id=member.guild.id
+            key="member_left", target=StorageTarget.SETTINGS, guild_id=member.guild.id
         )
         if not result:
             return
 
         channel_id = self.settings.dict_storage.get_value(
-            key='notification_channel_id',
+            key="notification_channel_id",
             target=StorageTarget.SYSTEM_CHANNELS,
-            guild_id=member.guild.id
+            guild_id=member.guild.id,
         )
 
         if not channel_id:
@@ -48,7 +45,7 @@ class MemberLeftNotification:
 
         guild_id = member.guild.id
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         joined_at = member.joined_at
 
@@ -60,53 +57,42 @@ class MemberLeftNotification:
 
         embed = discord.Embed(
             title=self.translator.t(
-                guild_id=guild_id,
-                section='EVENTS',
-                key='member_left_title'
+                guild_id=guild_id, section="EVENTS", key="member_left_title"
             ),
             description=self.translator.t(
                 guild_id=guild_id,
-                section='EVENTS',
-                key='member_left_msg',
-                member=member.display_name or member.global_name
+                section="EVENTS",
+                key="member_left_msg",
+                member=member.display_name or member.global_name,
             ),
             color=discord.Color.blue(),
-            timestamp=now
+            timestamp=now,
         )
 
         embed.add_field(
             name=self.translator.t(
-                guild_id=guild_id,
-                section='SYSTEM_GENERAL',
-                key='user'
+                guild_id=guild_id, section="SYSTEM_GENERAL", key="user"
             ),
-            value=f'{member.mention}',
-            inline=False
+            value=f"{member.mention}",
+            inline=False,
         )
 
         embed.add_field(
             name=self.translator.t(
-                guild_id=guild_id,
-                section='EVENTS',
-                key='member_joined',
+                guild_id=guild_id, section="EVENTS", key="member_joined"
             ),
-            value=f'<t:{int(member.joined_at.timestamp())}:F>',
-            inline=False
+            value=f"<t:{int(member.joined_at.timestamp())}:F>",
+            inline=False,
         )
 
         embed.add_field(
             name=self.translator.t(
-                guild_id=guild_id,
-                section='EVENTS',
-                key='time_on_server'
+                guild_id=guild_id, section="EVENTS", key="time_on_server"
             ),
             value=self.translator.t(
-                guild_id=guild_id,
-                section='EVENTS',
-                key='days_on_server',
-                days=days
+                guild_id=guild_id, section="EVENTS", key="days_on_server", days=days
             ),
-            inline=False
+            inline=False,
         )
 
         await channel.send(embed=embed)

@@ -9,7 +9,6 @@ from database.settings_storage.settings_manager import StorageTarget
 from features.auto_moderation.verification.flow import VerificationFlow
 from features.auto_moderation.verification.service import VerificationService
 from features.auto_moderation.verification.view import VerificationView
-
 from ui.embed_constructor.embed_constructor import WarningEmbed
 
 if TYPE_CHECKING:
@@ -19,11 +18,11 @@ if TYPE_CHECKING:
 
 class VerificationViewService:
     def __init__(
-            self,
-            bot: Bot,
-            settings: SettingsStorage,
-            service: VerificationService,
-            translator: Translator,
+        self,
+        bot: Bot,
+        settings: SettingsStorage,
+        service: VerificationService,
+        translator: Translator,
     ):
         self.bot = bot
         self.settings = settings
@@ -36,7 +35,7 @@ class VerificationViewService:
             bot=self.bot,
             settings=self.settings,
             service=self.service,
-            translator=self.translator
+            translator=self.translator,
         )
 
         self.view = VerificationView(flow=flow)
@@ -46,9 +45,7 @@ class VerificationViewService:
     async def ensure_all_guild_messages(self):
         for guild in self.bot.guilds:
             verification = self.settings.dict_storage.get_value(
-                key='verification',
-                target=StorageTarget.SETTINGS,
-                guild_id=guild.id
+                key="verification", target=StorageTarget.SETTINGS, guild_id=guild.id
             )
 
             if not verification:
@@ -61,23 +58,22 @@ class VerificationViewService:
 
             await self.ensure_single_message(channel=channel, guild_id=guild.id)
 
-    async def ensure_single_message(self, channel: discord.TextChannel, guild_id: int) -> None:
+    async def ensure_single_message(
+        self, channel: discord.TextChannel, guild_id: int
+    ) -> None:
         found = False
         async for message in channel.history(limit=25):
             if message.author == self.bot.user and message.components:
                 found = True
                 await self.service.save_message_id(
-                    message_id=message.id,
-                    guild_id=guild_id
+                    message_id=message.id, guild_id=guild_id
                 )
                 break
 
         if not found:
             embed = WarningEmbed(
                 description=self.translator.t(
-                    guild_id=guild_id,
-                    section='VERIFICATION',
-                    key='ensure_msg'
+                    guild_id=guild_id, section="VERIFICATION", key="ensure_msg"
                 )
             )
 
@@ -85,7 +81,7 @@ class VerificationViewService:
                 bot=self.bot,
                 settings=self.settings,
                 service=self.service,
-                translator=self.translator
+                translator=self.translator,
             )
 
             view = VerificationView(flow=flow)
@@ -95,19 +91,12 @@ class VerificationViewService:
 
                 if item.custom_id == "verify_agree":
                     item.label = self.translator.t(
-                        guild_id=guild_id,
-                        section='VERIFICATION',
-                        key='agree_button'
+                        guild_id=guild_id, section="VERIFICATION", key="agree_button"
                     )
                 elif item.custom_id == "verify_disagree":
                     item.label = self.translator.t(
-                        guild_id=guild_id,
-                        section='VERIFICATION',
-                        key='disagree_button'
+                        guild_id=guild_id, section="VERIFICATION", key="disagree_button"
                     )
 
             message = await channel.send(embed=embed, view=view)
-            await self.service.save_message_id(
-                message_id=message.id,
-                guild_id=guild_id
-            )
+            await self.service.save_message_id(message_id=message.id, guild_id=guild_id)

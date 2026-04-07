@@ -13,20 +13,16 @@ class AddSuperusersModal(discord.ui.Modal):
     def __init__(self, flow: SuperusersFlow, translator: Translator, guild_id: int):
         super().__init__(
             title=translator.t(
-                guild_id=guild_id,
-                section='SUPERUSERS',
-                key='superuser_names'
+                guild_id=guild_id, section="SUPERUSERS", key="superuser_names"
             )
         )
         self.flow = flow
 
         self.superuser_names = discord.ui.TextInput(
             label=translator.t(
-                guild_id=guild_id,
-                section='SUPERUSERS',
-                key='ask_s_users_names'
+                guild_id=guild_id, section="SUPERUSERS", key="ask_s_users_names"
             ),
-            placeholder='user123, user456, user_, _user, etc.',
+            placeholder="user123, user456, user_, _user, etc.",
             required=True,
         )
 
@@ -34,6 +30,5 @@ class AddSuperusersModal(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         await self.flow.save_members(
-            interaction=interaction,
-            user_names=self.superuser_names.value
+            interaction=interaction, user_names=self.superuser_names.value
         )

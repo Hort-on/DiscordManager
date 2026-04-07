@@ -7,26 +7,25 @@ import discord
 from features.for_admins.superusers.buttons import (
     AddSuperuserButton,
     DeleteSuperusersButton,
-    SuperusersListButton
+    SuperusersListButton,
 )
-
 from ui.buttons.back_button import BackButton
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from features.for_admins.superusers.flow import SuperusersFlow
-    from ui.button_protection.button_protection_service import ButtonProtectionService
     from general_services.translator.translator import Translator
+    from ui.button_protection.button_protection_service import ButtonProtectionService
 
 
 class SuperusersMenuView(discord.ui.View):
     def __init__(
-            self,
-            navigator: Navigator,
-            buttons_protection: ButtonProtectionService,
-            flow: SuperusersFlow,
-            translator: Translator,
-            guild_id: int
+        self,
+        navigator: Navigator,
+        buttons_protection: ButtonProtectionService,
+        flow: SuperusersFlow,
+        translator: Translator,
+        guild_id: int,
     ):
         super().__init__(timeout=60)
 
@@ -35,7 +34,7 @@ class SuperusersMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -44,7 +43,7 @@ class SuperusersMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
@@ -53,14 +52,10 @@ class SuperusersMenuView(discord.ui.View):
                 buttons_protection=buttons_protection,
                 flow=flow,
                 translator=translator,
-                guild_id=guild_id
+                guild_id=guild_id,
             )
         )
 
         self.add_item(
-            BackButton(
-                navigator=navigator,
-                translator=translator,
-                guild_id=guild_id
-            )
+            BackButton(navigator=navigator, translator=translator, guild_id=guild_id)
         )

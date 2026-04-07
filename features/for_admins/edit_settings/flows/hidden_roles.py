@@ -6,32 +6,32 @@ import discord
 
 from core.navigator.params_containers import GeneralParams
 from core.navigator.routes import Route
-
 from database.settings_storage.settings_manager import StorageTarget
-
-from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 from ui.drop_down_menu.drop_down_selector import DropMenuView
+from ui.embed_constructor.embed_constructor import ErrorEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
-
-    from features.for_admins.edit_settings.services.settings_formatter import SettingsFormatter
-    from features.for_admins.edit_settings.services.hidden_roles import HiddenRolesService
-
+    from features.for_admins.edit_settings.services.hidden_roles import (
+        HiddenRolesService,
+    )
+    from features.for_admins.edit_settings.services.settings_formatter import (
+        SettingsFormatter,
+    )
     from general_services.other_services.cleanup_service import CleanUpService
     from general_services.translator.translator import Translator
 
 
 class HiddenRolesFlow:
     def __init__(
-            self,
-            navigator: Navigator,
-            context: NavigationContext,
-            formatter: SettingsFormatter,
-            hidden_roles_service: HiddenRolesService,
-            cleanup_service: CleanUpService,
-            translator: Translator
+        self,
+        navigator: Navigator,
+        context: NavigationContext,
+        formatter: SettingsFormatter,
+        hidden_roles_service: HiddenRolesService,
+        cleanup_service: CleanUpService,
+        translator: Translator,
     ):
 
         self.navigator = navigator
@@ -51,9 +51,7 @@ class HiddenRolesFlow:
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=guild.id,
-                    section='EDIT_SETTINGS',
-                    key='no_roles_to_add'
+                    guild_id=guild.id, section="EDIT_SETTINGS", key="no_roles_to_add"
                 )
             )
             await interaction.response.edit_message(embed=error_embed)
@@ -65,50 +63,45 @@ class HiddenRolesFlow:
             translator=self.translator,
             guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=guild.id,
-                section='EDIT_SETTINGS',
-                key='ask_role_placeholder'
+                guild_id=guild.id, section="EDIT_SETTINGS", key="ask_role_placeholder"
             ),
             callback=self._save_role_to_hidden,
-            max_values=min(25, len(options))
+            max_values=min(25, len(options)),
         )
 
         view.context = self.context
 
         self.context.push(
-            target=Route.HIDDEN_ROLES_MENU,
-            params=GeneralParams(guild_id=guild.id)
+            target=Route.HIDDEN_ROLES_MENU, params=GeneralParams(guild_id=guild.id)
         )
 
         await interaction.response.edit_message(view=view)
 
-    async def _save_role_to_hidden(self, interaction: discord.Interaction, values: list[str]) -> None:
+    async def _save_role_to_hidden(
+        self, interaction: discord.Interaction, values: list[str]
+    ) -> None:
         guild = interaction.guild
         assert guild is not None
 
-        result = await self.hidden_roles_service.save_roles(guild_id=guild.id, values=values)
+        result = await self.hidden_roles_service.save_roles(
+            guild_id=guild.id, values=values
+        )
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=guild.id,
-                    section='SYSTEM_GENERAL',
-                    key='error_msg'
+                    guild_id=guild.id, section="SYSTEM_GENERAL", key="error_msg"
                 )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
 
         success_msg = self.translator.t(
-            guild_id=guild.id,
-            section='EDIT_SETTINGS',
-            key='success_role_addition'
+            guild_id=guild.id, section="EDIT_SETTINGS", key="success_role_addition"
         )
 
         await self._send_result(
-            interaction=interaction,
-            values=values,
-            first_line=success_msg
+            interaction=interaction, values=values, first_line=success_msg
         )
 
     # ================================= METHODS FOR DELETE BUTTON =================================
@@ -117,8 +110,7 @@ class HiddenRolesFlow:
         assert guild is not None
 
         embed = await self.formatter.format_current_hidden(
-            interaction=interaction,
-            target=StorageTarget.HIDDEN_ROLES
+            interaction=interaction, target=StorageTarget.HIDDEN_ROLES
         )
 
         options = self._get_deletable_roles(
@@ -128,9 +120,7 @@ class HiddenRolesFlow:
         if not options:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=guild.id,
-                    section='EDIT_SETTINGS',
-                    key='no_roles_to_delete'
+                    guild_id=guild.id, section="EDIT_SETTINGS", key="no_roles_to_delete"
                 )
             )
             await interaction.response.edit_message(embed=error_embed)
@@ -142,76 +132,69 @@ class HiddenRolesFlow:
             translator=self.translator,
             guild_id=guild.id,
             placeholder=self.translator.t(
-                guild_id=guild.id,
-                section='EDIT_SETTINGS',
-                key='ask_role_to_delete'
+                guild_id=guild.id, section="EDIT_SETTINGS", key="ask_role_to_delete"
             ),
             callback=self._delete_role_procedure,
-            max_values=min(25, len(options))
+            max_values=min(25, len(options)),
         )
 
         view.context = self.context
 
         self.context.push(
-            target=Route.HIDDEN_ROLES_MENU,
-            params=GeneralParams(guild_id=guild.id)
+            target=Route.HIDDEN_ROLES_MENU, params=GeneralParams(guild_id=guild.id)
         )
 
-        await interaction.response.edit_message(
-            view=view,
-            embed=embed
-        )
+        await interaction.response.edit_message(view=view, embed=embed)
 
-    async def _delete_role_procedure(self, interaction: discord.Interaction, values: list[str]):
+    async def _delete_role_procedure(
+        self, interaction: discord.Interaction, values: list[str]
+    ):
         guild = interaction.guild
         assert guild is not None
 
-        result = await self.hidden_roles_service.delete_roles(guild_id=guild.id, values=values)
+        result = await self.hidden_roles_service.delete_roles(
+            guild_id=guild.id, values=values
+        )
 
         if not result:
             error_embed = ErrorEmbed(
                 description=self.translator.t(
-                    guild_id=guild.id,
-                    section='SYSTEM_GENERAL',
-                    key='error_msg'
+                    guild_id=guild.id, section="SYSTEM_GENERAL", key="error_msg"
                 )
             )
             await interaction.response.edit_message(embed=error_embed)
             return
 
         success_msg = self.translator.t(
-                guild_id=guild.id,
-                section='EDIT_SETTINGS',
-                key='success_role_deletion'
-            )
+            guild_id=guild.id, section="EDIT_SETTINGS", key="success_role_deletion"
+        )
 
         await self._send_result(
-            interaction=interaction,
-            values=values,
-            first_line=success_msg
+            interaction=interaction, values=values, first_line=success_msg
         )
 
     # ================================= METHODS FOR BOTH =================================
-    def _get_available_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:
+    def _get_available_roles(
+        self, interaction: discord.Interaction
+    ) -> list[discord.SelectOption]:
         guild = interaction.guild
         assert guild is not None
 
         hidden_roles = self.hidden_roles_service.get_hidden_roles(guild_id=guild.id)
 
-        sorted_roles = sorted(interaction.user.roles, key=lambda role: role.name.lower())
+        sorted_roles = sorted(
+            interaction.user.roles, key=lambda role: role.name.lower()
+        )
 
         return [
-            discord.SelectOption(
-                label=role.name,
-                value=str(role.id)
-            )
-            for role in sorted_roles if (
-                    role.id not in hidden_roles
-                    and not role.is_default()
-            )
+            discord.SelectOption(label=role.name, value=str(role.id))
+            for role in sorted_roles
+            if (role.id not in hidden_roles and not role.is_default())
         ]
 
-    def _get_deletable_roles(self, interaction: discord.Interaction) -> list[discord.SelectOption]:
+    def _get_deletable_roles(
+        self, interaction: discord.Interaction
+    ) -> list[discord.SelectOption]:
         guild = interaction.guild
         assert guild is not None
 
@@ -230,47 +213,37 @@ class HiddenRolesFlow:
             available_roles[role_id] = role.name
 
         if not_found_roles:
-            self.cleanup.clean_up_hidden_roles(guild_id=guild.id, role_ids=not_found_roles)
+            self.cleanup.clean_up_hidden_roles(
+                guild_id=guild.id, role_ids=not_found_roles
+            )
 
         return [
-            discord.SelectOption(
-                label=value,
-                value=str(key)
-            )
+            discord.SelectOption(label=value, value=str(key))
             for key, value in sorted(available_roles.items(), key=lambda i: i[0])
         ]
 
     async def _send_result(
-            self,
-            interaction: discord.Interaction,
-            values: list[str],
-            first_line: str
+        self, interaction: discord.Interaction, values: list[str], first_line: str
     ):
         role_ids: set[int] = set(int(role_id) for role_id in values)
 
         role_names: list[str] = [first_line]
         for role_id in role_ids:
             role = interaction.guild.get_role(role_id)
-            role_names.append(f'🔸 {role.name}')
+            role_names.append(f"🔸 {role.name}")
 
-        result_msg = '\n'.join(role_names)
+        result_msg = "\n".join(role_names)
 
-        success_embed = SuccessEmbed(
-            description=result_msg
-        )
+        success_embed = SuccessEmbed(description=result_msg)
 
         settings_embed = await self.formatter.format_current_hidden(
-            interaction=interaction,
-            target=StorageTarget.HIDDEN_ROLES
+            interaction=interaction, target=StorageTarget.HIDDEN_ROLES
         )
 
-        await interaction.response.edit_message(
-            embeds=[settings_embed, success_embed]
-        )
+        await interaction.response.edit_message(embeds=[settings_embed, success_embed])
 
     async def for_roles_list(self, interaction: discord.Interaction):
         embed = await self.formatter.format_current_hidden(
-            interaction=interaction,
-            target=StorageTarget.HIDDEN_ROLES
+            interaction=interaction, target=StorageTarget.HIDDEN_ROLES
         )
         await interaction.response.edit_message(embed=embed)

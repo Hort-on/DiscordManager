@@ -1,7 +1,7 @@
-from pathlib import Path
-import os
 import asyncio
 import logging
+import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -9,38 +9,35 @@ from core.bot_config import create_bot
 from core.controller import Controller
 from core.general_services_container import GeneralContainer
 from core.navigator.navigator import Navigator
-
 from database.data_base_model import DB
-from database.settings_storage.settings import SettingsStorage
 from database.db_factory.db_scenario_factory import DBFactory
-
+from database.settings_storage.settings import SettingsStorage
 from event_services.member_left import MemberLeftNotification
-
 from features.auto_moderation.message_moderation.module import build_automod_module
-from features.auto_moderation.verification.view_service import VerificationViewService
 from features.auto_moderation.verification.service import VerificationService
+from features.auto_moderation.verification.view_service import VerificationViewService
 from features.for_admins.module import build_admin_module
-from features.for_admins.send_messages.services.send_message_service import MessageService
+from features.for_admins.send_messages.services.send_message_service import (
+    MessageService,
+)
 from features.for_admins.send_messages.services.send_rules_service import RulesService
 from features.for_everyone.module import build_everyone_module
-# from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 
+# from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
 from general_services.translator.translator import Translator
-
 from ui.button_protection.button_protection_service import ButtonProtectionService
-
 
 # Logging
 logging.basicConfig(level=logging.INFO)
-logging.getLogger('discord.http').setLevel(logging.WARNING)
+logging.getLogger("discord.http").setLevel(logging.WARNING)
 
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
+TOKEN = os.getenv("TOKEN")
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / 'database' / 'DATA' / 'assistant_data.sqlite'
+DB_PATH = BASE_DIR / "database" / "DATA" / "assistant_data.sqlite"
 
 
 async def main():
@@ -61,28 +58,22 @@ async def main():
 
     cleanup_service = CleanUpService(settings=settings, db_factory=db_factory)
 
-    verification_service = VerificationService(bot=bot, settings=settings, db_factory=db_factory)
+    verification_service = VerificationService(
+        bot=bot, settings=settings, db_factory=db_factory
+    )
 
     rules_service = RulesService(bot=bot, settings=settings)
 
     send_message_service = MessageService(
-        bot=bot,
-        db_factory=db_factory,
-        settings=settings,
-        translator=translator
+        bot=bot, db_factory=db_factory, settings=settings, translator=translator
     )
 
     member_left_service = MemberLeftNotification(
-        bot=bot,
-        settings=settings,
-        translator=translator
+        bot=bot, settings=settings, translator=translator
     )
 
     verification_view_service = VerificationViewService(
-        bot=bot,
-        settings=settings,
-        service=verification_service,
-        translator=translator
+        bot=bot, settings=settings, service=verification_service, translator=translator
     )
 
     admin_module = build_admin_module(
@@ -94,20 +85,14 @@ async def main():
         verification_view_service=verification_view_service,
         rules_service=rules_service,
         send_message_service=send_message_service,
-        translator=translator
+        translator=translator,
     )
 
     everyone_module = build_everyone_module(
-        bot=bot,
-        settings=settings,
-        db_factory=db_factory,
-        translator=translator
+        bot=bot, settings=settings, db_factory=db_factory, translator=translator
     )
 
-    automod_module = build_automod_module(
-        settings=settings,
-        translator=translator
-    )
+    automod_module = build_automod_module(settings=settings, translator=translator)
 
     general_container = GeneralContainer(
         logger=logger,
@@ -116,13 +101,13 @@ async def main():
         settings=settings,
         translator=translator,
         cleanup_service=cleanup_service,
-        button_protection=button_protector
+        button_protection=button_protector,
     )
 
     navigator = Navigator(
         general_container=general_container,
         admin_module=admin_module,
-        everyone_module=everyone_module
+        everyone_module=everyone_module,
     )
 
     bot.navigator = navigator
@@ -138,12 +123,13 @@ async def main():
         moderation_service=automod_module,
         translator=translator,
         send_message_service=send_message_service,
-        member_left_service=member_left_service
+        member_left_service=member_left_service,
     )
 
     await bot.start(TOKEN)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

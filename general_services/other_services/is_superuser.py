@@ -10,7 +10,6 @@ class IsSuperuserService:
 
     def is_superuser(self, guild: discord.Guild, user_id: int) -> bool:
         superusers = self.settings.set_storage.for_set_get(
-            target=StorageTarget.SUPERUSERS,
-            guild_id=guild.id
+            target=StorageTarget.SUPERUSERS, guild_id=guild.id
         )
         return user_id in superusers or user_id == guild.owner_id
