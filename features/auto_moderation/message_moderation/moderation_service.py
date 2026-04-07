@@ -181,7 +181,7 @@ class ModerationService:
                 guild_id=guild_id,
                 section="MODERATION",
                 key="actioned_users",
-                user_list=user_list,
+                users=user_list,
             )
         ]
 
