@@ -73,7 +73,7 @@ class Controller:
         await self.verification_view_service.ensure_all_guild_messages()
 
     async def on_message(self, message: discord.Message) -> None:
-        if message.author.bot:
+        if message.author.bot and message.webhook_id is None:
             return
 
         if message.content.lower() in ["ok", "ок"]:
