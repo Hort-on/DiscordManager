@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
+from general_services.raid_dayz.service import RaidService
+
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from database.db_factory.db_scenario_factory import DBFactory
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
 
 
 class Controller:
+
     def __init__(
         self,
         bot,
@@ -37,6 +40,7 @@ class Controller:
         member_left_service: MemberLeftNotification,
         send_message_service: MessageService,
         translator: Translator,
+        raid_service: RaidService,
     ):
         self.bot = bot
         self.settings = settings
@@ -49,6 +53,7 @@ class Controller:
         self.member_left = member_left_service
         self.send_message_service = send_message_service
         self.translator = translator
+        self.raid_service = raid_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -70,6 +75,13 @@ class Controller:
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot:
             return
+
+        if message.content.lower() in ["ok", "ок"]:
+            await self.raid_service.stop_raid()
+            return
+
+        if message.webhook_id == self.raid_service.WEBHOOK_ID:
+            await self.raid_service.start_raid(message.guild)
 
         if not message.guild:
             await self.rules_service.send_message(

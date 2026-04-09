@@ -22,10 +22,10 @@ from features.for_admins.send_messages.services.send_message_service import (
 )
 from features.for_admins.send_messages.services.send_rules_service import RulesService
 from features.for_everyone.module import build_everyone_module
-
 # from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
+from general_services.raid_dayz.service import RaidService
 from general_services.translator.translator import Translator
 from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -110,6 +110,8 @@ async def main():
         everyone_module=everyone_module,
     )
 
+    raid_service = RaidService()
+
     bot.navigator = navigator
 
     Controller(
@@ -124,6 +126,7 @@ async def main():
         translator=translator,
         send_message_service=send_message_service,
         member_left_service=member_left_service,
+        raid_service=raid_service,
     )
 
     await bot.start(TOKEN)
