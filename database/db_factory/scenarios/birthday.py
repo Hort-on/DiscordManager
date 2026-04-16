@@ -73,7 +73,8 @@ class GetTodayBirthdayScenario(DataBaseScenario):
             async with conn.execute(
                 query, (self.guild_id, self.today, self.today)
             ) as cursor:
-                return await cursor.fetchall()
+                rows = await cursor.fetchall()
+                return [row[0] for row in rows]
 
 
 class UpdateLastCongratsScenario(DataBaseScenario):

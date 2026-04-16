@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from general_services.translator.translator import Translator
 
 
-# TODO: зробити завантаження у кеш
 class BirthdayManager(DBBaseService):
     def __init__(
         self,
@@ -40,7 +39,6 @@ class BirthdayManager(DBBaseService):
             if not is_enabled:
                 continue
 
-            # TODO: зробити точну часову зону для кожної гільдії
             today = datetime.now()
             today_str = today.strftime("%d.%m")
 
@@ -91,11 +89,11 @@ class BirthdayManager(DBBaseService):
         birthdays: list,
         today_str: str,
     ) -> None:
-        for user in birthdays:
-            user_id = user[0]
+        members = []
+
+        for user_id in birthdays:
             member = guild.get_member(user_id)
 
-            # TODO: Оптимізувати
             if not member:
                 delete_scenario = self.db_factory.for_delete_birthday(
                     guild_id=guild.id, user_id=user_id
@@ -103,21 +101,33 @@ class BirthdayManager(DBBaseService):
                 await delete_scenario.db_proceed()
                 continue
 
-            congrats_msg = self.translator.t(
-                guild_id=guild.id,
-                section="BIRTHDAYS",
-                key="congrats",
-                name=member.display_name,
-            )
+            members.append(member)
 
-            try:
-                message = await channel.send(congrats_msg + member.mention)
-            except (discord.NotFound, discord.HTTPException):
-                continue
+        if not members:
+            return
 
-            await message.add_reaction("🎂")
+        mentions = " ".join(member.mention for member in members)
+
+        names = ", ".join(member.display_name for member in members)
+
+        congrats_msg = self.translator.t(
+            guild_id=guild.id,
+            section="BIRTHDAYS",
+            key="congrats",
+            names=names,
+        )
+
+        message = await channel.send(f"{mentions}\n```{congrats_msg}```")
+
+        await message.add_reaction("🎂")
+        await message.add_reaction("🎉")
+        await message.add_reaction("❤️")
+
+        for member in members:
             await self.update_congrats(
-                guild_id=guild.id, user_id=user_id, today_str=today_str
+                guild_id=guild.id,
+                user_id=member.id,
+                today_str=today_str,
             )
 
     async def update_congrats(

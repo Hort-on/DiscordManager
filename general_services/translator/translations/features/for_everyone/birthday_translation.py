@@ -40,8 +40,8 @@ BIRTHDAYS = {
         "uk": "Будь ласка введіть глобальне ім'я користувача",
     },
     "congrats": {
-        "en": "Today we wish {name} a happy birthday.",
-        "uk": "Сьогодні ми вітаємо {name} з днем народження.",
+        "en": "Today we wish {names} a happy birthday.",
+        "uk": "Сьогодні ми вітаємо {names} з днем народження.",
     },
     "for_admin_add": {
         "en": "📥Add for another user",

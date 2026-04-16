@@ -21,8 +21,8 @@ from features.for_admins.send_messages.services.send_message_service import (
     MessageService,
 )
 from features.for_admins.send_messages.services.send_rules_service import RulesService
+from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 from features.for_everyone.module import build_everyone_module
-# from features.for_everyone.birthdays.birthday_manager import BirthdayManager
 from general_services.logger.logger import Logger
 from general_services.other_services.cleanup_service import CleanUpService
 from general_services.raid_dayz.service import RaidService
@@ -76,6 +76,10 @@ async def main():
         bot=bot, settings=settings, service=verification_service, translator=translator
     )
 
+    birthday_manager = BirthdayManager(
+        bot=bot, settings=settings, db_factory=db_factory, translator=translator
+    )
+
     admin_module = build_admin_module(
         bot=bot,
         db_factory=db_factory,
@@ -127,6 +131,7 @@ async def main():
         send_message_service=send_message_service,
         member_left_service=member_left_service,
         raid_service=raid_service,
+        birthday_manager=birthday_manager,
     )
 
     await bot.start(TOKEN)

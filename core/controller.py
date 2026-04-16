@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from datetime import time, timezone, timedelta
 from typing import TYPE_CHECKING
 
 import discord
+from discord.ext import tasks
 
 from general_services.raid_dayz.service import RaidService
 
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
     from event_services.member_left import MemberLeftNotification
     from features.auto_moderation.message_moderation.module import AutoModModule
     from features.auto_moderation.verification.service import VerificationService
+    from features.for_everyone.birthdays.birthday_manager import BirthdayManager
     from features.auto_moderation.verification.view_service import (
         VerificationViewService,
     )
@@ -41,6 +44,7 @@ class Controller:
         send_message_service: MessageService,
         translator: Translator,
         raid_service: RaidService,
+        birthday_manager: BirthdayManager,
     ):
         self.bot = bot
         self.settings = settings
@@ -54,6 +58,7 @@ class Controller:
         self.send_message_service = send_message_service
         self.translator = translator
         self.raid_service = raid_service
+        self.birthday_manager = birthday_manager
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
@@ -65,8 +70,9 @@ class Controller:
     async def on_ready(self) -> None:
         print(f"Ми приєдналися як {self.bot.user.name}")
 
-        # if not self.daily_birthday_check.is_running():
-        #     self.daily_birthday_check.start()
+        if not self.daily_birthday_check.is_running():
+            self.daily_birthday_check.start()
+
         await self.settings.load_all_guilds_settings()
 
         await self.verification_view_service.register_persistent_view()
@@ -109,8 +115,8 @@ class Controller:
         await scenario.db_proceed()
 
     # --------------------------- LOOPS ---------------------------
+    kyiv_tz = timezone(timedelta(hours=3))
 
-    # @tasks.loop(hours=24)
-    # async def daily_birthday_check(self) -> None:
-    #     await self.birthday_manager.check_daily_birthday()
-    #
+    @tasks.loop(time=time(hour=12, minute=0, tzinfo=kyiv_tz))
+    async def daily_birthday_check(self):
+        await self.birthday_manager.check_daily_birthday()
