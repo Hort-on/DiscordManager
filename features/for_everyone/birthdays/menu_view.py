@@ -39,10 +39,6 @@ class BirthdayMenuView(discord.ui.View):
         self.add_item(
             DeleteBirthdayButton(flow=flow, translator=translator, guild_id=guild_id)
         )
-        self.add_item(
-            BackButton(navigator=navigator, translator=translator, guild_id=guild_id)
-        )
-
         if user_id in admins or user_id == owner_id:
             self.add_item(
                 AddForAdmins(
@@ -61,3 +57,6 @@ class BirthdayMenuView(discord.ui.View):
                     protection_service=protection_service,
                 )
             )
+        self.add_item(
+            BackButton(navigator=navigator, translator=translator, guild_id=guild_id)
+        )

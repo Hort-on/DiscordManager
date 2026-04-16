@@ -54,8 +54,6 @@ class BirthdayFlow:
     async def save_birthday(
         self, interaction: discord.Interaction, user_birthday: str, user_id: int = None
     ) -> None:
-        await interaction.response.defer(ephemeral=True)
-
         guild = interaction.guild
         assert guild is not None
 
