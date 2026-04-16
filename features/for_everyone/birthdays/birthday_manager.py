@@ -63,7 +63,9 @@ class BirthdayManager(DBBaseService):
         self, guild_id: int, today_str: str, birthdays: list
     ) -> None:
         settings_scenario = self.db_factory.for_get_data(
-            guild_id=guild_id, table_name="settings", *"congrats_channel_id"
+            guild_id=guild_id,
+            table_name="settings",
+            columns=("congrats_channel_id",),
         )
         settings = await settings_scenario.db_proceed()
 
