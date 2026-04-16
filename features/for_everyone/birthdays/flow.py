@@ -69,7 +69,7 @@ class BirthdayFlow:
         else:
             embed = SuccessEmbed(description=result.message)
 
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     async def add_for_admin(self, interaction: discord.Interaction) -> None:
         guild = interaction.guild
@@ -94,8 +94,6 @@ class BirthdayFlow:
     async def admin_for_add(
         self, interaction: discord.Interaction, user_name: str, user_birthday: str
     ) -> None:
-        await interaction.response.defer(ephemeral=True)
-
         guild = interaction.guild
         assert guild is not None
 
@@ -115,8 +113,6 @@ class BirthdayFlow:
     async def admin_for_delete(
         self, interaction: discord.Interaction, user_name: str
     ) -> None:
-        await interaction.response.defer(ephemeral=True)
-
         guild = interaction.guild
         assert guild is not None
 
@@ -134,8 +130,6 @@ class BirthdayFlow:
     async def delete_birthday(
         self, interaction: discord.Interaction, user_id: int
     ) -> None:
-        await interaction.response.defer(ephemeral=True)
-
         guild = interaction.guild
         assert guild is not None
 

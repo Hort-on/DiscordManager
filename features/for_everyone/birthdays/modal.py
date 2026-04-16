@@ -31,6 +31,7 @@ class AddBirthdayModal(discord.ui.Modal):
         self.add_item(self.birthday_input)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.flow.save_birthday(
             interaction=interaction, user_birthday=self.birthday_input.value
         )
@@ -67,6 +68,7 @@ class AddAdminBirthdayModal(discord.ui.Modal):
         self.add_item(self.birthday_input)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.flow.admin_for_add(
             interaction=interaction,
             user_name=self.user_name.value,
@@ -92,4 +94,5 @@ class DeleteAdminBirthdayModal(discord.ui.Modal):
         )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True)
         await self.flow.add_for_admin(interaction=interaction)
