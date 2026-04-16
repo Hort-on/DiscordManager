@@ -5,7 +5,12 @@ from general_services.logger.logger import Logger
 
 class GetData(DataBaseScenario):
     def __init__(
-        self, db_connect: DB, logger: Logger, guild_id: int, table_name: str, *columns
+        self,
+        db_connect: DB,
+        logger: Logger,
+        guild_id: int,
+        table_name: str,
+        columns: tuple[str],
     ):
         super().__init__(db_connect=db_connect, logger=logger, guild_id=guild_id)
 

@@ -30,13 +30,15 @@ class DBFactory:
         self.db_connect = db_connect
         self.logger = logger
 
-    def for_get_data(self, guild_id: int, table_name: str, *columns: str) -> GetData:
+    def for_get_data(
+        self, guild_id: int, table_name: str, columns: tuple[str]
+    ) -> GetData:
         return GetData(
             db_connect=self.db_connect,
             logger=self.logger,
             guild_id=guild_id,
             table_name=table_name,
-            *columns,
+            columns=columns,
         )
 
     def for_write_data(
