@@ -119,7 +119,7 @@ class SystemChannelsListButton(FirewallButton):
     ):
         super().__init__(
             label=translator.t(
-                guild_id=guild_id, section="EDIT_SETTINGS", key="add_hidden_roles"
+                guild_id=guild_id, section="EDIT_SETTINGS", key="hidden_ch_list"
             ),
             style=discord.ButtonStyle.blurple,
             protection_service=buttons_protection,
