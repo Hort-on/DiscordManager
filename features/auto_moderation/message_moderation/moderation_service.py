@@ -19,10 +19,10 @@ if TYPE_CHECKING:
 
 class ModerationService:
     def __init__(
-        self,
-        settings: SettingsStorage,
-        service: AntiSpamService,
-        translator: Translator,
+            self,
+            settings: SettingsStorage,
+            service: AntiSpamService,
+            translator: Translator,
     ):
         self.settings = settings
         self.service = service
@@ -49,9 +49,9 @@ class ModerationService:
 
         if data.get("flood_checking", False):
             if self.service.check_flood(
-                guild_id=message.guild.id,
-                user_id=message.author.id,
-                timestamp=timestamp,
+                    guild_id=message.guild.id,
+                    user_id=message.author.id,
+                    timestamp=timestamp,
             ):
                 if isinstance(message.author, discord.Member):
                     await self._timeout_for_flood(member=message.author)
@@ -66,10 +66,10 @@ class ModerationService:
             )
 
     async def _check_spam(
-        self,
-        message: discord.Message,
-        timestamp: float,
-        attachments: list[discord.Attachment],
+            self,
+            message: discord.Message,
+            timestamp: float,
+            attachments: list[discord.Attachment],
     ) -> None:
         if not message.guild:
             return
@@ -106,7 +106,7 @@ class ModerationService:
         )
 
     async def _timeout_for_spam(
-        self, messages: list[discord.Message], guild: discord.Guild
+            self, messages: list[discord.Message], guild: discord.Guild
     ) -> None:
         if not messages:
             return

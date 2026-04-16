@@ -182,9 +182,7 @@ class HiddenRolesFlow:
 
         hidden_roles = self.hidden_roles_service.get_hidden_roles(guild_id=guild.id)
 
-        sorted_roles = sorted(
-            interaction.user.roles, key=lambda role: role.name.lower()
-        )
+        sorted_roles = sorted(guild.roles, key=lambda role: role.name.lower())
 
         return [
             discord.SelectOption(label=role.name, value=str(role.id))
