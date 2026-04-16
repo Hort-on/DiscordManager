@@ -117,6 +117,6 @@ class Controller:
     # --------------------------- LOOPS ---------------------------
     kyiv_tz = timezone(timedelta(hours=3))
 
-    @tasks.loop(time=time(hour=12, minute=0, tzinfo=kyiv_tz))
+    @tasks.loop(time=time(hour=14, minute=5, tzinfo=kyiv_tz))
     async def daily_birthday_check(self):
         await self.birthday_manager.check_daily_birthday()
