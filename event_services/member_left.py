@@ -73,7 +73,7 @@ class MemberLeftNotification:
             name=self.translator.t(
                 guild_id=guild_id, section="SYSTEM_GENERAL", key="user"
             ),
-            value=f"{member.mention}",
+            value=f"{member.global_name}",
             inline=False,
         )
 

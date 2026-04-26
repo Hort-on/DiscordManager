@@ -43,7 +43,7 @@ class MainMenuView(discord.ui.View):
         )
 
         role_manager = settings.dict_storage.get_value(
-            "role_manager", target=StorageTarget.SETTINGS, guild_id=guild_id
+            key="role_manager", target=StorageTarget.SETTINGS, guild_id=guild_id
         )
 
         self.add_item(

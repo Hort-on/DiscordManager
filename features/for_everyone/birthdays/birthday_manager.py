@@ -122,9 +122,10 @@ class BirthdayManager(DBBaseService):
 
         message = await channel.send(f"{mentions}\n```{congrats_msg}```")
 
-        await message.add_reaction("🎂")
-        await message.add_reaction("🎉")
-        await message.add_reaction("❤️")
+        reactions = ["🎂", "🎉", "❤️"]
+
+        for emoji in reactions:
+            await message.add_reaction(emoji)
 
         for member in members:
             await self.update_congrats(
