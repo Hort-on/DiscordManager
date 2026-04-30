@@ -19,8 +19,13 @@ class RaidService:
         if self.active:
             return
 
+        if webhook_id not in self.WEBHOOK_ID:
+            return
+
         self.active = True
-        self.task = asyncio.create_task(self._raid_loop(guild=guild, webhook_id=webhook_id))
+        self.task = asyncio.create_task(
+            self._raid_loop(guild=guild, webhook_id=webhook_id)
+        )
 
     async def stop_raid(self):
         self.active = False
@@ -44,7 +49,9 @@ class RaidService:
             finally:
                 self.active = False
 
-    async def _send_raid_notification(self, guild, webhook_id: int) -> None:
+    async def _send_raid_notification(
+        self, guild: discord.Guild, webhook_id: int
+    ) -> None:
         channel = guild.get_channel(self.CHANNEL_ID)
         if not isinstance(channel, discord.TextChannel):
             return
@@ -53,6 +60,6 @@ class RaidService:
         if not role:
             return
 
-        server = "Лівонія!" if webhook_id == 1491811762943557695 else "Чернорусь!"
+        server = "Чернорусь!" if webhook_id == 1491811762943557695 else "Лівонія!"
 
         await channel.send(f"{role.mention}" + server)
