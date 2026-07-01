@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from features.auto_moderation.message_moderation.module import AutoModModule
     from features.auto_moderation.verification.service import VerificationService
     from features.for_everyone.birthdays.birthday_manager import BirthdayManager
+    from features.for_everyone.temp_voice_channel.service import TempVoiceChannelService
     from features.auto_moderation.verification.view_service import (
         VerificationViewService,
     )
@@ -29,7 +30,6 @@ if TYPE_CHECKING:
 
 
 class Controller:
-
     def __init__(
         self,
         bot,
@@ -45,6 +45,7 @@ class Controller:
         translator: Translator,
         raid_service: RaidService,
         birthday_manager: BirthdayManager,
+        temp_voice_channel_service: TempVoiceChannelService,
     ):
         self.bot = bot
         self.settings = settings
@@ -59,12 +60,15 @@ class Controller:
         self.translator = translator
         self.raid_service = raid_service
         self.birthday_manager = birthday_manager
+        self.temp_voice_channel_service = temp_voice_channel_service
 
         bot.add_listener(self.on_ready)
         bot.add_listener(self.on_message)
         bot.add_listener(self.on_member_remove)
         bot.add_listener(self.on_guild_remove)
         bot.add_listener(self.on_guild_join)
+        bot.add_listener(self.on_voice_state_update)
+        bot.add_listener(self.on_guild_channel_delete)
 
     # --------------------------- EVENTS --------------------------- #
     async def on_ready(self) -> None:
@@ -113,6 +117,26 @@ class Controller:
         print(f"бот приєднався до {guild.name}")
         scenario = self.db_factory.for_init_guild(guild.id)
         await scenario.db_proceed()
+
+    async def on_voice_state_update(
+        self,
+        member: discord.Member,
+        before: discord.VoiceState,
+        after: discord.VoiceState,
+    ) -> None:
+        if before.channel is None or before.channel == after.channel:
+            return
+
+        if isinstance(before.channel, discord.VoiceChannel):
+            await self.temp_voice_channel_service.delete_if_empty(before.channel)
+
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
+        if not isinstance(channel, discord.VoiceChannel):
+            return
+
+        await self.temp_voice_channel_service.delete_record(
+            guild_id=channel.guild.id, channel_id=channel.id
+        )
 
     # --------------------------- LOOPS ---------------------------
     kyiv_tz = timezone(timedelta(hours=3))

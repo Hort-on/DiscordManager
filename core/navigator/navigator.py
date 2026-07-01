@@ -55,11 +55,13 @@ class Navigator:
         from features.for_everyone.main_menu.view import MainMenuView
 
         birthday_module = self.everyone_module.birthday_module
+        temp_voice_channel_module = self.everyone_module.temp_voice_channel_module
         return MainMenuView(
             settings=self.general_container.settings,
             navigator=self,
             buttons_protection=self.general_container.button_protection,
             birthday_service=birthday_module.service,
+            temp_voice_channel_service=temp_voice_channel_module.service,
             translator=self.general_container.translator,
             guild_id=guild_id,
             user_id=user_id,

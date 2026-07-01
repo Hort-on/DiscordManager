@@ -21,6 +21,12 @@ from database.db_factory.scenarios.common import (
     InsertSet,
     WriteData,
 )
+from database.db_factory.scenarios.temp_channel import (
+    DeleteTempChannelScenario,
+    GetTempChannelByOwnerScenario,
+    GetTempChannelScenario,
+    SaveTempChannelScenario,
+)
 from general_services.logger.logger import Logger
 
 
@@ -177,4 +183,45 @@ class DBFactory:
     def for_cleanup_role_delete(self, guild_id: int) -> CleanUpVerificationRole:
         return CleanUpVerificationRole(
             db_connect=self.db_connect, logger=self.logger, guild_id=guild_id
+        )
+
+    def for_save_temp_channel(
+        self, guild_id: int, channel_id: int, owner_id: int
+    ) -> SaveTempChannelScenario:
+        return SaveTempChannelScenario(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id,
+            channel_id=channel_id,
+            owner_id=owner_id,
+        )
+
+    def for_get_temp_channel_by_owner(
+        self, guild_id: int, owner_id: int
+    ) -> GetTempChannelByOwnerScenario:
+        return GetTempChannelByOwnerScenario(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id,
+            owner_id=owner_id,
+        )
+
+    def for_get_temp_channel(
+        self, guild_id: int, channel_id: int
+    ) -> GetTempChannelScenario:
+        return GetTempChannelScenario(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id,
+            channel_id=channel_id,
+        )
+
+    def for_delete_temp_channel(
+        self, guild_id: int, channel_id: int
+    ) -> DeleteTempChannelScenario:
+        return DeleteTempChannelScenario(
+            db_connect=self.db_connect,
+            logger=self.logger,
+            guild_id=guild_id,
+            channel_id=channel_id,
         )

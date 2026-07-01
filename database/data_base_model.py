@@ -130,6 +130,7 @@ class DB:
                 CREATE TABLE IF NOT EXISTS TempChannels (
                     guild_id INTEGER NOT NULL,
                     channel_id INTEGER NOT NULL,
+                    owner_id INTEGER,
 
                     PRIMARY KEY (guild_id, channel_id),
 
@@ -138,6 +139,14 @@ class DB:
                         ON DELETE CASCADE
                 );
             """)
+
+            async with temp_conn.execute("PRAGMA table_info(TempChannels)") as cursor:
+                columns = {row[1] for row in await cursor.fetchall()}
+
+            if "owner_id" not in columns:
+                await temp_conn.execute(
+                    "ALTER TABLE TempChannels ADD COLUMN owner_id INTEGER"
+                )
 
             await temp_conn.execute("""
                 CREATE TABLE IF NOT EXISTS Groups (

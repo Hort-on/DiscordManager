@@ -9,12 +9,16 @@ from features.for_admins.admin_menu import AdminMenuButton
 from features.for_everyone.birthdays.buttons import BirthdayMenuButton
 from features.for_everyone.randomizer.buttons import RandomizerMenuButton
 from features.for_everyone.role_manager.buttons import RoleManagerMenuButton
+from features.for_everyone.temp_voice_channel.buttons import (
+    CreateTempVoiceChannelButton,
+)
 
 if TYPE_CHECKING:
     from core.navigator.navigator import Navigator
     from core.navigator.navigator_context import NavigationContext
     from database.settings_storage.settings import SettingsStorage
     from features.for_everyone.birthdays.service import BirthdayService
+    from features.for_everyone.temp_voice_channel.service import TempVoiceChannelService
     from general_services.translator.translator import Translator
     from ui.button_protection.button_protection_service import ButtonProtectionService
 
@@ -26,6 +30,7 @@ class MainMenuView(discord.ui.View):
         navigator: Navigator,
         buttons_protection: ButtonProtectionService,
         birthday_service: BirthdayService,
+        temp_voice_channel_service: TempVoiceChannelService,
         context: NavigationContext,
         translator: Translator,
         guild_id: int,
@@ -50,6 +55,14 @@ class MainMenuView(discord.ui.View):
             RandomizerMenuButton(
                 navigator=navigator,
                 context=context,
+                translator=translator,
+                guild_id=guild_id,
+            )
+        )
+
+        self.add_item(
+            CreateTempVoiceChannelButton(
+                service=temp_voice_channel_service,
                 translator=translator,
                 guild_id=guild_id,
             )

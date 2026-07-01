@@ -132,6 +132,7 @@ async def main():
         member_left_service=member_left_service,
         raid_service=raid_service,
         birthday_manager=birthday_manager,
+        temp_voice_channel_service=everyone_module.temp_voice_channel_module.service,
     )
 
     await bot.start(TOKEN)
